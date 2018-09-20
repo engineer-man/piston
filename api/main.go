@@ -11,12 +11,17 @@ import (
     "strings"
 )
 
-type script struct {
+type inbound struct {
     Language string  `json:"language"`
     Source   string  `json:"source"`
 }
 
-type result struct {
+type problem struct {
+    Code    string  `json:"code"`
+    Message string  `json:"message"`
+}
+
+type outbound struct {
     Ran    bool    `json:"ran"`
     Output string  `json:"output"`
 }
@@ -31,17 +36,50 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     res.Header().Set("Content-Type", "application/json")
 
     // get json
-    script := script{}
+    inbound := inbound{}
     message := json.NewDecoder(req.Body)
-    message.Decode(&script)
+    message.Decode(&inbound)
+
+    whitelist := []string{
+        "python2",
+        "python",
+        "python3",
+        "ruby",
+        "javascript",
+        "js",
+        "node",
+    }
+
+    found := false
+
+    // check if the supplied language is supported
+    for _, lang := range whitelist {
+        if lang == inbound.Language {
+            found = true
+            break
+        }
+    }
+
+    // send an error if it isn't
+    if !found {
+        problem := problem{
+            Code: "unsupported_language",
+            Message: inbound.Language + " is not supported by Piston",
+        }
+
+        pres, _ := json.Marshal(problem)
+
+        res.Write(pres)
+        return
+    }
 
     // write the code to temp dir
     filename := fmt.Sprintf("/tmp/%d.code", time.Now().UnixNano())
 
-    ioutil.WriteFile(filename, []byte(script.Source), 0644)
+    ioutil.WriteFile(filename, []byte(inbound.Source), 0644)
 
     // set up the execution
-    cmd := exec.Command("../docker/execute", script.Language, filename)
+    cmd := exec.Command("../docker/execute", inbound.Language, filename)
 
     // capture out/err
     var stdout, stderr bytes.Buffer
@@ -51,12 +89,12 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     err := cmd.Run()
 
     // prepare response
-    data := result{
+    outbound := outbound{
         Ran: err == nil,
         Output: strings.TrimSpace(stdout.String()),
     }
 
-    response, _ := json.Marshal(data)
+    response, _ := json.Marshal(outbound)
 
     res.Write(response)
 }
