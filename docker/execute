@@ -6,5 +6,5 @@ file=$(basename $abs)
 docker run \
     --rm \
     -v $abs:/$file \
-    -it foo \
+    -it piston \
     python3 /$file
