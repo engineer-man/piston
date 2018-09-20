@@ -5,6 +5,8 @@
 #docker run --rm -it piston /usr/bin/ruby --version
 #docker run --rm -it piston /usr/bin/nodejs --version
 
+dir="$( cd "$( dirname "$0" )" && pwd )"
+
 if [ -z "$1" ]; then
     echo "invalid args"
     exit
@@ -21,16 +23,22 @@ file=$(basename $abs)
 bin=
 case "$lang" in
 "python2")
-    bin=python2
+    bin=executor_python2
     ;;
 "python" | "python3")
-    bin=python3
+    bin=executor_python3
     ;;
 "ruby")
     bin=ruby
     ;;
 "javascript" | "js" | "node")
     bin=nodejs
+    ;;
+"c")
+    bin=executor_c
+    ;;
+"cpp" | "c++")
+    bin=executor_cpp
     ;;
 *)
     echo "invalid language"
@@ -42,5 +50,9 @@ docker run \
     --cpus=".5" \
     --rm \
     -v $abs:/$file \
+    -v $dir/executors/python2:/executor_python2 \
+    -v $dir/executors/python3:/executor_python3 \
+    -v $dir/executors/c:/executor_c \
+    -v $dir/executors/cpp:/executor_cpp \
     piston \
-    timeout -s HUP 3 $bin /$file 2>&1
+    timeout -s HUP 3 /$bin /$file $file 2>&1

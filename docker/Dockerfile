@@ -7,5 +7,3 @@ RUN apt-get -y install python
 RUN apt-get -y install python3
 RUN apt-get -y install ruby
 RUN apt-get -y install nodejs
-
-CMD sleep infinity
