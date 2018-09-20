@@ -57,3 +57,5 @@ docker run \
     -v $dir/executors/cpp:/executor_cpp \
     piston \
     timeout -s HUP 3 /$bin /$file $file 2>&1
+
+rm -f /tmp/$file
