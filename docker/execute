@@ -1,10 +1,46 @@
 #!/usr/bin/env bash
 
-abs=$1
+#docker run --rm -it piston /usr/bin/python -V
+#docker run --rm -it piston /usr/bin/python3 -V
+#docker run --rm -it piston /usr/bin/ruby --version
+#docker run --rm -it piston /usr/bin/nodejs --version
+
+if [ -z "$1" ]; then
+    echo "invalid args"
+    exit
+fi
+if [ -z "$2" ]; then
+    echo "invalid args"
+    exit
+fi
+
+lang=$1
+abs=$2
 file=$(basename $abs)
 
+bin=
+case "$lang" in
+"python2")
+    bin=python2
+    ;;
+"python" | "python3")
+    bin=python3
+    ;;
+"ruby")
+    bin=ruby
+    ;;
+"javascript" | "js" | "node")
+    bin=nodejs
+    ;;
+*)
+    echo "invalid language"
+    exit
+esac
+
 docker run \
+    -m 16m \
+    --cpus=".5" \
     --rm \
     -v $abs:/$file \
-    -it piston \
-    python3 /$file
+    piston \
+    timeout -s HUP 3 $bin /$file 2>&1
