@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+abs=$1
+file=$(basename $abs)
+
+docker run \
+    --rm \
+    -v $abs:/$file \
+    -it foo \
+    python3 /$file
