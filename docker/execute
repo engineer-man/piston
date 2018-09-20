@@ -47,6 +47,7 @@ esac
 
 docker run \
     -m 16m \
+    --network none \
     --cpus=".5" \
     --rm \
     -v $abs:/$file \
