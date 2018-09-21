@@ -14,4 +14,4 @@ RUN useradd runner
 RUN echo '@runner soft nproc 16' >> /etc/security/limits.conf
 RUN echo '@runner hard nproc 16' >> /etc/security/limits.conf
 
-USER newuser
+USER runner
