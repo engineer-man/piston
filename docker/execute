@@ -52,7 +52,6 @@ docker run \
     -m 64m \
     --network none \
     --cpus=".5" \
-    --ulimit nproc=4:4 \
     --rm \
     -v $abs:/$file:ro \
     -v $dir/executors/python2:/executor_python2:ro \
