@@ -52,6 +52,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "c",
         "cpp",
         "c++",
+        "go",
     }
 
     // check if the supplied language is supported
