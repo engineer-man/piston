@@ -1,3 +1,9 @@
 #!/bin/sh
 
-go run $1
+file=$1
+
+go build $file
+
+file=${file%%.*}
+
+timeout -s HUP 2 ./$file
