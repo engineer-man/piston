@@ -52,7 +52,7 @@ docker run \
     -m 64m \
     --network none \
     --cpus=".5" \
-    --kernel-memory-limit 1m \
+    --kernel-memory 1m \
     --kill-children-on-exit \
     --rm \
     -v $abs:/$file:ro \
