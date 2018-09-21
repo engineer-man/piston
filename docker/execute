@@ -62,6 +62,6 @@ docker run \
     -v $dir/executors/cpp:/executor_cpp:ro \
     -v $dir/executors/go:/executor_go:ro \
     piston \
-    /$bin /$file $file 2>&1
+    runuser -l runner -c '/$bin /$file $file 2>&1'
 
 rm -f /tmp/$file

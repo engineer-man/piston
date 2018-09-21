@@ -16,5 +16,4 @@ RUN echo 'runner hard nproc 16' >> /etc/security/limits.conf
 RUN echo 'runner soft nofile 128' >> /etc/security/limits.conf
 RUN echo 'runner hard nofile 128' >> /etc/security/limits.conf
 
-USER runner
 WORKDIR /tmp
