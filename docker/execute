@@ -49,7 +49,7 @@ case "$lang" in
 esac
 
 docker run \
-    -m 16m \
+    -m 64m \
     --network none \
     --cpus=".5" \
     --ulimit nproc=8:16 \
