@@ -53,7 +53,6 @@ docker run \
     --network none \
     --cpus=".5" \
     --kernel-memory 1m \
-    --kill-children-on-exit \
     --rm \
     -v $abs:/$file:ro \
     -v $dir/executors/python2:/executor_python2:ro \
