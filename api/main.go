@@ -79,8 +79,14 @@ func Execute(res http.ResponseWriter, req *http.Request) {
 }
 
 func launch(inbound2 inbound, res http.ResponseWriter){
+    var ext string = "code";
+
+    if inbound2.Language == "go" {
+        ext = "go"
+    }
+
     // write the code to temp dir
-    filename := fmt.Sprintf("/tmp/%d.code", time.Now().UnixNano())
+    filename := fmt.Sprintf("/tmp/%d." + ext, time.Now().UnixNano())
 
     ioutil.WriteFile(filename, []byte(inbound2.Source), 0644)
 
