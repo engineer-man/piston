@@ -17,8 +17,8 @@ if [ -z "$2" ]; then
 fi
 
 lang=$1
-abs=$2
-file=$(basename $abs)
+filepath=$(realpath $2)
+file=$(basename $2)
 
 bin=
 case "$lang" in
@@ -53,7 +53,7 @@ docker run \
     --network none \
     --cpus=".5" \
     --rm \
-    -v $abs:/$file:ro \
+    -v $filepath:/$file:ro \
     -v $dir/executors/python2:/executor_python2:ro \
     -v $dir/executors/python3:/executor_python3:ro \
     -v $dir/executors/ruby:/executor_ruby:ro \
@@ -62,6 +62,8 @@ docker run \
     -v $dir/executors/cpp:/executor_cpp:ro \
     -v $dir/executors/go:/executor_go:ro \
     piston \
-    runuser -l runner -c "/$bin /$file $file 2>&1"
+    runuser \
+        -l runner \
+        -c "/$bin /$file $file 2>&1"
 
 rm -f /tmp/$file
