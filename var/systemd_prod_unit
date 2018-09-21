@@ -1,0 +1,13 @@
+[Unit]
+Description=Piston
+
+[Service]
+Type=simple
+User=root
+Environment=PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+WorkingDirectory=/root/piston/api
+ExecStart=/root/piston/api/start
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
