@@ -52,6 +52,7 @@ docker run \
     -m 64m \
     --network none \
     --cpus=".5" \
+    --ulimit nofile=64:128 \
     --ulimit nproc=8:16 \
     --rm \
     -v $abs:/$file:ro \
