@@ -56,8 +56,11 @@ docker run \
     -v $abs:/$file \
     -v $dir/executors/python2:/executor_python2 \
     -v $dir/executors/python3:/executor_python3 \
+    -v $dir/executors/ruby:/executor_ruby \
+    -v $dir/executors/node:/executor_node \
     -v $dir/executors/c:/executor_c \
     -v $dir/executors/cpp:/executor_cpp \
+    -v $dir/executors/go:/executor_go \
     piston \
     timeout -s HUP 3 /$bin /$file $file 2>&1
 
