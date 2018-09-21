@@ -9,7 +9,7 @@ RUN apt-get -y install ruby
 RUN apt-get -y install nodejs
 RUN apt-get -y install golang
 
-RUN useradd runner
+RUN useradd runner root
 
 RUN echo '@runner soft nproc 16' >> /etc/security/limits.conf
 RUN echo '@runner hard nproc 16' >> /etc/security/limits.conf
