@@ -54,14 +54,14 @@ docker run \
     --cpus=".5" \
     --ulimit nproc=8:16 \
     --rm \
-    -v $abs:/$file \
-    -v $dir/executors/python2:/executor_python2 \
-    -v $dir/executors/python3:/executor_python3 \
-    -v $dir/executors/ruby:/executor_ruby \
-    -v $dir/executors/node:/executor_node \
-    -v $dir/executors/c:/executor_c \
-    -v $dir/executors/cpp:/executor_cpp \
-    -v $dir/executors/go:/executor_go \
+    -v $abs:/$file:ro \
+    -v $dir/executors/python2:/executor_python2:ro \
+    -v $dir/executors/python3:/executor_python3:ro \
+    -v $dir/executors/ruby:/executor_ruby:ro \
+    -v $dir/executors/node:/executor_node:ro \
+    -v $dir/executors/c:/executor_c:ro \
+    -v $dir/executors/cpp:/executor_cpp:ro \
+    -v $dir/executors/go:/executor_go:ro \
     piston \
     timeout -s HUP 15 /$bin /$file $file 2>&1
 
