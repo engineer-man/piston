@@ -29,16 +29,19 @@ case "$lang" in
     bin=executor_python3
     ;;
 "ruby")
-    bin=ruby
+    bin=executor_ruby
     ;;
 "javascript" | "js" | "node")
-    bin=nodejs
+    bin=executor_node
     ;;
 "c")
     bin=executor_c
     ;;
 "cpp" | "c++")
     bin=executor_cpp
+    ;;
+"go")
+    bin=executor_go
     ;;
 *)
     echo "invalid language"
