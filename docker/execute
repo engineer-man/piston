@@ -57,7 +57,7 @@ docker run \
     --network none \
     --rm \
     --log-driver none \
-    -v $filepath:/tmp/$file:ro \
+    -v $filepath:/$file:ro \
     -v $dir/executors/python2:/executor_python2:ro \
     -v $dir/executors/python3:/executor_python3:ro \
     -v $dir/executors/ruby:/executor_ruby:ro \
@@ -71,6 +71,6 @@ docker run \
     piston \
     runuser \
         -l runner \
-        -c "/$bin /tmp/$file $file 2>&1 | head -c 65536"
+        -c "/$bin /$file $file 2>&1 | head -c 65536"
 
 rm -f /tmp/$file
