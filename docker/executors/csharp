@@ -1,5 +1,5 @@
 #!/bin/sh
 
-mv /*.code .
+cp /*.code .
 mcs $(echo $1 | sed 's/\///') -out:tmp/binary
 timeout -s KILL 3 mono tmp/binary
