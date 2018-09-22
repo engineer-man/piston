@@ -38,6 +38,15 @@ case "$lang" in
 "go")
     bin=executor_go
     ;;
+"c#" | "csharp" | "cs")
+    bin=executor_csharp
+    ;;
+"r")
+    bin=executor_r
+    ;;
+"php")
+    bin=executor_php
+    ;;
 *)
     echo "invalid language"
     exit
@@ -56,6 +65,9 @@ docker run \
     -v $dir/executors/c:/executor_c:ro \
     -v $dir/executors/cpp:/executor_cpp:ro \
     -v $dir/executors/go:/executor_go:ro \
+    -v $dir/executors/csharp:/executor_csharp:ro \
+    -v $dir/executors/r:/executor_r:ro \
+    -v $dir/executors/php:/executor_php:ro \
     piston \
     runuser \
         -l runner \

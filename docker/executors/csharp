@@ -1,0 +1,4 @@
+#!/bin/sh
+
+mcs $1 -out:binary
+timeout -s KILL 3 mono binary

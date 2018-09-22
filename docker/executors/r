@@ -1,0 +1,3 @@
+#!/bin/sh
+
+timeout -s KILL 3 Rscript $*
