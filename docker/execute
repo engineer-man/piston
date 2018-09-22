@@ -65,6 +65,6 @@ docker run \
     piston \
     runuser \
         -l runner \
-        -c "/$bin /$file $file 2>&1"
+        -c "/$bin /$file $file | head -c 1024 2>&1"
 
 rm -f /tmp/$file
