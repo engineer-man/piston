@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mcs $1 -out:binary
+mcs $(echo $1 | sed 's/\///') -out:binary
 timeout -s KILL 3 mono binary
