@@ -1,4 +1,4 @@
 #!/bin/sh
 
 gcc -o binary -x c $1
-timeout -s HUP 2 ./binary
+timeout -s KILL 2 ./binary

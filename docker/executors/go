@@ -6,4 +6,4 @@ go build $file
 
 file=${file%%.*}
 
-timeout -s HUP 2 ./$file
+timeout -s KILL 2 ./$file
