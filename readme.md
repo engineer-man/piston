@@ -13,7 +13,7 @@ from from EMKC contests and challenges. It's also used in the Engineer Man Disco
 - `docker/execute <lang> <path to file>`
 
 #### Supported Languages
-Currently python2, python3, c, c++, go, node, ruby, r, c#, and php are supported.
+Currently python2, python3, c, c++, go, node, ruby, r, c#, and php is supported.
 
 #### Principle of Operation
 Piston utilizes Docker as the primary mechanism for sandboxing. There is a small API written in Go which takes
