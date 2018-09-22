@@ -51,8 +51,9 @@ esac
 docker run \
     -m 64m \
     --network none \
-    --cpus=".5" \
+    --cpus=".2" \
     --rm \
+    --log-driver none \
     -v $filepath:/$file:ro \
     -v $dir/executors/python2:/executor_python2:ro \
     -v $dir/executors/python3:/executor_python3:ro \
