@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-#docker run --rm -it piston /usr/bin/python -V
-#docker run --rm -it piston /usr/bin/python3 -V
-#docker run --rm -it piston /usr/bin/ruby --version
-#docker run --rm -it piston /usr/bin/nodejs --version
-
 dir="$( cd "$( dirname "$0" )" && pwd )"
 
 if [ -z "$1" ]; then
@@ -51,7 +46,6 @@ esac
 docker run \
     -m 64m \
     --network none \
-    --cpus=".2" \
     --rm \
     --log-driver none \
     -v $filepath:/$file:ro \

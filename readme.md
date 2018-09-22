@@ -38,7 +38,9 @@ various privilege escalation, denial-of-service, and resource saturation threats
 #### Performance
 One thing that needs investigation is how to spawn containers faster. The Docker daemon is synchronous in its
 container spawning. This means the bottleneck for code execution is how fast containers can start. Environments
-vary, but, in ours they start at a rate of no more than 1 per second.
+vary, but, in ours they start at a rate of no more than 1 per second. One possibility is Docker in Docker where by
+X number of containers stay running all the time and then requests are delivered to each in a round robin and spawn
+new Piston containers.
 
 #### License
 Piston is licensed under the MIT license.
