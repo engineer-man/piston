@@ -33,7 +33,6 @@ func main() {
 }
 
 func Execute(res http.ResponseWriter, req *http.Request) {
-    var found = false
     res.Header().Set("Content-Type", "application/json")
 
     // get json
@@ -42,22 +41,16 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     message.Decode(&inbound)
 
     whitelist := []string{
-        "python",
-        "python2",
-        "python3",
+        "python", "python2", "python3",
         "ruby",
-        "javascript",
-        "js",
-        "node",
+        "javascript", "js", "node",
         "c",
-        "cpp",
-        "c++",
+        "cpp", "c++",
         "go",
         "r",
         "php",
-        "c#",
-        "csharp",
-        "cs",
+        "c#", "csharp", "cs",
+        "nasm", "asm",
     }
 
     // check if the supplied language is supported
@@ -70,33 +63,30 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     }
 
     // now only called when the language is not supported
-    if !found {
-        problem := problem{
-            Code: "unsupported_language",
-            Message: inbound.Language + " is not supported by Piston",
-        }
-
-        pres, _ := json.Marshal(problem)
-
-        res.Write(pres)
-        return
+    problem := problem{
+        Code: "unsupported_language",
+        Message: inbound.Language + " is not supported by Piston",
     }
+
+    pres, _ := json.Marshal(problem)
+
+    res.Write(pres)
 }
 
-func launch(inbound2 inbound, res http.ResponseWriter){
+func launch(request inbound, res http.ResponseWriter) {
     var ext string = "code";
 
-    if inbound2.Language == "go" {
+    if request.Language == "go" {
         ext = "go"
     }
 
     // write the code to temp dir
     filename := fmt.Sprintf("/tmp/%d." + ext, time.Now().UnixNano())
 
-    ioutil.WriteFile(filename, []byte(inbound2.Source), 0644)
+    ioutil.WriteFile(filename, []byte(request.Source), 0644)
 
     // set up the execution
-    cmd := exec.Command("../docker/execute", inbound2.Language, filename)
+    cmd := exec.Command("../docker/execute", request.Language, filename)
 
     // capture out/err
     var stdout, stderr bytes.Buffer

@@ -17,6 +17,7 @@ RUN apt-get -y install golang
 RUN apt-get -y install php7.2
 RUN apt-get -y install r-base
 RUN apt-get -y install mono-complete
+RUN apt-get -y install nasm
 
 RUN useradd -m runner
 

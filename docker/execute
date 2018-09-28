@@ -47,6 +47,9 @@ case "$lang" in
 "php")
     bin=executor_php
     ;;
+"nasm" | "asm")
+    bin=executor_nasm
+    ;;
 *)
     echo "invalid language"
     exit
@@ -68,6 +71,7 @@ docker run \
     -v $dir/executors/csharp:/executor_csharp:ro \
     -v $dir/executors/r:/executor_r:ro \
     -v $dir/executors/php:/executor_php:ro \
+    -v $dir/executors/nasm:/executor_nasm:ro \
     piston \
     runuser \
         -l runner \

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+nasm -f elf64 -o binary.o $1
+ld binary.o -o binary
