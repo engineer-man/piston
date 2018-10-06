@@ -1,3 +1,1 @@
-#!/bin/sh
-
-timeout -s KILL 3 python2 ${@:2}
+timeout -s KILL 3 python2 $1 ${@:2}

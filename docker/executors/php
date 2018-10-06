@@ -1,3 +1,1 @@
-#!/bin/sh
-
-timeout -s KILL 3 php ${@:2}
+timeout -s KILL 3 php $1 ${@:2}

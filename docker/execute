@@ -75,6 +75,6 @@ docker run \
     piston \
     runuser \
         -l runner \
-        -c "/$bin /$file $file ${@:2} 2>&1 | head -c 65536"
+        -c "bash /$bin /$file $file ${@:3} 2>&1 | head -c 65536"
 
 rm -f /tmp/$file

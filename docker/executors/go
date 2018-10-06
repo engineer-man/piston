@@ -1,5 +1,3 @@
-#!/bin/sh
-
 file=$1
 
 timeout -s KILL 10 go build $file
