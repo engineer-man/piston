@@ -41,16 +41,17 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     message.Decode(&inbound)
 
     whitelist := []string{
-        "python", "python2", "python3",
-        "ruby",
-        "javascript", "js", "node",
         "c",
         "cpp", "c++",
-        "go",
-        "r",
-        "php",
         "c#", "csharp", "cs",
+        "go",
+        "java",
         "nasm", "asm",
+        "javascript", "js", "node",
+        "php",
+        "python", "python2", "python3",
+        "r",
+        "ruby",
     }
 
     // check if the supplied language is supported
