@@ -2,8 +2,8 @@
 
 file=$1
 
-go build $file
+timeout -s KILL 10 go build $file
 
 file=${file%%.*}
 
-timeout -s KILL 3 ./$file
+timeout -s KILL 3 ./$file ${@:2}
