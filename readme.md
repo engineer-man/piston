@@ -10,7 +10,7 @@ from from EMKC contests and challenges. It's also used in the Engineer Man Disco
 - `./build`
 
 #### Usage
-- `docker/execute <lang> <path to file>`
+- `docker/execute [language] [path] [arg]...`
 
 #### Supported Languages
 Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, and java is supported.

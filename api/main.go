@@ -12,8 +12,9 @@ import (
 )
 
 type inbound struct {
-    Language string  `json:"language"`
-    Source   string  `json:"source"`
+    Language string    `json:"language"`
+    Source   string    `json:"source"`
+    Args     []string  `json:"args"`
 }
 
 type problem struct {
@@ -75,19 +76,23 @@ func Execute(res http.ResponseWriter, req *http.Request) {
 }
 
 func launch(request inbound, res http.ResponseWriter) {
-    var ext string = "code";
-
-    if request.Language == "go" {
-        ext = "go"
-    }
+    stamp := time.Now().UnixNano()
 
     // write the code to temp dir
-    filename := fmt.Sprintf("/tmp/%d." + ext, time.Now().UnixNano())
+    srcfile := fmt.Sprintf("/tmp/%d.code", stamp)
 
-    ioutil.WriteFile(filename, []byte(request.Source), 0644)
+    ioutil.WriteFile(srcfile, []byte(request.Source), 0644)
+
+    // set up the arguments to send to the execute command
+    var args []string
+
+    args = append(args, request.Language)
+    args = append(args, srcfile)
+
+    args = append(args, strings.Join(request.Args, "\n"))
 
     // set up the execution
-    cmd := exec.Command("../docker/execute", request.Language, filename)
+    cmd := exec.Command("../docker/execute", args...)
 
     // capture out/err
     var stdout, stderr bytes.Buffer

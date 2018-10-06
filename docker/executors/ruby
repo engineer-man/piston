@@ -1,1 +1,1 @@
-timeout -s KILL 3 ruby $1 ${@:3}
+timeout -s KILL 3 cat /*.args | xargs -d '\n' ruby $1
