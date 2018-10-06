@@ -18,6 +18,7 @@ RUN apt-get -y install php7.2
 RUN apt-get -y install r-base
 RUN apt-get -y install mono-complete
 RUN apt-get -y install nasm
+RUN apt-get -y install openjdk-8-jre
 
 RUN useradd -m runner
 
