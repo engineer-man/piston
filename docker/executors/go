@@ -4,4 +4,4 @@ timeout -s KILL 10 go build $file
 
 file=${file%%.*}
 
-timeout -s KILL 3 ./$file ${@:2}
+timeout -s KILL 3 ./$file ${@:3}

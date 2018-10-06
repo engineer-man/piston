@@ -1,1 +1,1 @@
-timeout -s KILL 3 nodejs $1 ${@:2}
+timeout -s KILL 3 nodejs $1 ${@:3}

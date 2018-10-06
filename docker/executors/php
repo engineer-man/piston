@@ -1,1 +1,1 @@
-timeout -s KILL 3 php $1 ${@:2}
+timeout -s KILL 3 php $1 ${@:3}

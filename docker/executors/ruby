@@ -1,1 +1,1 @@
-timeout -s KILL 3 ruby $1 ${@:2}
+timeout -s KILL 3 ruby $1 ${@:3}
