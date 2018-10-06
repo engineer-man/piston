@@ -1,5 +1,5 @@
 cp /*.code interim.java
-name=$(cat interim.java | grep -Eo 'public class ([A-Za-z0-9]+)' | sed -n 's/  */ /gp' | cut -d' ' -f3)
+name=$(cat interim.java | grep -Eo 'public\s+class\s+([A-Za-z0-9]+)' | sed -n 's/  */ /gp' | cut -d' ' -f3)
 mv interim.java $name.java
 timeout -s KILL 10 javac $name.java
 timeout -s KILL 3 java $name ${@:3}
