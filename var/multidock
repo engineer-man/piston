@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker -H unix:///var/run/docker-$1.sock ${@:2}

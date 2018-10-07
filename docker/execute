@@ -16,6 +16,7 @@ filepath=$(realpath $2)
 file=$(basename $2)
 argpath="/tmp/$(date +%s%N).args"
 arg=$(basename $argpath)
+socket=${SOCKET:-unix:///var/run/docker.sock}
 
 # write arg file
 echo "${@:3}" > $argpath
@@ -63,7 +64,9 @@ case "$lang" in
     exit
 esac
 
-docker run \
+docker \
+    -H $socket \
+    run \
     -m 64m \
     --network none \
     --rm \

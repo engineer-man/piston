@@ -6,8 +6,10 @@ import (
     "fmt"
     "io/ioutil"
     "net/http"
+    "os"
     "os/exec"
     "strings"
+    "strconv"
     "time"
 )
 
@@ -27,10 +29,24 @@ type outbound struct {
     Output string  `json:"output"`
 }
 
-func main() {
-    http.HandleFunc("/execute", Execute)
+var instance int
 
-    http.ListenAndServe("0.0.0.0:1337", nil)
+func main() {
+    port := 2000
+
+    if len(os.Args) > 1 {
+        if i, err := strconv.Atoi(os.Args[1]); err == nil {
+            instance = i
+            port += i
+        }
+    } else {
+        instance = 0
+    }
+
+    fmt.Println("starting api on port", port)
+
+    http.HandleFunc("/execute", Execute)
+    http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", port), nil)
 }
 
 func Execute(res http.ResponseWriter, req *http.Request) {
@@ -93,6 +109,11 @@ func launch(request inbound, res http.ResponseWriter) {
 
     // set up the execution
     cmd := exec.Command("../docker/execute", args...)
+    cmd.Env = os.Environ()
+
+    if instance > 0 {
+        cmd.Env = append(cmd.Env, fmt.Sprintf("SOCKET=unix:///var/run/docker-%d.sock", instance))
+    }
 
     // capture out/err
     var stdout, stderr bytes.Buffer
