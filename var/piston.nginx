@@ -1,0 +1,20 @@
+upstream piston {
+    server 127.0.0.1:2001;
+    server 127.0.0.1:2002;
+    server 127.0.0.1:2003;
+    server 127.0.0.1:2004;
+    server 127.0.0.1:2005;
+    server 127.0.0.1:2006;
+    server 127.0.0.1:2007;
+    server 127.0.0.1:2008;
+    server 127.0.0.1:2009;
+    server 127.0.0.1:2010;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://piston;
+    }
+}

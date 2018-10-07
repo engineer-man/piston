@@ -1,0 +1,8 @@
+create vm
+git piston
+install dock and piston units
+systemctl enable dock@{1..10}.service
+systemctl start dock@{1..10}.service
+systemctl enable piston@{1..10}.service
+systemctl start piston@{1..10}.service
+install nginx config
