@@ -6,3 +6,4 @@ systemctl start dock@{1..10}.service
 systemctl enable piston@{1..10}.service
 systemctl start piston@{1..10}.service
 install nginx config
+cp /var/lib/docker -> docker-1, ..., docker-10
