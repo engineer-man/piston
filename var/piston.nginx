@@ -12,9 +12,10 @@ upstream piston {
 }
 
 server {
-    listen 80;
+    listen 1337;
 
     location / {
+        proxy_buffering off;
         proxy_pass http://piston;
     }
 }

@@ -25,8 +25,9 @@ type problem struct {
 }
 
 type outbound struct {
-    Ran    bool    `json:"ran"`
-    Output string  `json:"output"`
+    Generator string  `json:"instance"`
+    Ran       bool    `json:"ran"`
+    Output    string  `json:"output"`
 }
 
 var instance int
@@ -124,6 +125,7 @@ func launch(request inbound, res http.ResponseWriter) {
 
     // prepare response
     outbound := outbound{
+        Generator: fmt.Sprintf("docker-%d", instance),
         Ran: err == nil,
         Output: strings.TrimSpace(stdout.String()),
     }

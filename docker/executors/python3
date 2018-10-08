@@ -1,1 +1,1 @@
-timeout -s KILL 3 cat /*.args | xargs -d '\n' python3.6 $1
+timeout -s KILL 3 bash -c "cat /*.args | xargs -d '\n' python3.6 $1"
