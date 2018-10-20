@@ -4,10 +4,10 @@ WORKDIR /tmp
 
 RUN useradd -m runner
 
-RUN echo 'runner soft nproc 16' >> /etc/security/limits.conf
-RUN echo 'runner hard nproc 16' >> /etc/security/limits.conf
-RUN echo 'runner soft nofile 256' >> /etc/security/limits.conf
-RUN echo 'runner hard nofile 256' >> /etc/security/limits.conf
+RUN echo 'runner soft nproc 256' >> /etc/security/limits.conf
+RUN echo 'runner hard nproc 256' >> /etc/security/limits.conf
+RUN echo 'runner soft nofile 4096' >> /etc/security/limits.conf
+RUN echo 'runner hard nofile 4096' >> /etc/security/limits.conf
 
 RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirror.math.princeton.edu\/pub\/ubuntu\//' /etc/apt/sources.list
 RUN apt-get update && \
