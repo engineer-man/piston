@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+echo 'testing c'
+../lxc/execute c test.c
+echo 'testing cpp'
+../lxc/execute cpp test.cpp
+echo 'testing cs'
+../lxc/execute cs test.cs
+echo 'testing go'
+../lxc/execute go test.go
+echo 'testing java'
+../lxc/execute java test.java
+echo 'testing asm'
+../lxc/execute asm test.nasm
+echo 'testing js'
+../lxc/execute js test.js
+echo 'testing php'
+../lxc/execute php test.php
+echo 'testing python2'
+../lxc/execute python2 test2.py
+echo 'testing python3'
+../lxc/execute python3 test3.py
+echo 'testing r'
+../lxc/execute r test.r
+echo 'testing ruby'
+../lxc/execute ruby test.rb

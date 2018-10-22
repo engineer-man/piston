@@ -1,0 +1,6 @@
+cd /tmp/$1
+cp code.code interim.go
+file="interim.go"
+GOROOT=/usr/lib/go timeout -s KILL 10 go build $file
+file=${file%%.*}
+timeout -s KILL 3 bash -c "cat args.args | xargs -d '\n' ./$file"

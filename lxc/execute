@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+dir="$( cd "$( dirname "$0" )" && pwd )"
+
+if [ -z "$1" ]; then
+    echo "invalid args"
+    exit
+fi
+if [ -z "$2" ]; then
+    echo "invalid args"
+    exit
+fi
+
+lang=$1
+epoch=$(date +%s%3N)
+basepath="/var/lib/lxc/piston/rootfs"
+filepath="/tmp/$epoch/code.code"
+file=$(basename $2)
+argpath="/tmp/$epoch/args.args"
+arg=$(basename $argpath)
+
+# write arg file
+mkdir -p $basepath/tmp/$epoch
+chmod 777 $basepath/tmp/$epoch
+cat $file > $basepath$filepath
+echo "${@:3}" > $basepath$argpath
+
+bin=
+case "$lang" in
+"python2")
+    bin=python2
+    ;;
+"python" | "python3")
+    bin=python3
+    ;;
+"ruby")
+    bin=ruby
+    ;;
+"javascript" | "js" | "node")
+    bin=node
+    ;;
+"c")
+    bin=c
+    ;;
+"cpp" | "c++")
+    bin=cpp
+    ;;
+"go")
+    bin=go
+    ;;
+"c#" | "csharp" | "cs")
+    bin=csharp
+    ;;
+"r")
+    bin=r
+    ;;
+"php")
+    bin=php
+    ;;
+"nasm" | "asm")
+    bin=nasm
+    ;;
+"java")
+    bin=java
+    ;;
+*)
+    echo "invalid language"
+    exit
+esac
+
+lxc-attach -n piston -- \
+    /bin/su ubuntu \
+        -c "bash /home/ubuntu/$bin $epoch 2>&1 | head -c 65536"
+
+#rm -f $basepath$filepath
+#rm -f $basepath$argpath

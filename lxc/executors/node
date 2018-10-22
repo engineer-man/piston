@@ -1,0 +1,2 @@
+cd /tmp/$1
+timeout -s KILL 3 bash -c "cat args.args | xargs -d '\n' nodejs code.code"

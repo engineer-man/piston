@@ -1,0 +1,3 @@
+<?php
+
+echo 'good' . "\n";
