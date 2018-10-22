@@ -1,5 +1,5 @@
 # install
-yum install lxc lxc-template debootstrap
+yum install lxc lxc-templates debootstrap libvirt
 
 # create container
 lxc-create -t download -n piston

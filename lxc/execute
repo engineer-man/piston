@@ -72,5 +72,4 @@ lxc-attach -n piston -- \
     /bin/su ubuntu \
         -c "bash /home/ubuntu/$bin $epoch 2>&1 | head -c 65536"
 
-#rm -f $basepath$filepath
-#rm -f $basepath$argpath
+rm -rf $basepath/tmp/$epoch
