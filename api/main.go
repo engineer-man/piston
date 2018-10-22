@@ -109,7 +109,8 @@ func launch(request inbound, res http.ResponseWriter) {
     args = append(args, strings.Join(request.Args, "\n"))
 
     // set up the execution
-    cmd := exec.Command("../docker/execute", args...)
+    //cmd := exec.Command("../docker/execute", args...)
+    cmd := exec.Command("../lxc/execute", args...)
     cmd.Env = os.Environ()
 
     if instance > 0 {
