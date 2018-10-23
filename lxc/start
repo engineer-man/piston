@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-rm -f /var/lib/lxc/piston/rootfs/home/ubuntu/*
-cp -f executors/* /var/lib/lxc/piston/rootfs/home/ubuntu
+mkdir -p /var/lib/lxc/piston/rootfs/exec
+rm -f /var/lib/lxc/piston/rootfs/exec/*
+cp -f executors/* /var/lib/lxc/piston/rootfs/exec
+chmod 700 /var/lib/lxc/piston/rootfs/exec/*
 
 lxc-start -n piston -d

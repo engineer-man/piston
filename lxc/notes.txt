@@ -16,11 +16,13 @@ apt-get update
 apt-get -y install tzdata nano dpkg-dev build-essential python python3 ruby nodejs golang php7.2 r-base mono-complete nasm openjdk-8-jdk
 
 # apply limits
-echo 'ubuntu soft nproc 128' >> /etc/security/limits.conf
-echo 'ubuntu hard nproc 128' >> /etc/security/limits.conf
+echo 'ubuntu soft nproc 16' >> /etc/security/limits.conf
+echo 'ubuntu hard nproc 16' >> /etc/security/limits.conf
 echo 'ubuntu soft nofile 1024' >> /etc/security/limits.conf
 echo 'ubuntu hard nofile 1024' >> /etc/security/limits.conf
-echo 'runner soft nproc 16' >> /etc/security/limits.conf
-echo 'runner hard nproc 16' >> /etc/security/limits.conf
-echo 'runner soft nofile 512' >> /etc/security/limits.conf
-echo 'runner hard nofile 512' >> /etc/security/limits.conf
+
+# remove home dir
+rm -rf /home/ubuntu
+
+# set tmp
+chmod 755 /tmp

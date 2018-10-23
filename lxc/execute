@@ -15,14 +15,13 @@ lang=$1
 epoch=$(date +%s%3N)
 basepath="/var/lib/lxc/piston/rootfs"
 filepath="/tmp/$epoch/code.code"
-file=$(basename $2)
 argpath="/tmp/$epoch/args.args"
 arg=$(basename $argpath)
 
 # write arg file
 mkdir -p $basepath/tmp/$epoch
 chmod 777 $basepath/tmp/$epoch
-cat $file > $basepath$filepath
+cat $2 > $basepath$filepath
 echo "${@:3}" > $basepath$argpath
 
 bin=
@@ -69,7 +68,6 @@ case "$lang" in
 esac
 
 lxc-attach -n piston -- \
-    /bin/su ubuntu \
-        -c "bash /home/ubuntu/$bin $epoch 2>&1 | head -c 65536"
+    /bin/bash -c "PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin bash /exec/$bin $epoch 2>&1 | head -c 65536"
 
 rm -rf $basepath/tmp/$epoch
