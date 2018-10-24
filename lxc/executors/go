@@ -1,6 +1,6 @@
-cd /tmp/$1
+cd /tmp/$2
 cp code.code interim.go
 file="interim.go"
 GOROOT=/usr/lib/go timeout -s KILL 10 go build $file
 file=${file%%.*}
-timeout -s KILL 3 runuser ubuntu -c "cat args.args | xargs -d '\n' ./$file"
+runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./$file"

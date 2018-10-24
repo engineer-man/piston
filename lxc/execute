@@ -24,6 +24,17 @@ chmod 777 $basepath/tmp/$epoch
 cat $2 > $basepath$filepath
 echo "${@:3}" > $basepath$argpath
 
+# process incrementor
+oldinc=$(cat $dir/i | awk '{$1=$1};1')
+newinc=$(expr $oldinc + 1)
+
+if (( newinc >= 151 )); then
+    newinc=1
+    echo 1 > $dir/i
+else
+    echo $newinc > $dir/i
+fi
+
 bin=
 case "$lang" in
 "python2")
@@ -67,7 +78,14 @@ case "$lang" in
     exit
 esac
 
+# runner
 lxc-attach -n piston -- \
-    /bin/bash -c "PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin bash /exec/$bin $epoch 2>&1 | head -c 65536"
+    /bin/bash -c "\
+        PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin \
+        bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
+
+# process janitor
+lxc-attach -n piston -- \
+    /bin/bash -c "for i in {1..2000}; do pkill -u runner$newinc --signal SIGKILL; done" > /dev/null 2>&1 &
 
 rm -rf $basepath/tmp/$epoch
