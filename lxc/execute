@@ -89,6 +89,6 @@ lxc-attach -n piston -- \
     /bin/bash -c "\
         for i in {1..100}; do pkill -u runner$newinc --signal SIGKILL; done ;\
         find /tmp/* -user runner$newinc -exec /bin/rm -rf {} \;\
-        "
+        " > /dev/null 2>&1 &
 
 rm -rf $basepath/tmp/$epoch
