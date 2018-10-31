@@ -70,6 +70,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "python", "python2", "python3",
         "r",
         "ruby",
+        "swift",
     }
 
     // check if the supplied language is supported

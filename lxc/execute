@@ -73,6 +73,9 @@ case "$lang" in
 "java")
     bin=java
     ;;
+"swift")
+    bin=swift
+    ;;
 *)
     echo "invalid language"
     exit
