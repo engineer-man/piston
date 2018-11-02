@@ -16,6 +16,8 @@ apt-get update
 apt-get -y install ubuntu-make
 apt-get -y install git tzdata nano dpkg-dev build-essential python python3 ruby nodejs golang php7.2 r-base mono-complete nasm openjdk-8-jdk
 umake swift
+set dir to /opt
+ln -s /opt/swift/usr/bin/swift /usr/bin/swift
 
 
 # create users and apply limits
