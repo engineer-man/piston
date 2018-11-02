@@ -13,11 +13,11 @@ lxc-attach -n piston
 export PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
 sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu/http:\/\/mirror.math.princeton.edu\/pub\/ubuntu/' /etc/apt/sources.list
 apt-get update
-apt-get -y install ubuntu-make
 apt-get -y install git tzdata nano dpkg-dev build-essential python python3 ruby nodejs golang php7.2 r-base mono-complete nasm openjdk-8-jdk
+apt-get -y install ubuntu-make
 umake swift
-set dir to /opt
-ln -s /opt/swift/usr/bin/swift /usr/bin/swift
+set dir to /opt/swift/swift-lang
+ln -s /opt/swift/swift-lang/usr/bin/swift /usr/bin/swift
 
 
 # create users and apply limits

@@ -2,6 +2,8 @@
 
 dir="$( cd "$( dirname "$0" )" && pwd )"
 
+touch $dir/lockfile
+
 if [ -z "$1" ]; then
     echo "invalid args"
     exit
@@ -12,7 +14,7 @@ if [ -z "$2" ]; then
 fi
 
 lang=$1
-epoch=$(date +%s%3N)
+epoch=$(date +%s%N)
 basepath="/var/lib/lxc/piston/rootfs"
 filepath="/tmp/$epoch/code.code"
 argpath="/tmp/$epoch/args.args"
@@ -25,6 +27,8 @@ cat $2 > $basepath$filepath
 echo "${@:3}" > $basepath$argpath
 
 # process incrementor
+exec 200>$dir/lockfile
+flock -x 200
 oldinc=$(cat $dir/i | awk '{$1=$1};1')
 newinc=$(expr $oldinc + 1)
 
@@ -34,6 +38,7 @@ if (( newinc >= 151 )); then
 else
     echo $newinc > $dir/i
 fi
+exec 200>&-
 
 bin=
 case "$lang" in
