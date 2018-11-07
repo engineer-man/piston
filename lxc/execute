@@ -87,10 +87,11 @@ case "$lang" in
 esac
 
 # runner
-lxc-attach -n piston -- \
-    /bin/bash -c "\
-        PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin \
-        bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
+timeout -s KILL 10 \
+    lxc-attach -n piston -- \
+        /bin/bash -c "\
+            PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin \
+            bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
 
 # process janitor
 lxc-attach -n piston -- \
