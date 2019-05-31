@@ -12,8 +12,8 @@ cd piston/lxc
 # install dependencies
 
 # centos:
-yum install epel-release
-yum install lxc lxc-templates debootstrap libvirt
+yum install -y epel-release
+yum install -y lxc lxc-templates debootstrap libvirt
 
 # everything else:
 # not documented, please open pull requests with commands for ubuntu/debian/arch/macos
@@ -29,7 +29,8 @@ lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
 ./shell
 
 # install all necessary piston dependencies
-export PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+echo 'export PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin' >> /root/.bashrc
+echo 'export PATH=$PATH:/root/.cargo/bin' >> /root/.bashrc
 sed -i \
     's/http:\/\/archive.ubuntu.com\/ubuntu/http:\/\/mirror.math.princeton.edu\/pub\/ubuntu/' \
     /etc/apt/sources.list
@@ -38,9 +39,10 @@ apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
     ruby nodejs golang php7.2 r-base mono-complete \
     nasm openjdk-8-jdk ubuntu-make bf
-# IMPORTANT: set dir to /opt/swift/swift-lang
 umake swift
-ln -s /opt/swift/swift-lang/usr/bin/swift /usr/bin/swift
+ln -s /root/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
+# IMPORTANT: choose option 1
+curl https://sh.rustup.rs -sSf | sh
 rm -rf /home/ubuntu
 chmod 777 /tmp
 

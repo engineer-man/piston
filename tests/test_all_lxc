@@ -26,3 +26,7 @@ echo 'testing ruby'
 ../lxc/execute ruby test.rb
 echo 'testing brainfuck'
 ../lxc/execute bf test.bf
+echo 'testing rust'
+../lxc/execute rust test.rs
+echo 'testing swift'
+../lxc/execute swift test.swift
