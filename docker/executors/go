@@ -1,5 +1,0 @@
-cp /*.code interim.go
-file="interim.go"
-timeout -s KILL 10 go build $file
-file=${file%%.*}
-timeout -s KILL 3 bash -c "cat /*.args | xargs -d '\n' ./$file"

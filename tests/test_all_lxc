@@ -24,3 +24,5 @@ echo 'testing r'
 ../lxc/execute r test.r
 echo 'testing ruby'
 ../lxc/execute ruby test.rb
+echo 'testing brainfuck'
+../lxc/execute bf test.bf

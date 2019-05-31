@@ -1,1 +1,0 @@
-timeout -s KILL 3 bash -c "cat /*.args | xargs -d '\n' php $1"

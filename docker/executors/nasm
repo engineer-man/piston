@@ -1,3 +1,0 @@
-timeout -s KILL 10 nasm -f elf64 -o binary.o $1
-timeout -s KILL 10 ld binary.o -o binary
-timeout -s KILL 3 bash -c "cat /*.args | xargs -d '\n' ./binary"

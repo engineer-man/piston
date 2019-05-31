@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-systemctl stop piston@{1..10}.service
-systemctl stop dock@{1..10}.service

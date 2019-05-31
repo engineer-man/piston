@@ -1,3 +1,0 @@
-cp /*.code .
-timeout -s KILL 10 mcs $(echo $1 | sed 's/\///') -out:binary
-timeout -s KILL 3 bash -c "cat /*.args | xargs -d '\n' mono binary"

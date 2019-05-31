@@ -6,10 +6,8 @@ import (
     "fmt"
     "io/ioutil"
     "net/http"
-    "os"
     "os/exec"
     "strings"
-    "strconv"
     "time"
 )
 
@@ -25,7 +23,6 @@ type problem struct {
 }
 
 type outbound struct {
-    Generator string  `json:"instance"`
     Ran       bool    `json:"ran"`
     Output    string  `json:"output"`
 }
@@ -34,15 +31,6 @@ var instance int
 
 func main() {
     port := 2000
-
-    if len(os.Args) > 1 {
-        if i, err := strconv.Atoi(os.Args[1]); err == nil {
-            instance = i
-            port += i
-        }
-    } else {
-        instance = 0
-    }
 
     fmt.Println("starting api on port", port)
 
@@ -111,13 +99,7 @@ func launch(request inbound, res http.ResponseWriter) {
     args = append(args, strings.Join(request.Args, "\n"))
 
     // set up the execution
-    //cmd := exec.Command("../docker/execute", args...)
     cmd := exec.Command("../lxc/execute", args...)
-    cmd.Env = os.Environ()
-
-    if instance > 0 {
-        cmd.Env = append(cmd.Env, fmt.Sprintf("SOCKET=unix:///var/run/docker-%d.sock", instance))
-    }
 
     // capture out/err
     var stdout, stderr bytes.Buffer
@@ -128,7 +110,6 @@ func launch(request inbound, res http.ResponseWriter) {
 
     // prepare response
     outbound := outbound{
-        Generator: fmt.Sprintf("docker-%d", instance),
         Ran: err == nil,
         Output: strings.TrimSpace(stdout.String()),
     }
