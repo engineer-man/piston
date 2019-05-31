@@ -41,10 +41,10 @@ apt-get -y install git tzdata nano \
     nasm openjdk-8-jdk ubuntu-make bf
 umake swift
 ln -s /root/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
-# IMPORTANT: choose option 1
 curl https://sh.rustup.rs -sSf | sh
 rm -rf /home/ubuntu
 chmod 777 /tmp
+chmod 777 -R /root
 
 # create runnable users and apply limits
 for i in {1..150}; do
