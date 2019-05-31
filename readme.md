@@ -30,7 +30,9 @@ lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
 
 # install all necessary piston dependencies
 export PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
-sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu/http:\/\/mirror.math.princeton.edu\/pub\/ubuntu/' /etc/apt/sources.list
+sed -i \
+    's/http:\/\/archive.ubuntu.com\/ubuntu/http:\/\/mirror.math.princeton.edu\/pub\/ubuntu/' \
+    /etc/apt/sources.list
 apt-get update
 apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
@@ -64,7 +66,7 @@ cd ../tests
 - `lxc/execute [language] [path] [arg]...`
 
 #### Supported Languages
-Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, and java is supported.
+Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, and brainfuck is supported.
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes
