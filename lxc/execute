@@ -84,6 +84,9 @@ case "$lang" in
 "brainfuck" | "bf")
     bin=brainfuck
     ;;
+"rust")
+    bin=rust
+    ;;
 *)
     echo "invalid language"
     exit
