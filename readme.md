@@ -35,7 +35,7 @@ apt-get update
 apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
     ruby nodejs golang php7.2 r-base mono-complete \
-    nasm openjdk-8-jdk ubuntu-make
+    nasm openjdk-8-jdk ubuntu-make bf
 # IMPORTANT: set dir to /opt/swift/swift-lang
 umake swift
 ln -s /opt/swift/swift-lang/usr/bin/swift /usr/bin/swift
