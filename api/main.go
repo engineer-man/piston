@@ -60,6 +60,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "ruby",
         "swift",
         "brainfuck", "bf",
+        "rust",
     }
 
     // check if the supplied language is supported
