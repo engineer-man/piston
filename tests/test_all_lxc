@@ -30,3 +30,5 @@ echo 'testing rust'
 ../lxc/execute rust test.rs
 echo 'testing swift'
 ../lxc/execute swift test.swift
+echo 'testing bash'
+../lxc/execute bash test.sh
