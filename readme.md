@@ -65,8 +65,38 @@ cd ../tests
 ./test_all_lxc
 ```
 
-#### Usage
+#### CLI Usage
 - `lxc/execute [language] [file path] [arg]...`
+
+#### API Usage
+The Piston API exposes one endpoint at `http://127.0.0.1:2000/execute`.
+This endpoint takes the following JSON payload and expects at least the language and source. If
+source is not provided, a blank file is passed as the source.
+```json
+{
+    "language": "js",
+    "source": "console.log(process.argv)",
+    "args": [
+        "1",
+        "2",
+        "3"
+    ]
+}
+```
+A typical response when everything succeeds will be similar to the following:
+```json
+{
+    "ran": true,
+    "output": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]"
+}
+```
+If an invalid language is supplied, a typical response will look like the following:
+```json
+{
+    "code": "unsupported_language",
+    "message": "whatever is not supported by Piston"
+}
+```
 
 #### Supported Languages
 Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, swift, brainfuck, rust, and bash is supported.
