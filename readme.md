@@ -69,6 +69,11 @@ cd ../tests
 - `lxc/execute [language] [file path] [arg]...`
 
 #### API Usage
+To use the API, it must first be started. To start the API, run the following:
+```
+cd api
+./start
+```
 The Piston API exposes one endpoint at `http://127.0.0.1:2000/execute`.
 This endpoint takes the following JSON payload and expects at least the language and source. If
 source is not provided, a blank file is passed as the source.
