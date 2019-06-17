@@ -66,10 +66,10 @@ cd ../tests
 ```
 
 #### Usage
-- `lxc/execute [language] [path] [arg]...`
+- `lxc/execute [language] [file path] [arg]...`
 
 #### Supported Languages
-Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, and brainfuck is supported.
+Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, swift, brainfuck, rust, and bash is supported.
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes
@@ -82,9 +82,10 @@ LXC provides a great deal of security out of the box in that it's separate from 
 Piston takes additional steps to make it resistant to
 various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
 - Disabling outgoing network interaction
-- Capping max processes at 16 (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
-- Capping max files at 256 (resists various file based attacks)
+- Capping max processes at 64 (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
+- Capping max files at 2048 (resists various file based attacks)
 - Mounting all resources read-only (resists `sudo rm -rf --no-preserve-root /`)
+- Running as a variety of unprivileged users
 - Capping runtime execution at 3 seconds
 - Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
 - SIGKILLing misbehaving code

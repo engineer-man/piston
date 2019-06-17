@@ -1,3 +1,3 @@
 cd /tmp/$2
 timeout -s KILL 10 mcs $(echo code.code | sed 's/\///') -nowarn:0219 -out:binary
-runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 mono binary"
+runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs timeout -s KILL 3 mono binary"
