@@ -14,12 +14,13 @@ cd piston/lxc
 # centos:
 yum install -y epel-release
 yum install -y lxc lxc-templates debootstrap libvirt
+systemctl start libvirtd
+
+# ubuntu server 18.04:
+apt install lxc lxc-templates debootstrap libvirt0
 
 # everything else:
-# not documented, please open pull requests with commands for ubuntu/debian/arch/macos
-
-# start libvirtd
-systemctl start libvirtd
+# not documented, please open pull requests with commands for debian/arch/macos
 
 # create and start container
 lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
@@ -39,6 +40,7 @@ apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
     ruby nodejs golang php7.2 r-base mono-complete \
     nasm openjdk-8-jdk ubuntu-make bf
+mkdir -p /root/.local/share/umake/swift/swift-lang
 umake swift
 ln -s /root/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
 curl https://sh.rustup.rs -sSf | sh
