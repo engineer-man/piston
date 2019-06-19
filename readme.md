@@ -30,6 +30,7 @@ lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
 ./shell
 
 # install all necessary piston dependencies
+export HOME=/opt
 echo 'export PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin' >> /root/.bashrc
 echo 'export PATH=$PATH:/root/.cargo/bin' >> /root/.bashrc
 sed -i \
@@ -40,14 +41,13 @@ apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
     ruby nodejs golang php7.2 r-base mono-complete \
     nasm openjdk-8-jdk ubuntu-make bf
-mkdir -p /root/.local/share/umake/swift/swift-lang
 umake swift
-ln -s /root/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
-curl https://sh.rustup.rs -sSf | sh
-ln -s /root/.cargo/bin/rustc /usr/bin/rustc
+ln -s /opt/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
+curl https://sh.rustup.rs > rust.sh
+sh rust.sh -y
+ln -s /opt/.cargo/bin/rustc /usr/bin/rustc
 rm -rf /home/ubuntu
 chmod 777 /tmp
-chmod 777 -R /root
 
 # create runnable users and apply limits
 for i in {1..150}; do
