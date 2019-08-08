@@ -1,6 +1,6 @@
 cd /tmp/$2
 mv code.code interim.ts
-timeout -s KILL 10 tsc interim.ts
+timeout -s KILL 10 /usr/local/bin/tsc interim.ts
 rm interim.ts
 mv interim.js code.code
 runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 nodejs code.code"
