@@ -54,6 +54,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "java",
         "nasm", "asm",
         "javascript", "js", "node",
+        "typescript", "ts",
         "php",
         "python", "python2", "python3",
         "r",

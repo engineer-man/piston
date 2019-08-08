@@ -39,8 +39,9 @@ sed -i \
 apt-get update
 apt-get -y install git tzdata nano \
     dpkg-dev build-essential python python3 \
-    ruby nodejs golang php7.2 r-base mono-complete \
+    ruby nodejs npm golang php7.2 r-base mono-complete \
     nasm openjdk-8-jdk ubuntu-make bf
+npm install -g typescript
 umake swift
 ln -s /opt/.local/share/umake/swift/swift-lang/usr/bin/swift /usr/bin/swift
 curl https://sh.rustup.rs > rust.sh
@@ -106,7 +107,7 @@ If an invalid language is supplied, a typical response will look like the follow
 ```
 
 #### Supported Languages
-Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, swift, brainfuck, rust, and bash is supported.
+Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java, swift, brainfuck, rust, bash, and typescript is supported.
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes

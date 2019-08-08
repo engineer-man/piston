@@ -90,6 +90,9 @@ case "$lang" in
 "bash")
     bin=bash
     ;;
+"typescript" | "ts")
+    bin=typescript
+    ;;
 *)
     echo "invalid language"
     exit

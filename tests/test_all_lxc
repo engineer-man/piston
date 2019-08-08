@@ -32,3 +32,5 @@ echo 'testing swift'
 ../lxc/execute swift test.swift
 echo 'testing bash'
 ../lxc/execute bash test.sh
+echo 'testing typescript'
+../lxc/execute typescript test.ts
