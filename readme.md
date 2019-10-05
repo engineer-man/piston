@@ -1,6 +1,5 @@
 ## Piston
-Piston is the underlying engine for running untrusted and possibly malicious code that originates
-from from EMKC contests and challenges. It's also used in the Engineer Man Discord server via
+Piston is the underlying engine for running untrusted and possibly malicious code that originates from EMKC contests and challenges. It's also used in the Engineer Man Discord server via
 [felix bot](https://github.com/engineer-man/felix).
 
 #### Installation
