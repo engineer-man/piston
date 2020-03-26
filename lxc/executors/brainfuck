@@ -1,2 +1,0 @@
-cd /tmp/$2
-runuser -l runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 bf code.code"

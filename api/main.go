@@ -57,10 +57,8 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "typescript", "ts",
         "php",
         "python", "python2", "python3",
-        "r",
         "ruby",
         "swift",
-        "brainfuck", "bf",
         "rust",
         "bash",
     }

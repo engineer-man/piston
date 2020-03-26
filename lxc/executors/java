@@ -3,4 +3,4 @@ cp code.code interim.java
 name=$(cat interim.java | grep -Eo 'public\s+class\s+([A-Za-z0-9]+)' | sed -n 's/  */ /gp' | cut -d' ' -f3)
 mv interim.java $name.java
 timeout -s KILL 10 javac $name.java
-runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"
+runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"

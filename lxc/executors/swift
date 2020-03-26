@@ -1,2 +1,2 @@
 cd /tmp/$2
-runuser -l runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 swift code.code"
+runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 swift code.code"

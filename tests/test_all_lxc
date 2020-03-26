@@ -20,12 +20,8 @@ echo 'testing python2'
 ../lxc/execute python2 test2.py
 echo 'testing python3'
 ../lxc/execute python3 test3.py
-echo 'testing r'
-../lxc/execute r test.r
 echo 'testing ruby'
 ../lxc/execute ruby test.rb
-echo 'testing brainfuck'
-../lxc/execute bf test.bf
 echo 'testing rust'
 ../lxc/execute rust test.rs
 echo 'testing swift'

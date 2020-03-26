@@ -66,9 +66,6 @@ case "$lang" in
 "c#" | "csharp" | "cs")
     bin=csharp
     ;;
-"r")
-    bin=r
-    ;;
 "php")
     bin=php
     ;;
@@ -80,9 +77,6 @@ case "$lang" in
     ;;
 "swift")
     bin=swift
-    ;;
-"brainfuck" | "bf")
-    bin=brainfuck
     ;;
 "rust")
     bin=rust
@@ -100,14 +94,12 @@ esac
 
 # runner
 timeout -s KILL 10 \
-    lxc-attach -n piston -- \
-        /bin/bash -c "\
-            PATH=/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin \
-            bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
+    lxc-attach --clear-env -n piston -- \
+        /bin/bash -l -c "bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
 
 # process janitor
-lxc-attach -n piston -- \
-    /bin/bash -c "\
+lxc-attach --clear-env -n piston -- \
+    /bin/bash -l -c "\
         for i in {1..100}; do pkill -u runner$newinc --signal SIGKILL; done ;\
         find /tmp -user runner$newinc -exec /bin/rm -rf {} \;\
         " > /dev/null 2>&1 &
