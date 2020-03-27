@@ -38,11 +38,16 @@ type Language struct {
 var instance int
 var versionRegex = regexp.MustCompile("([0-9]+\\.[0-9]+\\.[0-9]+)")
 var javaRegex = regexp.MustCompile("([0-9]+)")
+var languages []Language
 
 func main() {
     port := "2000"
-
-    updateVersions()
+    var err error
+    languages, err = updateVersions()
+    if err != nil {
+        log.Println(err)
+        return
+    }
 
     fmt.Println("starting api on port", port)
     http.HandleFunc("/execute", Execute)
@@ -132,24 +137,22 @@ func launch(request inbound, res http.ResponseWriter) {
     res.Write(response)
 }
 
-func updateVersions() {
+func updateVersions() ([]Language, error) {
     f, err := os.Create("versions.json")
     if err != nil {
-        log.Println(err)
-        return
+        return nil, err
     }
     defer f.Close()
     langs, err := getVersions()
     if err != nil {
-        log.Println(err)
-        return
+        return nil, err
     }
     res, err := json.Marshal(langs)
     if err != nil {
-        log.Println(err)
-        return
+        return nil, err
     }
     f.Write(res)
+    return langs, nil
 }
 
 // get all the language and their current version
@@ -193,4 +196,13 @@ func getVersion(s string) (string, string) {
         return "java", javaRegex.FindString(lines[2])
     }
     return lines[1], versionRegex.FindString(s)
+}
+
+func versions(w http.ResponseWriter, r *http.Request) {
+    data, err := json.Marshal(languages)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    w.Write(data)
 }
