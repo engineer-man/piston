@@ -1,47 +1,47 @@
 #!/usr/bin/env bash
 echo '---'
 echo 'bash'
-bash --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "bash --version"
 echo '---'
 echo 'c'
-gcc -v
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
 echo '---'
 echo 'cpp'
-g++ -v
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ -v"
 echo '---'
 echo 'csharp'
-mcs --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "mcs --version"
 echo '---'
 echo 'go'
-go version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "go version"
 echo '---'
 echo 'java'
-java -version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "java -version"
 echo '---'
 echo 'nasm'
-nasm -version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 echo 'node'
-node --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
 echo '---'
 echo 'php'
-php -v
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "php -v"
 echo '---'
 echo 'python2'
-python -V
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python -V"
 echo '---'
 echo 'python3'
-python3 -V
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
 echo '---'
 echo 'ruby'
-ruby --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "ruby --version"
 echo '---'
 echo 'rust'
-rustc --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "rustc --version"
 echo '---'
 echo 'swift'
-swift --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "swift --version"
 echo '---'
 echo 'typescript'
-tsc --version
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "tsc --version"
 echo '---'
