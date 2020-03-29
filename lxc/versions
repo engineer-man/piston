@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 echo '---'
+echo 'awk'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "awk -W version"
+echo '---'
 echo 'bash'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "bash --version"
 echo '---'

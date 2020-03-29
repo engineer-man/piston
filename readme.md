@@ -185,6 +185,8 @@ A typical response when everything succeeds will be similar to the following:
 ```json
 {
     "ran": true,
+    "language": "js",
+    "version": "12.13.0",
     "output": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]"
 }
 ```
@@ -198,7 +200,7 @@ If an invalid language is supplied, a typical response will look like the follow
 
 #### Supported Languages
 Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java,
-swift, brainfuck, rust, bash, and typescript is supported.
+swift, brainfuck, rust, bash, awk, and typescript is supported.
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes

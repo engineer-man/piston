@@ -5,29 +5,29 @@ import (
     "encoding/json"
     "fmt"
     "io/ioutil"
-    "log"
     "net/http"
-    "os"
     "os/exec"
     "regexp"
     "strings"
     "time"
 )
 
-type inbound struct {
+type Inbound struct {
     Language string   `json:"language"`
     Source   string   `json:"source"`
     Args     []string `json:"args"`
 }
 
-type problem struct {
+type Problem struct {
     Code    string `json:"code"`
     Message string `json:"message"`
 }
 
-type outbound struct {
-    Ran    bool   `json:"ran"`
-    Output string `json:"output"`
+type Outbound struct {
+    Ran      bool   `json:"ran"`
+    Language string `json:"language"`
+    Version  string `json:"version"`
+    Output   string `json:"output"`
 }
 
 type Language struct {
@@ -36,61 +36,65 @@ type Language struct {
 }
 
 var instance int
-var versionRegex = regexp.MustCompile("([0-9]+\\.[0-9]+\\.[0-9]+)")
-var javaRegex = regexp.MustCompile("([0-9]+)")
 var languages []Language
 
 func main() {
     port := "2000"
+
     var err error
-    languages, err = updateVersions()
+    languages, err = UpdateVersions()
+
     if err != nil {
-        log.Println(err)
+        fmt.Println("could not get version info and therefore couldn't start")
+        fmt.Println(err)
         return
     }
 
     fmt.Println("starting api on port", port)
     http.HandleFunc("/execute", Execute)
-    http.HandleFunc("/versions", versions)
-    http.ListenAndServe(":"+port, nil)
+    http.HandleFunc("/versions", Versions)
+    http.ListenAndServe(":" + port, nil)
 }
 
 func Execute(res http.ResponseWriter, req *http.Request) {
     res.Header().Set("Content-Type", "application/json")
 
     // get json
-    inbound := inbound{}
+    inbound := Inbound{}
     message := json.NewDecoder(req.Body)
     message.Decode(&inbound)
 
     whitelist := []string{
+        "awk",
+        "bash",
         "c",
         "cpp", "c++",
-        "c#", "csharp", "cs",
+        "csharp", "cs", "c#",
         "go",
         "java",
         "nasm", "asm",
-        "javascript", "js", "node",
-        "typescript", "ts",
+        "node", "javascript", "js",
         "php",
-        "python", "python2", "python3",
+        "python2",
+        "python3", "python",
         "ruby",
-        "swift",
         "rust",
-        "bash",
+        "swift",
+        "typescript", "ts",
     }
 
     // check if the supplied language is supported
     // now calls function and returns
     for _, lang := range whitelist {
         if lang == inbound.Language {
+
             launch(inbound, res)
             return
         }
     }
 
     // now only called when the language is not supported
-    problem := problem{
+    problem := Problem{
         Code:    "unsupported_language",
         Message: inbound.Language + " is not supported by Piston",
     }
@@ -100,7 +104,15 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     res.Write(pres)
 }
 
-func launch(request inbound, res http.ResponseWriter) {
+func Versions(res http.ResponseWriter, req *http.Request) {
+    res.Header().Set("Content-Type", "application/json")
+
+    data, _ := json.Marshal(languages)
+
+    res.Write(data)
+}
+
+func launch(request Inbound, res http.ResponseWriter) {
     stamp := time.Now().UnixNano()
 
     // write the code to temp dir
@@ -126,10 +138,47 @@ func launch(request inbound, res http.ResponseWriter) {
 
     err := cmd.Run()
 
+    // get the executing version of the language
+    execlang := request.Language
+
+    switch execlang {
+        case "c++":
+            execlang = "cpp"
+            break
+        case "cs":
+        case "c#":
+            execlang = "csharp"
+            break
+        case "asm":
+            execlang = "nasm"
+            break
+        case "javascript":
+        case "js":
+            execlang = "node"
+            break
+        case "python":
+            execlang = "python3"
+            break
+        case "ts":
+            execlang = "typescript"
+            break
+    }
+
+    var version string
+
+    for _, lang := range languages {
+        if lang.Name == execlang {
+            version = lang.Version
+            break
+        }
+    }
+
     // prepare response
-    outbound := outbound{
-        Ran:    err == nil,
-        Output: strings.TrimSpace(stdout.String()),
+    outbound := Outbound{
+        Ran:      err == nil,
+        Language: request.Language,
+        Version:  version,
+        Output:   strings.TrimSpace(stdout.String()),
     }
 
     response, _ := json.Marshal(outbound)
@@ -137,72 +186,64 @@ func launch(request inbound, res http.ResponseWriter) {
     res.Write(response)
 }
 
-func updateVersions() ([]Language, error) {
-    f, err := os.Create("versions.json")
+func UpdateVersions() ([]Language, error) {
+    langs, err := GetVersions()
+
     if err != nil {
         return nil, err
     }
-    defer f.Close()
-    langs, err := getVersions()
-    if err != nil {
-        return nil, err
-    }
-    res, err := json.Marshal(langs)
-    if err != nil {
-        return nil, err
-    }
-    f.Write(res)
+
     return langs, nil
 }
 
 // get all the language and their current version
-func getVersions() ([]Language, error) {
+func GetVersions() ([]Language, error) {
     var languages []Language
-    res, err := execVersionScript()
+
+    res, err := ExecVersionScript()
+
     if err != nil {
         return nil, err
     }
-    languageInfo := strings.Split(res, "---")
-    for _, v := range languageInfo {
+
+    info := strings.Split(res, "---")
+
+    for _, v := range info {
         if len(v) < 2 {
             continue
         }
-        name, version := getVersion(v)
+        name, version := GetVersion(v)
         languages = append(languages, Language{
             Name:    name,
             Version: version,
         })
     }
+
     return languages, nil
 }
 
 // run the script that retrieves all the language versions
-func execVersionScript() (string, error) {
-    fmt.Println("running script")
-    output := bytes.Buffer{}
-    cmd := exec.Command("../lcx/versions")
-    cmd.Stdout = &output
+func ExecVersionScript() (string, error) {
+    cmd := exec.Command("../lxc/versions")
+
+    var stdout bytes.Buffer
+    cmd.Stdout = &stdout
+    cmd.Stderr = &stdout
+
     err := cmd.Run()
-    return strings.ToLower(output.String()), err
+
+    return strings.ToLower(stdout.String()), err
 }
 
 // return the language and its version
 // most of the time it is easy to get the name and version
 // but for some languages helper functions are used
-
-func getVersion(s string) (string, string) {
+func GetVersion(s string) (string, string) {
     lines := strings.Split(s, "\n")
-    if lines[1] == "java" {
-        return "java", javaRegex.FindString(lines[2])
-    }
-    return lines[1], versionRegex.FindString(s)
-}
 
-func versions(w http.ResponseWriter, r *http.Request) {
-    data, err := json.Marshal(languages)
-    if err != nil {
-        log.Println(err)
-        return
+    if lines[1] == "java" {
+        return "java", regexp.MustCompile("([0-9]+)").FindString(lines[2])
     }
-    w.Write(data)
+
+    return lines[1], regexp.MustCompile("([0-9]+\\.[0-9]+\\.[0-9]+)").FindString(s)
 }

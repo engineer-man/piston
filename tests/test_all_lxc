@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo 'testing awk'
+../lxc/execute awk test.awk
 echo 'testing c'
 ../lxc/execute c test.c
 echo 'testing cpp'

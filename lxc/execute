@@ -42,17 +42,11 @@ exec 200>&-
 
 bin=
 case "$lang" in
-"python2")
-    bin=python2
+"awk")
+    bin=awk
     ;;
-"python" | "python3")
-    bin=python3
-    ;;
-"ruby")
-    bin=ruby
-    ;;
-"javascript" | "js" | "node")
-    bin=node
+"bash")
+    bin=bash
     ;;
 "c")
     bin=c
@@ -60,29 +54,38 @@ case "$lang" in
 "cpp" | "c++")
     bin=cpp
     ;;
-"go")
-    bin=go
-    ;;
-"c#" | "csharp" | "cs")
+"csharp" | "cs" | "c#")
     bin=csharp
     ;;
-"php")
-    bin=php
-    ;;
-"nasm" | "asm")
-    bin=nasm
+"go")
+    bin=go
     ;;
 "java")
     bin=java
     ;;
-"swift")
-    bin=swift
+"nasm" | "asm")
+    bin=nasm
+    ;;
+"node" | "js" | "javascript")
+    bin=node
+    ;;
+"php")
+    bin=php
+    ;;
+"python2")
+    bin=python2
+    ;;
+"python3" | "python")
+    bin=python3
+    ;;
+"ruby")
+    bin=ruby
     ;;
 "rust")
     bin=rust
     ;;
-"bash")
-    bin=bash
+"swift")
+    bin=swift
     ;;
 "typescript" | "ts")
     bin=typescript
