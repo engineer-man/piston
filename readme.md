@@ -67,6 +67,7 @@ tar -xf Python-3.8.2.tar
 cd Python-3.8.2
 ./configure
 make
+ln -s python python3.8
 echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
 source /opt/.profile
 
