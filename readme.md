@@ -54,7 +54,7 @@ tar -xf Python-2.7.17.tar
 cd Python-2.7.17
 ./configure
 # open Modules/Setup and uncomment zlib line
-make -j16
+make
 echo 'export PATH=$PATH:/opt/python2/Python-2.7.17' >> /opt/.profile
 source /opt/.profile
 
@@ -66,7 +66,7 @@ unxz Python-3.8.2.tar.xz
 tar -xf Python-3.8.2.tar
 cd Python-3.8.2
 ./configure
-make -j16
+make
 echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
 source /opt/.profile
 
@@ -100,7 +100,7 @@ wget https://www.php.net/distributions/php-7.4.4.tar.gz
 tar -xzf php-7.4.4.tar.gz
 cd php-7.4.4
 ./configure
-make -j16
+make
 make install
 
 # install rust
@@ -124,7 +124,7 @@ wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz
 tar -xzf nasm-2.14.02.tar.gz
 cd nasm-2.14.02
 ./configure
-make -j16
+make
 echo 'export PATH=$PATH:/opt/nasm/nasm-2.14.02' >> /opt/.profile
 source /opt/.profile
 
