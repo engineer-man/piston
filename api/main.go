@@ -53,7 +53,7 @@ func main() {
     fmt.Println("starting api on port", port)
     http.HandleFunc("/execute", Execute)
     http.HandleFunc("/versions", Versions)
-    http.ListenAndServe(":" + port, nil)
+    http.ListenAndServe(":"+port, nil)
 }
 
 func Execute(res http.ResponseWriter, req *http.Request) {
@@ -87,7 +87,6 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     // now calls function and returns
     for _, lang := range whitelist {
         if lang == inbound.Language {
-
             launch(inbound, res)
             return
         }
@@ -121,15 +120,7 @@ func launch(request Inbound, res http.ResponseWriter) {
     ioutil.WriteFile(srcfile, []byte(request.Source), 0644)
 
     // set up the arguments to send to the execute command
-    var args []string
-
-    args = append(args, request.Language)
-    args = append(args, srcfile)
-
-    args = append(args, strings.Join(request.Args, "\n"))
-
-    // set up the execution
-    cmd := exec.Command("../lxc/execute", args...)
+    cmd := exec.Command("../lxc/execute", request.Language, srcfile, strings.Join(request.Args, "\n"))
 
     // capture out/err
     var stdout, stderr bytes.Buffer
@@ -142,43 +133,34 @@ func launch(request Inbound, res http.ResponseWriter) {
     execlang := request.Language
 
     switch execlang {
-        case "c++":
-            execlang = "cpp"
-            break
-        case "cs":
-        case "c#":
-            execlang = "csharp"
-            break
-        case "asm":
-            execlang = "nasm"
-            break
-        case "javascript":
-        case "js":
-            execlang = "node"
-            break
-        case "python":
-            execlang = "python3"
-            break
-        case "ts":
-            execlang = "typescript"
-            break
-    }
-
-    var version string
-
-    for _, lang := range languages {
-        if lang.Name == execlang {
-            version = lang.Version
-            break
-        }
+    case "c++":
+        execlang = "cpp"
+    case "cs", "c#":
+        execlang = "csharp"
+    case "asm":
+        execlang = "nasm"
+    case "js", "javascript":
+        execlang = "node"
+    case "python":
+        execlang = "python3"
+    case "ts":
+        execlang = "typescript"
     }
 
     // prepare response
     outbound := Outbound{
         Ran:      err == nil,
         Language: request.Language,
-        Version:  version,
+        Version:  "",
         Output:   strings.TrimSpace(stdout.String()),
+    }
+
+    // retrieve the language version
+    for _, lang := range languages {
+        if lang.Name == execlang {
+            outbound.Version = lang.Version
+            break
+        }
     }
 
     response, _ := json.Marshal(outbound)
