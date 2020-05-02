@@ -16,6 +16,8 @@ echo 'testing asm'
 ../lxc/execute asm test.nasm
 echo 'testing js'
 ../lxc/execute js test.js
+echo 'testing jl'
+../lxc/execute jl test.jl
 echo 'testing php'
 ../lxc/execute php test.php
 echo 'testing python2'
