@@ -72,6 +72,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "csharp", "cs", "c#",
         "go",
         "java",
+        "julia", "jl",
         "nasm", "asm",
         "node", "javascript", "js",
         "php",
@@ -141,6 +142,8 @@ func launch(request Inbound, res http.ResponseWriter) {
         execlang = "nasm"
     case "js", "javascript":
         execlang = "node"
+    case "jl":
+        execlang = "julia"
     case "python":
         execlang = "python3"
     case "ts":

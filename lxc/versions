@@ -21,6 +21,9 @@ echo '---'
 echo 'java'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "java -version"
 echo '---'
+echo 'julia'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "julia --version"
+echo '---'
 echo 'nasm'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
