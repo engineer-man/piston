@@ -72,6 +72,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "csharp", "cs", "c#",
         "go",
         "java",
+        "julia", "jl",
         "nasm", "asm",
         "node", "javascript", "js",
         "php",

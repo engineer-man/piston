@@ -63,6 +63,9 @@ case "$lang" in
 "java")
     bin=java
     ;;
+"julia" | "jl")
+    bin=julia
+    ;;
 "nasm" | "asm")
     bin=nasm
     ;;
