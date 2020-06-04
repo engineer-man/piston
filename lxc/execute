@@ -57,6 +57,9 @@ case "$lang" in
 "csharp" | "cs" | "c#")
     bin=csharp
     ;;
+"elixir" | "exs")
+    bin=elixir
+    ;;
 "go")
     bin=go
     ;;
