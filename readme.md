@@ -20,7 +20,7 @@ systemctl start libvirtd
 apt install lxc lxc-templates debootstrap libvirt0
 
 # arch:
-sudo pacman -S lxc libvirt
+sudo pacman -S lxc libvirt unzip
 
 # everything else:
 # not documented, please open pull requests with commands for debian/arch/macos
@@ -146,6 +146,23 @@ cd /opt && mkdir julia && cd julia
 wget https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.1-linux-x86_64.tar.gz
 tar -xzf julia-1.4.1-linux-x86_64.tar.gz
 echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
+source /opt/.profile
+
+# install elixir and erlang
+# final binary: /opt/elixir/bin/elixir --version
+# erlang
+cd /opt && mkdir erlang && cd erlang
+wget http://erlang.org/download/otp_src_23.0.tar.gz
+gunzip -c otp_src_23.0.tar.gz | tar xf -
+cd otp_src_23.0 && ./configure
+make
+echo 'export PATH=$PATH:/opt/erlang/otp_src_23.0/bin' >> /opt/.profile
+source /opt/.profile
+#elixir
+cd /opt && mkdir elixir && cd elixir
+wget https://github.com/elixir-lang/elixir/releases/download/v1.10.3/Precompiled.zip
+mkdir elixir-1.10.3 && unzip Precompiled.zip -d elixir-1.10.3/
+echo 'export PATH=$PATH:/opt/elixir/elixir-1.10.3/bin' >> /opt/.profile
 source /opt/.profile
 
 
