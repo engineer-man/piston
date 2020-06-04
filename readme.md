@@ -19,6 +19,9 @@ systemctl start libvirtd
 # ubuntu server 18.04:
 apt install lxc lxc-templates debootstrap libvirt0
 
+# arch:
+sudo pacman -S lxc libvirt
+
 # everything else:
 # not documented, please open pull requests with commands for debian/arch/macos
 
