@@ -8,6 +8,8 @@ echo 'testing cpp'
 ../lxc/execute cpp test.cpp
 echo 'testing cs'
 ../lxc/execute cs test.cs
+echo 'testing elixir'
+../lxc/exexute exs test.exs
 echo 'testing go'
 ../lxc/execute go test.go
 echo 'testing java'
