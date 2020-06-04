@@ -12,6 +12,8 @@ echo 'testing go'
 ../lxc/execute go test.go
 echo 'testing java'
 ../lxc/execute java test.java
+echo 'testing kotlin'
+../lxc/execute kotlin test.kt
 echo 'testing asm'
 ../lxc/execute asm test.nasm
 echo 'testing js'

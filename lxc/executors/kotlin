@@ -1,0 +1,4 @@
+cd /tmp/$2
+cp code.code code.kt
+timeout -s KILL 10 kotlinc code.kt -include-runtime -d code.jar
+runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 java -jar code.jar"
