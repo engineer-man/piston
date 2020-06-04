@@ -139,6 +139,8 @@ func launch(request Inbound, res http.ResponseWriter) {
         execlang = "cpp"
     case "cs", "c#":
         execlang = "csharp"
+    case "elixir", "exs":
+        execlang = "elixir"
     case "asm":
         execlang = "nasm"
     case "js", "javascript":
