@@ -99,6 +99,12 @@ case "$lang" in
 "swift")
     bin=swift
     ;;
+"elisp" | "el")
+    bin=emacs
+    ;;
+"bash")
+    bin=bash
+    ;;
 "typescript" | "ts")
     bin=typescript
     ;;

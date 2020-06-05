@@ -71,7 +71,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "cpp", "c++",
         "csharp", "cs", "c#",
         "elixir", "exs",
-        "emacs",
+        "elisp", "el",
         "go",
         "java",
         "julia", "jl",
