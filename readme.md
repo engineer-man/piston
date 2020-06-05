@@ -46,7 +46,7 @@ apt-get update
 apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
-    ruby
+    ruby libtinfo-dev
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python -V
@@ -149,7 +149,7 @@ echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
 source /opt/.profile
 
 # install kotlin
-# final binary: /opt/kotlinc/bin/kotlinc
+# final binary: /opt/kotlinc/bin/kotlinc -version
 cd /opt
 wget https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-compiler-1.3.72.zip
@@ -172,6 +172,16 @@ cd /opt && mkdir elixir && cd elixir
 wget https://github.com/elixir-lang/elixir/releases/download/v1.10.3/Precompiled.zip
 mkdir elixir-1.10.3 && unzip Precompiled.zip -d elixir-1.10.3/
 echo 'export PATH=$PATH:/opt/elixir/elixir-1.10.3/bin' >> /opt/.profile
+source /opt/.profile
+
+# install emacs
+# final binary: /opt/emacs/emacs-26.3/src/emacs --version
+cd /opt && mkdir emacs && cd emacs
+wget https://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-26.3.tar.xz
+tar -xf emacs-26.3.tar.xz
+cd emacs-26.3
+./configure --with-gnutls=no
+echo 'export PATH=$PATH:/opt/emacs/emacs-26.3/src' >> /opt/.profile
 source /opt/.profile
 
 # create runnable users and apply limits
