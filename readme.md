@@ -19,6 +19,9 @@ systemctl start libvirtd
 # ubuntu server 18.04:
 apt install lxc lxc-templates debootstrap libvirt0
 
+# arch:
+sudo pacman -S lxc libvirt unzip
+
 # everything else:
 # not documented, please open pull requests with commands for debian/arch/macos
 
@@ -145,13 +148,30 @@ tar -xzf julia-1.4.1-linux-x86_64.tar.gz
 echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
 source /opt/.profile
 
-#install kotlin
-#final binary: /opt/kotlinc/bin/kotlinc
+# install kotlin
+# final binary: /opt/kotlinc/bin/kotlinc
 cd /opt
 wget https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-compiler-1.3.72.zip
 rm kotlin-compiler-1.3.72.zip
 echo 'export PATH=$PATH:/opt/kotlinc/bin' >> /opt/.profile
+source /opt/.profile
+
+# install elixir and erlang
+# final binary: /opt/elixir/bin/elixir --version
+# erlang
+cd /opt && mkdir erlang && cd erlang
+wget http://erlang.org/download/otp_src_23.0.tar.gz
+gunzip -c otp_src_23.0.tar.gz | tar xf -
+cd otp_src_23.0 && ./configure
+make
+echo 'export PATH=$PATH:/opt/erlang/otp_src_23.0/bin' >> /opt/.profile
+source /opt/.profile
+# elixir
+cd /opt && mkdir elixir && cd elixir
+wget https://github.com/elixir-lang/elixir/releases/download/v1.10.3/Precompiled.zip
+mkdir elixir-1.10.3 && unzip Precompiled.zip -d elixir-1.10.3/
+echo 'export PATH=$PATH:/opt/elixir/elixir-1.10.3/bin' >> /opt/.profile
 source /opt/.profile
 
 # create runnable users and apply limits
