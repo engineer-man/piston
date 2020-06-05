@@ -66,6 +66,9 @@ case "$lang" in
 "julia" | "jl")
     bin=julia
     ;;
+"kotlin")
+    bin=kotlin
+    ;;
 "nasm" | "asm")
     bin=nasm
     ;;

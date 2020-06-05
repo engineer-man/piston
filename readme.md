@@ -145,6 +145,14 @@ tar -xzf julia-1.4.1-linux-x86_64.tar.gz
 echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
 source /opt/.profile
 
+#install kotlin
+#final binary: /opt/kotlinc/bin/kotlinc
+cd /opt
+wget https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
+unzip kotlin-compiler-1.3.72.zip
+rm kotlin-compiler-1.3.72.zip
+echo 'export PATH=$PATH:/opt/kotlinc/bin' >> /opt/.profile
+source /opt/.profile
 
 # create runnable users and apply limits
 for i in {1..150}; do

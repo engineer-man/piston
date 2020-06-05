@@ -73,6 +73,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "go",
         "java",
         "julia", "jl",
+        "kotlin",
         "nasm", "asm",
         "node", "javascript", "js",
         "php",
