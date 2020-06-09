@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+cd tests
+
+echo 'testing awk'
+../execute awk test.awk
+echo 'testing c'
+../execute c test.c
+echo 'testing cpp'
+../execute cpp test.cpp
+echo 'testing cs'
+../execute cs test.cs
+#echo 'testing elixir'
+#../execute exs test.exs
+echo 'testing go'
+../execute go test.go
+echo 'testing java'
+../execute java test.java
+echo 'testing kotlin'
+../execute kotlin test.kt
+echo 'testing asm'
+../execute asm test.nasm
+echo 'testing js'
+../execute js test.js
+echo 'testing jl'
+../execute jl test.jl
+echo 'testing php'
+../execute php test.php
+echo 'testing perl'
+../execute perl test.pl
+echo 'testing python2'
+../execute python2 test2.py
+echo 'testing python3'
+../execute python3 test3.py
+echo 'testing ruby'
+../execute ruby test.rb
+echo 'testing rust'
+../execute rust test.rs
+echo 'testing swift'
+../execute swift test.swift
+echo 'testing bash'
+../execute bash test.sh
+echo 'testing typescript'
+../execute typescript test.ts
