@@ -49,7 +49,8 @@ apt-get install -y \
     ruby libtinfo-dev
 
 # install python2
-# final binary: /opt/python2/Python-2.7.17/python -V
+# final binary: /opt/python2/Python-2.7.17/python
+# get version: /opt/python2/Python-2.7.17/python -V
 cd /opt && mkdir python2 && cd python2
 wget https://www.python.org/ftp/python/2.7.17/Python-2.7.17.tar.xz
 unxz Python-2.7.17.tar.xz
@@ -62,7 +63,8 @@ echo 'export PATH=$PATH:/opt/python2/Python-2.7.17' >> /opt/.profile
 source /opt/.profile
 
 # install python3
-# final binary: /opt/python3/Python-3.8.2/python -V
+# final binary: /opt/python3/Python-3.8.2/python
+# get version: /opt/python3/Python-3.8.2/python -V
 cd /opt && mkdir python3 && cd python3
 wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz
 unxz Python-3.8.2.tar.xz
@@ -75,7 +77,8 @@ echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
 source /opt/.profile
 
 # install node.js
-# final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/node -v
+# final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/node
+# get version: /opt/nodejs/node-v12.16.1-linux-x64/bin/node -v
 cd /opt && mkdir nodejs && cd nodejs
 wget https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz
 unxz node-v12.16.1-linux-x64.tar.xz
@@ -84,11 +87,13 @@ echo 'export PATH=$PATH:/opt/nodejs/node-v12.16.1-linux-x64/bin' >> /opt/.profil
 source /opt/.profile
 
 # install typescript
-# final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/tsc -v
+# final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/tsc
+# get version: /opt/nodejs/node-v12.16.1-linux-x64/bin/tsc -v
 /opt/nodejs/node-v12.16.1-linux-x64/bin/npm i -g typescript
 
 # install golang
-# final binary: /opt/go/go/bin/go version
+# final binary: /opt/go/go/bin/go
+# get version: /opt/go/go/bin/go version
 cd /opt && mkdir go && cd go
 wget https://dl.google.com/go/go1.14.1.linux-amd64.tar.gz
 tar -xzf go1.14.1.linux-amd64.tar.gz
@@ -98,7 +103,8 @@ echo 'export GOCACHE=/tmp' >> /opt/.profile
 source /opt/.profile
 
 # install php
-# final binary: /usr/local/bin/php -v
+# final binary: /usr/local/bin/php
+# get version: /usr/local/bin/php -v
 cd /opt && mkdir php && cd php
 wget https://www.php.net/distributions/php-7.4.4.tar.gz
 tar -xzf php-7.4.4.tar.gz
@@ -108,13 +114,15 @@ make
 make install
 
 # install rust
-# final binary: /opt/.cargo/bin/rustc --version
+# final binary: /opt/.cargo/bin/rustc
+# get version: /opt/.cargo/bin/rustc --version
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 echo 'export PATH=$PATH:/opt/.cargo/bin' >> /opt/.profile
 source /opt/.profile
 
 # install swift
-# final binary: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift --version
+# final binary: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift
+# get version: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift --version
 cd /opt && mkdir swift && cd swift
 wget https://swift.org/builds/swift-5.1.5-release/ubuntu1804/swift-5.1.5-RELEASE/swift-5.1.5-RELEASE-ubuntu18.04.tar.gz
 tar -xzf swift-5.1.5-RELEASE-ubuntu18.04.tar.gz
@@ -122,7 +130,8 @@ echo 'export PATH=$PATH:/opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin' >> /
 source /opt/.profile
 
 # install nasm
-# final binary: /opt/nasm/nasm-2.14.02/nasm -v
+# final binary: /opt/nasm/nasm-2.14.02/nasm
+# get version: /opt/nasm/nasm-2.14.02/nasm -v
 cd /opt && mkdir nasm && cd nasm
 wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.gz
 tar -xzf nasm-2.14.02.tar.gz
@@ -133,7 +142,8 @@ echo 'export PATH=$PATH:/opt/nasm/nasm-2.14.02' >> /opt/.profile
 source /opt/.profile
 
 # install java
-# final binary: /opt/java/jdk-14/bin/java -version
+# final binary: /opt/java/jdk-14/bin/java
+# get version: /opt/java/jdk-14/bin/java -version
 cd /opt && mkdir java && cd java
 wget https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
 tar -xzf openjdk-14_linux-x64_bin.tar.gz
@@ -141,7 +151,8 @@ echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
 source /opt/.profile
 
 # install julia
-#final binary: /opt/julia/julia-1.4.1/bin/julia --version
+# final binary: /opt/julia/julia-1.4.1/bin/julia
+# get version: /opt/julia/julia-1.4.1/bin/julia --version
 cd /opt && mkdir julia && cd julia
 wget https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.1-linux-x86_64.tar.gz
 tar -xzf julia-1.4.1-linux-x86_64.tar.gz
@@ -149,7 +160,8 @@ echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
 source /opt/.profile
 
 # install kotlin
-# final binary: /opt/kotlinc/bin/kotlinc -version
+# final binary: /opt/kotlinc/bin/kotlinc
+# get version: /opt/kotlinc/bin/kotlinc -version
 cd /opt
 wget https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
 unzip kotlin-compiler-1.3.72.zip
@@ -158,7 +170,8 @@ echo 'export PATH=$PATH:/opt/kotlinc/bin' >> /opt/.profile
 source /opt/.profile
 
 # install elixir and erlang
-# final binary: /opt/elixir/bin/elixir --version
+# final binary: /opt/elixir/bin/elixir
+# get version: /opt/elixir/bin/elixir --version
 # erlang
 cd /opt && mkdir erlang && cd erlang
 wget http://erlang.org/download/otp_src_23.0.tar.gz
@@ -175,7 +188,8 @@ echo 'export PATH=$PATH:/opt/elixir/elixir-1.10.3/bin' >> /opt/.profile
 source /opt/.profile
 
 # install emacs
-# final binary: /opt/emacs/emacs-26.3/src/emacs --version
+# final binary: /opt/emacs/emacs-26.3/src/emacs
+# get version: /opt/emacs/emacs-26.3/src/emacs --version
 cd /opt && mkdir emacs && cd emacs
 wget https://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-26.3.tar.xz
 tar -xf emacs-26.3.tar.xz
@@ -247,8 +261,27 @@ If an invalid language is supplied, a typical response will look like the follow
 ```
 
 #### Supported Languages
-Currently python2, python3, c, c++, go, node, ruby, r, c#, nasm, php, java,
-swift, brainfuck, rust, bash, awk, and typescript is supported.
+- awk
+- bash
+- c
+- cpp
+- csharp
+- elixir
+- emacs
+- go
+- java
+- julia
+- kotlin
+- nasm
+- node
+- perl
+- php
+- python2
+- python3
+- ruby
+- rust
+- swift
+- typescript
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes

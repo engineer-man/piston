@@ -15,6 +15,12 @@ echo '---'
 echo 'csharp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "mcs --version"
 echo '---'
+echo "elixir"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "elixir --version"
+echo '---'
+echo "emacs"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "emacs --version"
+echo '---'
 echo 'go'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "go version"
 echo '---'
@@ -25,16 +31,16 @@ echo 'julia'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "julia --version"
 echo '---'
 echo 'kotlin'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version"
-echo '---'
-echo "elixir"
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "elixir --version"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version 2>&1 | grep kotlin"
 echo "---"
 echo 'nasm'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 echo 'node'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
+echo '---'
+echo 'perl'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "perl --version | grep x86"
 echo '---'
 echo 'php'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "php -v"
