@@ -99,7 +99,7 @@ case "$lang" in
 "swift")
     bin=swift
     ;;
-"elisp" | "el")
+"emacs" | "elisp" | "el")
     bin=emacs
     ;;
 "bash")
