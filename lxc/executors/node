@@ -1,2 +1,7 @@
 cd /tmp/$2
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 node code.code"
+
+if [[ -z $(grep '[^[:space:]]' args.args) ]]; then
+    runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 node code.code"
+else
+    runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 node code.code"
+fi
