@@ -71,7 +71,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "cpp", "c++",
         "csharp", "cs", "c#",
         "elixir", "exs",
-        "elisp", "el",
+        "emacs", "elisp", "el",
         "go",
         "java",
         "julia", "jl",
@@ -142,7 +142,9 @@ func launch(request Inbound, res http.ResponseWriter) {
         execlang = "cpp"
     case "cs", "c#":
         execlang = "csharp"
-    case "elixir", "exs":
+    case "el", "elisp":
+        execlang = "emacs"
+    case "exs":
         execlang = "elixir"
     case "asm":
         execlang = "nasm"
@@ -234,6 +236,10 @@ func GetVersion(s string) (string, string) {
 
     if lines[1] == "java" {
         return "java", regexp.MustCompile("([0-9]+)").FindString(lines[2])
+    }
+
+    if lines[1] == "emacs" {
+        return "emacs", regexp.MustCompile("([0-9]+\\.[0-9]+)").FindString(lines[2])
     }
 
     return lines[1], regexp.MustCompile("([0-9]+\\.[0-9]+\\.[0-9]+)").FindString(s)
