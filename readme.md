@@ -3,6 +3,13 @@ Piston is the underlying engine for running untrusted and possibly malicious
 code that originates from EMKC contests and challenges. It's also used in the
 Engineer Man Discord server via [felix bot](https://github.com/engineer-man/felix).
 
+#### Use Public API (new)
+Requires no installation and you can use it immediately. Reference the API Usage section below to learn
+about the request format but rather than using the local URLs, use the following URLs:
+- `GET` `https://emkc.org/api/v1/piston/versions`
+- `POST` `https://emkc.org/api/v1/piston/execute`
+Important Note: The Piston API is rate limited to 1 request per second
+
 #### Installation
 ```
 # clone and enter repo
@@ -230,7 +237,41 @@ To use the API, it must first be started. To start the API, run the following:
 cd api
 ./start
 ```
-The Piston API exposes one endpoint at `http://127.0.0.1:2000/execute`.
+
+#### Base URLs
+For your own local installation, use:
+```
+http://127.0.0.1:2000
+```
+When using the public Piston API, use:
+```
+https://emkc.org/api/v1/piston
+```
+
+#### Versions Endpoint
+`GET /versions`
+This endpoint takes no input and returns a JSON array of the currently installed languages.
+
+Truncated response sample:
+```json
+[
+    {
+        "name": "awk",
+        "version": "1.3.3"
+    },
+    {
+        "name": "bash",
+        "version": "4.4.20"
+    },
+    {
+        "name": "c",
+        "version": "7.5.0"
+    }
+]
+```
+
+#### Execution Endpoint
+`POST /execute`
 This endpoint takes the following JSON payload and expects at least the language and source. If
 source is not provided, a blank file is passed as the source.
 ```json
