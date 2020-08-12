@@ -159,12 +159,12 @@ echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
 source /opt/.profile
 
 # install julia
-# final binary: /opt/julia/julia-1.4.1/bin/julia
-# get version: /opt/julia/julia-1.4.1/bin/julia --version
+# final binary: /opt/julia/julia-1.5.0/bin/julia
+# get version: /opt/julia/julia-1.5.0/bin/julia --version
 cd /opt && mkdir julia && cd julia
-wget https://julialang-s3.julialang.org/bin/linux/x64/1.4/julia-1.4.1-linux-x86_64.tar.gz
-tar -xzf julia-1.4.1-linux-x86_64.tar.gz
-echo 'export PATH=$PATH:/opt/julia/julia-1.4.1/bin' >> /opt/.profile
+wget https://julialang-s3.julialang.org/bin/linux/x64/1.5/julia-1.5.0-linux-x86_64.tar.gz
+tar -xzf julia-1.5.0-linux-x86_64.tar.gz
+echo 'export PATH=$PATH:/opt/julia/julia-1.5.0/bin' >> /opt/.profile
 source /opt/.profile
 
 # install kotlin
