@@ -67,6 +67,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
     whitelist := []string{
         "awk",
         "bash",
+        "brainfuck", "bf",
         "c",
         "cpp", "c++",
         "csharp", "cs", "c#",
@@ -138,6 +139,8 @@ func launch(request Inbound, res http.ResponseWriter) {
     execlang := request.Language
 
     switch execlang {
+    case "bf":
+        execlang = "brainfuck"
     case "c++":
         execlang = "cpp"
     case "cs", "c#":

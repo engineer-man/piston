@@ -48,6 +48,9 @@ case "$lang" in
 "bash")
     bin=bash
     ;;
+"brainfuck" | "bf")
+    bin=brainfuck
+    ;;
 "c")
     bin=c
     ;;
