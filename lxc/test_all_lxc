@@ -23,8 +23,10 @@ echo 'testing js'
 ../execute js test.js
 echo 'testing kotlin'
 ../execute kotlin test.kt
-echo 'testing asm'
+echo 'testing asm 32 bit'
 ../execute asm test.nasm
+echo 'testing asm 64 bit'
+../execute asm64 test64.nasm
 echo 'testing php'
 ../execute php test.php
 echo 'testing perl'
