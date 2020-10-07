@@ -81,6 +81,9 @@ case "$lang" in
 "nasm" | "asm")
     bin=nasm
     ;;
+"nasm64" | "asm64")
+    bin=nasm64
+    ;;
 "node" | "js" | "javascript")
     bin=node
     ;;

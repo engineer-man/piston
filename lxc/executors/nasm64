@@ -1,0 +1,4 @@
+cd /tmp/$2
+timeout -s KILL 10 nasm -f elf64 -o binary.o code.code
+timeout -s KILL 10 ld -m elf_x86_64 binary.o -o binary
+runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"

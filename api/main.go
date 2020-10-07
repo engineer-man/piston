@@ -79,6 +79,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "kotlin",
         "lua",
         "nasm", "asm",
+        "nasm64", "asm64",
         "node", "javascript", "js",
         "perl", "pl",
         "php",
@@ -152,6 +153,8 @@ func launch(request Inbound, res http.ResponseWriter) {
         execlang = "elixir"
     case "asm":
         execlang = "nasm"
+    case "asm64":
+        execlang = "nasm64"
     case "js", "javascript":
         execlang = "node"
     case "jl":
