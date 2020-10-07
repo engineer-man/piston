@@ -75,6 +75,9 @@ case "$lang" in
 "kotlin")
     bin=kotlin
     ;;
+"lua")
+    bin=lua
+    ;;
 "nasm" | "asm")
     bin=nasm
     ;;

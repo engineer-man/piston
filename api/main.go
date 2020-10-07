@@ -77,6 +77,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "java",
         "julia", "jl",
         "kotlin",
+        "lua",
         "nasm", "asm",
         "node", "javascript", "js",
         "perl", "pl",

@@ -33,6 +33,9 @@ echo '---'
 echo 'kotlin'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version 2>&1 | grep kotlin"
 echo "---"
+echo 'lua'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "lua -v"
+echo "---"
 echo 'nasm'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
