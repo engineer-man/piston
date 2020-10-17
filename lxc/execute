@@ -66,8 +66,14 @@ case "$lang" in
 "go")
     bin=go
     ;;
+"haskell" | "hs")
+    bin=haskell
+    ;;
 "java")
     bin=java
+    ;;
+"jelly")
+    bin=jelly
     ;;
 "julia" | "jl")
     bin=julia
@@ -119,9 +125,6 @@ case "$lang" in
     ;;
 "typescript" | "ts")
     bin=typescript
-    ;;
-"haskell" | "hs")
-    bin=haskell
     ;;
 *)
     echo "invalid language"

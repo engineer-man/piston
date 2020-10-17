@@ -44,6 +44,7 @@ lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
 echo 'source /opt/.profile' >> /opt/.bashrc
 echo 'export HOME=/opt' >> /opt/.profile
 echo 'export TERM=linux' >> /opt/.profile
+echo 'export PATH=$PATH:/opt/.local/bin' >> /opt/.profile
 export HOME=/opt
 export TERM=linux
 sed -i 's/\/root/\/opt/' /etc/passwd
@@ -159,9 +160,11 @@ echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
 source /opt/.profile
 
 # install jelly
-git clone -q https://github.com/DennisMitchell/jellylanguage.git
-cd jellylanguage
-pip3 install --upgrade --user .
+cd /opt && mkdir jelly && cd jelly
+wget https://github.com/DennisMitchell/jellylanguage/archive/master.zip
+unzip master.zip
+cd jellylanguage-master
+pip3.8 install --upgrade --user .
 
 # install julia
 # final binary: /opt/julia/julia-1.5.0/bin/julia
@@ -231,6 +234,7 @@ apt install -y ghc
 # install deno
 # final binary: /opt/.deno/bin/deno
 # get version: /opt/.deno/bin/deno --version
+cd /opt && mkdir deno && cd deno
 curl -fsSL https://deno.land/x/install/install.sh | sh
 echo 'export DENO_INSTALL="/opt/.deno"' >> /opt/.profile
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> /opt/.profile
