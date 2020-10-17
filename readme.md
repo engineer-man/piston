@@ -164,7 +164,7 @@ cd /opt && mkdir jelly && cd jelly
 wget https://github.com/DennisMitchell/jellylanguage/archive/master.zip
 unzip master.zip
 cd jellylanguage-master
-pip3.8 install --upgrade --user .
+pip3.8 install .
 
 # install julia
 # final binary: /opt/julia/julia-1.5.0/bin/julia
