@@ -9,12 +9,16 @@ echo 'testing cpp'
 ../execute cpp test.cpp
 echo 'testing cs'
 ../execute cs test.cs
+echo 'testing deno ts'
+../execute deno testdeno.ts
 echo 'testing elisp'
 ../execute elisp test.el
 echo 'testing elixir'
 ../execute exs test.exs
 echo 'testing go'
 ../execute go test.go
+echo 'testing haskell'
+../execute haskell test.hs
 echo 'testing java'
 ../execute java test.java
 echo 'testing jl'
@@ -45,9 +49,3 @@ echo 'testing python2'
 ../execute python2 test2.py
 echo 'testing python3'
 ../execute python3 test3.py
-echo 'testing haskell'
-../execute haskell test.hs
-echo 'testing deno js'
-../execute deno testdeno.js
-echo 'testing deno ts'
-../execute deno testdeno.ts

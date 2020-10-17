@@ -333,6 +333,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - c
 - cpp
 - csharp
+- deno
 - elixir
 - emacs
 - go

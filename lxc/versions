@@ -1,74 +1,98 @@
 #!/usr/bin/env bash
 echo '---'
+
 echo 'awk'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "awk -W version"
 echo '---'
+
 echo 'bash'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "bash --version"
 echo '---'
+
 echo 'c'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
 echo '---'
+
 echo 'cpp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ -v"
 echo '---'
+
 echo 'csharp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "mcs --version"
 echo '---'
+
 echo "elixir"
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "elixir --version"
 echo '---'
+
+echo 'deno'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "deno --version"
+echo '---'
+
 echo "emacs"
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "emacs --version"
 echo '---'
+
 echo 'go'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "go version"
 echo '---'
-echo 'java'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "java -version"
-echo '---'
-echo 'julia'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "julia --version"
-echo '---'
-echo 'kotlin'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version 2>&1 | grep kotlin"
-echo "---"
-echo 'lua'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "lua -v"
-echo "---"
-echo 'nasm'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
-echo '---'
-echo 'node'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
-echo '---'
-echo 'perl'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "perl --version | grep x86"
-echo '---'
-echo 'php'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "php -v"
-echo '---'
-echo 'python2'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "python -V"
-echo '---'
-echo 'python3'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
-echo '---'
-echo 'ruby'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "ruby --version"
-echo '---'
-echo 'rust'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "rustc --version"
-echo '---'
-echo 'swift'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "swift --version"
-echo '---'
-echo 'typescript'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "tsc --version"
-echo '---'
+
 echo 'haskell'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "ghc --version"
 echo '---'
-echo 'deno'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "deno --version"
+
+echo 'java'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "java -version"
+echo '---'
+
+echo 'julia'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "julia --version"
+echo '---'
+
+echo 'kotlin'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version 2>&1 | grep kotlin"
+echo '---'
+
+echo 'lua'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "lua -v"
+echo '---'
+
+echo 'nasm'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
+echo '---'
+
+echo 'node'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
+echo '---'
+
+echo 'perl'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "perl --version | grep x86"
+echo '---'
+
+echo 'php'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "php -v"
+echo '---'
+
+echo 'python2'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python -V"
+echo '---'
+
+echo 'python3'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
+echo '---'
+
+echo 'ruby'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "ruby --version"
+echo '---'
+
+echo 'rust'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "rustc --version"
+echo '---'
+
+echo 'swift'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "swift --version"
+echo '---'
+
+echo 'typescript'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "tsc --version"
 echo '---'
