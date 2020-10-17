@@ -218,6 +218,11 @@ make
 echo 'export PATH=$PATH:/opt/lua/lua54/src' >> /opt/.profile
 source /opt/.profile
 
+# install haskell
+# final binary: /usr/bin/ghc
+# get version: /usr/bin/ghc --version
+apt install ghc
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i
@@ -323,6 +328,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - elixir
 - emacs
 - go
+- haskell
 - java
 - julia
 - kotlin

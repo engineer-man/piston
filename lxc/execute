@@ -117,6 +117,9 @@ case "$lang" in
 "typescript" | "ts")
     bin=typescript
     ;;
+"haskell" | "hs")
+    bin=haskell
+    ;;
 *)
     echo "invalid language"
     exit
