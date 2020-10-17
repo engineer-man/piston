@@ -221,14 +221,14 @@ source /opt/.profile
 # install haskell
 # final binary: /usr/bin/ghc
 # get version: /usr/bin/ghc --version
-apt install ghc
+apt install -y ghc
 
 # install deno
 # final binary: /opt/.deno/bin/deno
 # get version: /opt/.deno/bin/deno --version
 curl -fsSL https://deno.land/x/install/install.sh | sh
-echo 'export DENO_INSTALL="/opt/.deno"'
-echo 'export PATH="$DENO_INSTALL/bin:$PATH"'
+echo 'export DENO_INSTALL="/opt/.deno"' > /opt/.profile
+echo 'export PATH="$DENO_INSTALL/bin:$PATH"' > /opt/.profile
 source /opt/.profile
 
 # create runnable users and apply limits
