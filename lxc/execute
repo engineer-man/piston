@@ -87,6 +87,9 @@ case "$lang" in
 "node" | "js" | "javascript")
     bin=node
     ;;
+"deno" | "denojs" | "denots")
+    bin=deno
+    ;;
 "perl")
     bin=perl
     ;;

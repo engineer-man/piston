@@ -47,3 +47,7 @@ echo 'testing python3'
 ../execute python3 test3.py
 echo 'testing haskell'
 ../execute haskell test.hs
+echo 'testing deno js'
+../execute deno testdeno.js
+echo 'testing deno ts'
+../execute deno testdeno.ts

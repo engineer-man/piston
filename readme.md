@@ -54,7 +54,7 @@ apt-get update
 apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
-    ruby libtinfo-dev
+    ruby libtinfo-dev unzip
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python
@@ -222,6 +222,14 @@ source /opt/.profile
 # final binary: /usr/bin/ghc
 # get version: /usr/bin/ghc --version
 apt install ghc
+
+# install deno
+# final binary: /opt/.deno/bin/deno
+# get version: /opt/.deno/bin/deno --version
+curl -fsSL https://deno.land/x/install/install.sh | sh
+echo 'export DENO_INSTALL="/opt/.deno"'
+echo 'export PATH="$DENO_INSTALL/bin:$PATH"'
+source /opt/.profile
 
 # create runnable users and apply limits
 for i in {1..150}; do

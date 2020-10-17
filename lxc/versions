@@ -69,3 +69,6 @@ echo '---'
 echo 'haskell'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "ghc --version"
 echo '---'
+echo 'deno'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "deno --version"
+echo '---'
