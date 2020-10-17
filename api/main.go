@@ -75,6 +75,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "emacs", "elisp", "el",
         "go",
         "java",
+        "jelly",
         "julia", "jl",
         "kotlin",
         "lua",

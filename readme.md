@@ -158,6 +158,11 @@ tar -xzf openjdk-14_linux-x64_bin.tar.gz
 echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
 source /opt/.profile
 
+# install jelly
+git clone -q https://github.com/DennisMitchell/jellylanguage.git
+cd jellylanguage
+pip3 install --upgrade --user .
+
 # install julia
 # final binary: /opt/julia/julia-1.5.0/bin/julia
 # get version: /opt/julia/julia-1.5.0/bin/julia --version
@@ -339,6 +344,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - go
 - haskell
 - java
+- jelly
 - julia
 - kotlin
 - nasm
