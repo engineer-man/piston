@@ -45,6 +45,10 @@ echo 'java'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "java -version"
 echo '---'
 
+echo 'jelly'
+echo '1.0.0'
+echo '---'
+
 echo 'julia'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "julia --version"
 echo '---'
