@@ -69,7 +69,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "bash",
         "brainfuck", "bf",
         "c",
-	"commonlisp", "clisp", "cl",
+        "commonlisp", "clisp", "cl",
         "cpp", "c++",
         "csharp", "cs", "c#",
         "deno", "denojs", "denots",
