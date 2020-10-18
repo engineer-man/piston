@@ -240,6 +240,12 @@ echo 'export DENO_INSTALL="/opt/.deno"' >> /opt/.profile
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> /opt/.profile
 source /opt/.profile
 
+# install common lisp
+# final binary /usr/bin/sbcl
+# get version: /usr/bin/sbcl --version
+# important notice: use sbcl --script to run a clisp file, sbcl enters the REPL
+apt install -y sbcl
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i

@@ -120,6 +120,9 @@ case "$lang" in
 "emacs" | "elisp" | "el")
     bin=emacs
     ;;
+"lisp" | "clisp" | "commonlisp" | "sbcl")
+    bin=sbcl
+    ;;
 "bash")
     bin=bash
     ;;

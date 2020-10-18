@@ -100,3 +100,7 @@ echo '---'
 echo 'typescript'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "tsc --version"
 echo '---'
+
+echo 'common lisp'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "sbcl --version"
+echo '---'
