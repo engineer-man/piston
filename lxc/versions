@@ -85,6 +85,10 @@ echo 'python3'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
 echo '---'
 
+echo 'paradoc'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -m paradoc --version"
+echo '---'
+
 echo 'ruby'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "ruby --version"
 echo '---'
