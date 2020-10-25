@@ -9,6 +9,10 @@ echo 'bash'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "bash --version"
 echo '---'
 
+echo 'brainfuck'
+echo '1.0.0'
+echo '---'
+
 echo 'c'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
 echo '---'
