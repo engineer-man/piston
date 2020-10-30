@@ -1,6 +1,6 @@
 cd /tmp/$2
 cp code.code interim.java
-name=$(cat interim.java | sed -E 's/(public\s+class|interface)\s+([A-Za-z0-9]+)/\2/')
+name=$(grep -Po "(?<=\n|\A)\s*(public\s+)?(class|interface|enum)\s+\K([^\n\s{]+)" interim.java)
 mv interim.java $name.java
 timeout -s KILL 10 javac $name.java
 runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"
