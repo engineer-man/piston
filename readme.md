@@ -249,6 +249,8 @@ unxz nim-1.4.0-linux_x64.tar.xz
 tar -xf nim-1.4.0-linux_x64.tar
 cd nim-1.4.0
 ./install.sh /opt
+echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
+source /opt/.profile
 
 # create runnable users and apply limits
 for i in {1..150}; do
