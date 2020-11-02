@@ -99,6 +99,9 @@ case "$lang" in
 "deno" | "denojs" | "denots")
     bin=deno
     ;;
+"paradoc")
+    bin=paradoc
+    ;;
 "perl")
     bin=perl
     ;;
