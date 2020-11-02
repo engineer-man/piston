@@ -89,6 +89,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "php",
         "python2",
         "python3", "python",
+        "paradoc",
         "ruby",
         "rust",
         "swift",

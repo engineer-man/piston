@@ -85,6 +85,14 @@ ln -s python python3.8
 echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
 source /opt/.profile
 
+# install paradoc
+# this is not a binary, it is a python module
+# therefore it cannot be run directly as it requires python3 to be installed 
+cd /opt && mkdir paradoc && cd paradoc
+git clone https://github.com/betaveros/paradoc.git
+echo 'export PYTHONPATH=$PYTHONPATH:/opt/paradoc/paradoc' >> /opt/.profile
+source /opt/.profile
+
 # install node.js
 # final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/node
 # get version: /opt/nodejs/node-v12.16.1-linux-x64/bin/node -v
@@ -369,6 +377,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - php
 - python2
 - python3
+- paradoc
 - ruby
 - rust
 - swift
