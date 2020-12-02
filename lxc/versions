@@ -9,6 +9,10 @@ echo 'bash'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "bash --version"
 echo '---'
 
+echo 'brainfuck'
+echo '1.0.0'
+echo '---'
+
 echo 'c'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
 echo '---'
@@ -65,6 +69,10 @@ echo 'nasm'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 
+echo 'nim'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "nim -v | head -n1"
+echo '---'
+
 echo 'node'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
 echo '---'
@@ -83,6 +91,10 @@ echo '---'
 
 echo 'python3'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
+echo '---'
+
+echo 'paradoc'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -m paradoc --version"
 echo '---'
 
 echo 'ruby'

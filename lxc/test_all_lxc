@@ -31,6 +31,8 @@ echo 'testing asm 32 bit'
 ../execute asm test.nasm
 echo 'testing asm 64 bit'
 ../execute asm64 test64.nasm
+echo 'testing nim'
+../execute nim test.nim
 echo 'testing php'
 ../execute php test.php
 echo 'testing perl'
@@ -51,3 +53,5 @@ echo 'testing python3'
 ../execute python3 test3.py
 echo 'testing common lisp'
 ../execute sbcl --script test.cl
+echo 'testing paradoc'
+../execute python3 test_paradoc.py

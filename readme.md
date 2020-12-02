@@ -85,6 +85,14 @@ ln -s python python3.8
 echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
 source /opt/.profile
 
+# install paradoc
+# this is not a binary, it is a python module
+# therefore it cannot be run directly as it requires python3 to be installed 
+cd /opt && mkdir paradoc && cd paradoc
+git clone https://github.com/betaveros/paradoc.git
+echo 'export PYTHONPATH=$PYTHONPATH:/opt/paradoc/paradoc' >> /opt/.profile
+source /opt/.profile
+
 # install node.js
 # final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/node
 # get version: /opt/nodejs/node-v12.16.1-linux-x64/bin/node -v
@@ -179,9 +187,9 @@ source /opt/.profile
 # final binary: /opt/kotlinc/bin/kotlinc
 # get version: /opt/kotlinc/bin/kotlinc -version
 cd /opt
-wget https://github.com/JetBrains/kotlin/releases/download/v1.3.72/kotlin-compiler-1.3.72.zip
-unzip kotlin-compiler-1.3.72.zip
-rm kotlin-compiler-1.3.72.zip
+wget https://github.com/JetBrains/kotlin/releases/download/v1.4.10/kotlin-compiler-1.4.10.zip
+unzip kotlin-compiler-1.4.10.zip
+rm kotlin-compiler-1.4.10.zip
 echo 'export PATH=$PATH:/opt/kotlinc/bin' >> /opt/.profile
 source /opt/.profile
 
@@ -245,6 +253,18 @@ source /opt/.profile
 # get version: /usr/bin/sbcl --version
 # important notice: use sbcl --script to run a clisp file, sbcl enters the REPL
 apt install -y sbcl
+
+# install nim
+# final binary: /opt/nim/bin/nim
+# get version: /opt/nim/bin/nim -v
+cd /opt && mkdir nim && cd nim
+wget https://nim-lang.org/download/nim-1.4.0-linux_x64.tar.xz
+unxz nim-1.4.0-linux_x64.tar.xz
+tar -xf nim-1.4.0-linux_x64.tar
+cd nim-1.4.0
+./install.sh /opt
+echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
+source /opt/.profile
 
 # create runnable users and apply limits
 for i in {1..150}; do
@@ -363,6 +383,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - php
 - python2
 - python3
+- paradoc
 - ruby
 - rust
 - swift

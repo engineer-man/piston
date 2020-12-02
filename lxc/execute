@@ -90,11 +90,17 @@ case "$lang" in
 "nasm64" | "asm64")
     bin=nasm64
     ;;
+"nim")
+    bin=nim
+    ;;
 "node" | "js" | "javascript")
     bin=node
     ;;
 "deno" | "denojs" | "denots")
     bin=deno
+    ;;
+"paradoc")
+    bin=paradoc
     ;;
 "perl")
     bin=perl
