@@ -10,7 +10,7 @@ about the request format but rather than using the local URLs, use the following
 - `GET` `https://emkc.org/api/v1/piston/versions`
 - `POST` `https://emkc.org/api/v1/piston/execute`
 
-Important Note: The Piston API is rate limited to 1 request per second
+Important Note: The Piston API is rate limited to 5 requests per second
 
 #### Installation
 ```
