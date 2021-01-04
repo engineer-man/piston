@@ -261,6 +261,15 @@ cd nim-1.4.0
 echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
 source /opt/.profile
 
+# install crystal
+# final binary: /opt/crystal/crystal-0.35.1-1/bin/crystal
+# get version: /opt/crystal/crystal-0.35.1-1/bin/crystal -v
+cd /opt && mkdir crystal && cd crystal
+wget https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-x86_64.tar.gz
+tar -xzf crystal-0.35.1-1-linux-x86_64.tar.gz
+echo 'export PATH="$PATH:/opt/crystal/crystal-0.35.1-1/bin:$PATH"' >> /opt/.profile
+source /opt/.profile
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i
@@ -362,6 +371,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - bash
 - c
 - cpp
+- crystal
 - csharp
 - deno
 - elixir

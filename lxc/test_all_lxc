@@ -7,6 +7,8 @@ echo 'testing c'
 ../execute c test.c
 echo 'testing cpp'
 ../execute cpp test.cpp
+echo 'testing crystal'
+../execute crystal test.cr
 echo 'testing cs'
 ../execute cs test.cs
 echo 'testing deno ts'

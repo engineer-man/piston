@@ -57,6 +57,9 @@ case "$lang" in
 "cpp" | "c++")
     bin=cpp
     ;;
+"crystal" | "cr")
+    bin=crystal
+    ;;
 "csharp" | "cs" | "c#")
     bin=csharp
     ;;

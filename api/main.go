@@ -70,6 +70,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "brainfuck", "bf",
         "c",
         "cpp", "c++",
+        "crystal", "cr",
         "csharp", "cs", "c#",
         "deno", "denojs", "denots",
         "elixir", "exs",
@@ -150,6 +151,8 @@ func launch(request Inbound, res http.ResponseWriter) {
         execlang = "brainfuck"
     case "c++":
         execlang = "cpp"
+    case "cr":
+        execlang = "crystal"
     case "cs", "c#":
         execlang = "csharp"
     case "denojs", "denots":
