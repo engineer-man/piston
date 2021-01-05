@@ -29,6 +29,10 @@ echo "elixir"
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "elixir --version"
 echo '---'
 
+echo 'd' 
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "dmd --version"
+echo '---'
+
 echo 'deno'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "deno --version"
 echo '---'

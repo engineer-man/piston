@@ -60,6 +60,9 @@ case "$lang" in
 "csharp" | "cs" | "c#")
     bin=csharp
     ;;
+"d")
+    bin=dmd
+    ;;
 "elixir" | "exs")
     bin=elixir
     ;;

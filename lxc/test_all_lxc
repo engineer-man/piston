@@ -9,6 +9,8 @@ echo 'testing cpp'
 ../execute cpp test.cpp
 echo 'testing cs'
 ../execute cs test.cs
+echo 'testing d'
+../execute d test.d
 echo 'testing deno ts'
 ../execute deno testdeno.ts
 echo 'testing elisp'

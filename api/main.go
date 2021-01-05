@@ -71,6 +71,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "c",
         "cpp", "c++",
         "csharp", "cs", "c#",
+        "d",
         "deno", "denojs", "denots",
         "elixir", "exs",
         "emacs", "elisp", "el",
