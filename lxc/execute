@@ -61,7 +61,7 @@ case "$lang" in
     bin=csharp
     ;;
 "d")
-    bin=dmd
+    bin=d
     ;;
 "elixir" | "exs")
     bin=elixir
