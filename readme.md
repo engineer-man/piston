@@ -395,6 +395,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - rust
 - swift
 - typescript
+- zig
 
 #### Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes
