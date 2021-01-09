@@ -112,3 +112,7 @@ echo '---'
 echo 'typescript'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "tsc --version"
 echo '---'
+
+echo 'zig'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "zig version"
+echo '---'

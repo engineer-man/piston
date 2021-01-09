@@ -1,0 +1,4 @@
+cd /tmp/$2
+cp code.code main.zig
+timeout -s KILL 10 zig build-exe main.zig
+runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./main"

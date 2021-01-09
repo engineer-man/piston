@@ -94,6 +94,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "rust",
         "swift",
         "typescript", "ts",
+        "zig"
     }
 
     // check if the supplied language is supported

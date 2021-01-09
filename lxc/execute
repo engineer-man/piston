@@ -132,6 +132,9 @@ case "$lang" in
 "typescript" | "ts")
     bin=typescript
     ;;
+"zig")
+    bin=zig
+    ;;
 *)
     echo "invalid language"
     exit

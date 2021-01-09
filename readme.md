@@ -261,6 +261,18 @@ cd nim-1.4.0
 echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
 source /opt/.profile
 
+# install zig
+# final binary: /opt/zig/zig
+# get version: /opt/zig/zig version
+cd /opt
+wget https://ziglang.org/download/0.7.1/zig-linux-x86_64-0.7.1.tar.xz
+tar -xf zig-linux-x86_64-0.7.1.tar.xz
+mv zig-linux-x86_64-0.7.1 zig
+rm zig-linux-x86_64-0.7.1.tar.xz
+echo 'export PATH=$PATH:/opt/zig' >> /opt/.profile
+source /opt/.profile
+
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i

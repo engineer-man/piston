@@ -53,3 +53,5 @@ echo 'testing python3'
 ../execute python3 test3.py
 echo 'testing paradoc'
 ../execute python3 test_paradoc.py
+echo 'testing zig'
+../execute zig test.zig
