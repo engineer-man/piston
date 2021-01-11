@@ -113,6 +113,7 @@ func Execute(res http.ResponseWriter, req *http.Request) {
 
     pres, _ := json.Marshal(problem)
 
+    res.WriteHeader(http.StatusBadRequest)
     res.Write(pres)
 }
 
