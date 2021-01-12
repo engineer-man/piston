@@ -88,7 +88,7 @@ source /opt/.profile
 
 # install paradoc
 # this is not a binary, it is a python module
-# therefore it cannot be run directly as it requires python3 to be installed 
+# therefore it cannot be run directly as it requires python3 to be installed
 cd /opt && mkdir paradoc && cd paradoc
 git clone https://github.com/betaveros/paradoc.git
 echo 'export PYTHONPATH=$PYTHONPATH:/opt/paradoc/paradoc' >> /opt/.profile
@@ -247,18 +247,6 @@ cd /opt && mkdir deno && cd deno
 curl -fsSL https://deno.land/x/install/install.sh | sh
 echo 'export DENO_INSTALL="/opt/.deno"' >> /opt/.profile
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> /opt/.profile
-source /opt/.profile
-
-# install nim
-# final binary: /opt/nim/bin/nim
-# get version: /opt/nim/bin/nim -v
-cd /opt && mkdir nim && cd nim
-wget https://nim-lang.org/download/nim-1.4.0-linux_x64.tar.xz
-unxz nim-1.4.0-linux_x64.tar.xz
-tar -xf nim-1.4.0-linux_x64.tar
-cd nim-1.4.0
-./install.sh /opt
-echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
 source /opt/.profile
 
 # create runnable users and apply limits

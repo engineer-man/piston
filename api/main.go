@@ -83,7 +83,6 @@ func Execute(res http.ResponseWriter, req *http.Request) {
         "lua",
         "nasm", "asm",
         "nasm64", "asm64",
-        "nim",
         "node", "javascript", "js",
         "perl", "pl",
         "php",
