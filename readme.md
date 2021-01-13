@@ -16,7 +16,7 @@ Important Note: The Piston API is rate limited to 5 requests per second
 Updated installation instructions coming soon. See `var/install.txt` for how to do it from scratch.
 
 #### CLI Usage
-- `lxc/execute [language] [file path] [arg]...`
+- `lxc/execute [language] [file path] [args]`
 
 #### API Usage
 To use the API, it must first be started. To start the API, run the following:
@@ -41,6 +41,9 @@ This endpoint takes no input and returns a JSON array of the currently installed
 
 Truncated response sample:
 ```json
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 [
     {
         "name": "awk",
@@ -74,6 +77,9 @@ source is not provided, a blank file is passed as the source.
 ```
 A typical response when everything succeeds will be similar to the following:
 ```json
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 {
     "ran": true,
     "language": "js",
@@ -83,6 +89,9 @@ A typical response when everything succeeds will be similar to the following:
 ```
 If an invalid language is supplied, a typical response will look like the following:
 ```json
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
 {
     "code": "unsupported_language",
     "message": "whatever is not supported by Piston"
@@ -96,6 +105,7 @@ If an invalid language is supplied, a typical response will look like the follow
 - cpp
 - csharp
 - deno
+- erlang
 - elixir
 - emacs
 - go
@@ -130,6 +140,7 @@ various privilege escalation, denial-of-service, and resource saturation threats
 - Capping max processes at 64 (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
 - Capping max files at 2048 (resists various file based attacks)
 - Mounting all resources read-only (resists `sudo rm -rf --no-preserve-root /`)
+- Cleaning up all temp space after each execution (resists out of drive space attacks)
 - Running as a variety of unprivileged users
 - Capping runtime execution at 3 seconds
 - Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
