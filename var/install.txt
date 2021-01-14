@@ -1,23 +1,3 @@
-# clone and enter repo
-git clone https://github.com/engineer-man/piston
-cd piston/lxc
-
-# install dependencies
-
-# centos:
-yum install -y epel-release
-yum install -y lxc lxc-templates debootstrap libvirt
-systemctl start libvirtd
-
-# ubuntu server 18.04:
-apt install lxc lxc-templates debootstrap libvirt0
-
-# arch:
-sudo pacman -S lxc libvirt unzip
-
-# everything else:
-# not documented, please open pull requests with commands for debian/arch/macos
-
 # create and start container
 lxc-create -t download -n piston -- --dist ubuntu --release bionic --arch amd64
 ./start

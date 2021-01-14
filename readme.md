@@ -1,19 +1,46 @@
 ## Piston
-Piston is the underlying engine for running untrusted and possibly malicious
-code that originates from EMKC contests and challenges. It's also used in the
-Engineer Man Discord server via [I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1000+ other servers.
+Piston is the underlying engine for running untrusted and possibly malicious code that originates from
+[EMKC Challenges](https://emkc.org/challenges) and
+[EMKC Weekly Contests](https://emkc.org/contests). It's also used in the
+[Engineer Man Discord Server](https://discord.gg/engineerman) via
+[I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers.
 To get it in your own server, go here: https://emkc.org/run.
 
 #### Use Public API (new)
-Requires no installation and you can use it immediately. Reference the API Usage section below to learn
-about the request format but rather than using the local URLs, use the following URLs:
+Requires no installation and you can use it immediately. Reference the Versions/Execute sections
+below to learn about the request and response formats.
 - `GET` `https://emkc.org/api/v1/piston/versions`
 - `POST` `https://emkc.org/api/v1/piston/execute`
 
 Important Note: The Piston API is rate limited to 5 requests per second
 
-#### Installation
-Updated installation instructions coming soon. See `var/install.txt` for how to do it from scratch.
+#### Cloning and System Dependencies
+```
+# clone and enter repo
+git clone https://github.com/engineer-man/piston
+cd piston/lxc
+
+# centos/rhel dependencies:
+yum install -y epel-release
+yum install -y lxc lxc-templates debootstrap libvirt
+systemctl start libvirtd
+
+# ubuntu server 18.04 dependencies:
+apt install lxc lxc-templates debootstrap libvirt0
+
+# arch dependencies:
+sudo pacman -S lxc libvirt unzip
+
+# everything else:
+# not documented, please open pull requests with commands for debian/arch/macos/etc
+```
+
+#### Installation (simple)
+Coming soon
+
+#### Installation (advanced/manual)
+See `var/install.txt` for how to create a new LXC container and install all of the required
+software.
 
 #### CLI Usage
 - `lxc/execute [language] [file path] [args]`
@@ -26,13 +53,13 @@ cd api
 ```
 
 #### Base URLs
-For your own local installation, use:
-```
-http://127.0.0.1:2000
-```
 When using the public Piston API, use:
 ```
 https://emkc.org/api/v1/piston
+```
+For your own local installation, use:
+```
+http://127.0.0.1:2000
 ```
 
 #### Versions Endpoint
@@ -60,10 +87,11 @@ Content-Type: application/json
 ]
 ```
 
-#### Execution Endpoint
+#### Execute Endpoint
 `POST /execute`
 This endpoint takes the following JSON payload and expects at least the language and source. If
-source is not provided, a blank file is passed as the source.
+source is not provided, a blank file is passed as the source. If no `args` are desired, it can either
+be an empty array or left out entirely.
 ```json
 {
     "language": "js",
@@ -75,7 +103,9 @@ source is not provided, a blank file is passed as the source.
     ]
 }
 ```
-A typical response when everything succeeds will be similar to the following:
+A typical response upon successful execution will contain the `language`, `version`, `output` which
+is a combination of both `stdout` and `stderr` but in chronological order according to program output,
+as well as separate `stdout` and `stderr`.
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -84,7 +114,9 @@ Content-Type: application/json
     "ran": true,
     "language": "js",
     "version": "12.13.0",
-    "output": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]"
+    "output": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]",
+    "stdout": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]",
+    "stderr": ""
 }
 ```
 If an invalid language is supplied, a typical response will look like the following:
@@ -101,6 +133,7 @@ Content-Type: application/json
 #### Supported Languages
 - awk
 - bash
+- brainfuck
 - c
 - cpp
 - csharp
@@ -108,19 +141,21 @@ Content-Type: application/json
 - erlang
 - elixir
 - emacs
+- elisp
 - go
 - haskell
 - java
 - jelly
 - julia
 - kotlin
+- lua
 - nasm
 - node
+- paradoc
 - perl
 - php
 - python2
 - python3
-- paradoc
 - ruby
 - rust
 - swift
