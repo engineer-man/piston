@@ -6,13 +6,15 @@ Piston is the underlying engine for running untrusted and possibly malicious cod
 [I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers.
 To get it in your own server, go here: https://emkc.org/run.
 
-#### Use Public API (new)
+#### Use Public API
 Requires no installation and you can use it immediately. Reference the Versions/Execute sections
 below to learn about the request and response formats.
 - `GET` `https://emkc.org/api/v1/piston/versions`
 - `POST` `https://emkc.org/api/v1/piston/execute`
 
-Important Note: The Piston API is rate limited to 5 requests per second
+Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
+and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
+so we can discuss potentially getting you an unlimited key.
 
 #### Cloning and System Dependencies
 ```
