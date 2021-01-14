@@ -36,7 +36,7 @@ sudo pacman -S lxc libvirt unzip
 ```
 
 #### Installation (simple)
-Coming soon
+Coming soon.
 
 #### Installation (advanced/manual)
 See `var/install.txt` for how to create a new LXC container and install all of the required
@@ -46,7 +46,8 @@ software.
 - `lxc/execute [language] [file path] [args]`
 
 #### API Usage
-To use the API, it must first be started. To start the API, run the following:
+To use the API, it must first be started. Please note that if root is required to access
+LXC then the API must also be running as root. To start the API, run the following:
 ```
 cd api
 ./start
