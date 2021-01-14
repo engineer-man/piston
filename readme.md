@@ -35,6 +35,9 @@ apt install lxc lxc-templates debootstrap libvirt0
 # arch dependencies:
 sudo pacman -S lxc libvirt unzip
 
+#macOS dependencies:
+brew install lxc libvirt unzip
+
 # everything else:
 # not documented, please open pull requests with commands for debian/arch/macos/etc
 ```
