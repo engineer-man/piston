@@ -1,10 +1,12 @@
 ## Piston
-Piston is the underlying engine for running untrusted and possibly malicious code that originates from
-[EMKC Challenges](https://emkc.org/challenges) and
-[EMKC Weekly Contests](https://emkc.org/contests). It's also used in the
+Piston is a high performance general purpose code execution engine. It excels at running untrusted and
+possibly malicious code without fear from any harmful effects.
+It's used in numerous places including
+[EMKC Challenges](https://emkc.org/challenges),
+[EMKC Weekly Contests](https://emkc.org/contests), the
 [Engineer Man Discord Server](https://discord.gg/engineerman) via
-[I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers.
-To get it in your own server, go here: https://emkc.org/run.
+[I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers
+and 100+ direct integrations. To get it in your own server, go here: https://emkc.org/run.
 
 #### Use Public API
 Requires no installation and you can use it immediately. Reference the Versions/Execute sections
