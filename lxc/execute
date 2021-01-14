@@ -40,104 +40,10 @@ else
 fi
 exec 200>&-
 
-bin=
-case "$lang" in
-"awk")
-    bin=awk
-    ;;
-"bash")
-    bin=bash
-    ;;
-"brainfuck" | "bf")
-    bin=brainfuck
-    ;;
-"c")
-    bin=c
-    ;;
-"cpp" | "c++")
-    bin=cpp
-    ;;
-"csharp" | "cs" | "c#")
-    bin=csharp
-    ;;
-"elixir" | "exs")
-    bin=elixir
-    ;;
-"go")
-    bin=go
-    ;;
-"haskell" | "hs")
-    bin=haskell
-    ;;
-"java")
-    bin=java
-    ;;
-"jelly")
-    bin=jelly
-    ;;
-"julia" | "jl")
-    bin=julia
-    ;;
-"kotlin")
-    bin=kotlin
-    ;;
-"lua")
-    bin=lua
-    ;;
-"nasm" | "asm")
-    bin=nasm
-    ;;
-"nasm64" | "asm64")
-    bin=nasm64
-    ;;
-"node" | "js" | "javascript")
-    bin=node
-    ;;
-"deno" | "denojs" | "denots")
-    bin=deno
-    ;;
-"paradoc")
-    bin=paradoc
-    ;;
-"perl")
-    bin=perl
-    ;;
-"php")
-    bin=php
-    ;;
-"python2")
-    bin=python2
-    ;;
-"python3" | "python")
-    bin=python3
-    ;;
-"ruby")
-    bin=ruby
-    ;;
-"rust")
-    bin=rust
-    ;;
-"swift")
-    bin=swift
-    ;;
-"emacs" | "elisp" | "el")
-    bin=emacs
-    ;;
-"bash")
-    bin=bash
-    ;;
-"typescript" | "ts")
-    bin=typescript
-    ;;
-*)
-    echo "invalid language"
-    exit
-esac
-
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -l -c "bash /exec/$bin $newinc $epoch"
+        /bin/bash -l -c "bash /exec/$lang $newinc $epoch"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
