@@ -8,7 +8,7 @@ const versions = execFileSync(__dirname + '/../../lxc/versions')
     .toString()
     .toLowerCase()
     .split('---')
-    .map(section => section.split('\n'))
+    .map(section => section.trim().split('\n'))
     .filter(section => section.length >= 2);
 
 function getVersion(language) {
