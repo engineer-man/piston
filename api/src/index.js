@@ -2,24 +2,43 @@ const { writeFile } = require('fs/promises');
 const express = require('express');
 const app = express();
 const languages = require('./languages');
-const { spawn, execFileSync } = require('child_process');
+const { spawn } = require('child_process');
 
-const versions = execFileSync(__dirname + '/../../lxc/versions')
-    .toString()
-    .toLowerCase()
-    .split('---')
-    .map(section => section.trim().split('\n'))
-    .filter(section => section.length >= 2);
+(function setVersions() {
+    let output = '';
 
-function getVersion(language) {
-    return versions.find(section => section[0] === language?.name)?.slice(1).join('\n');
-}
+    const process = spawn(__dirname + '/../../lxc/versions');
 
-for (const language of languages) {
-    // TODO: Add custom handlers for some languages
+    process.stdout.setEncoding('utf-8');
+    process.stderr.setEncoding('utf-8');
 
-    language.version = getVersion(language);
-}
+    process.stdout.addListener('data', chunk => {
+        output += chunk;
+    });
+
+    process.stderr.addListener('data', chunk => {
+        output += chunk;
+    });
+    
+    process.on('exit', () => {
+        const sections = output.toLowerCase().split('---');
+        const versions = {};
+
+        for (let section of sections) {
+            section = section.trim().split('\n');
+            
+            if (section.length >= 2) {
+                const language = section[0];
+
+                versions[language] = /\d.\d.\d/.exec(section.slice(1).join('\n'))?.[0];
+            }
+        }
+
+        for (const language of languages) {
+            language.version = versions[language.name];
+        }
+    });
+})();
 
 app.use(express.json());
 
