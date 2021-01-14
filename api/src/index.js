@@ -40,7 +40,7 @@ app.post('/execute', (req, res) => {
             code: 'missing_source',
             message: 'source field is invalid',
         });
-    } else if (body.args && Array.isArray(body.args)) {
+    } else if (body.args && !Array.isArray(body.args)) {
         return res.status(400).json({
             code: 'invalid_args',
             message: 'args field is not an array',
