@@ -157,7 +157,8 @@ cd /opt && mkdir jelly && cd jelly
 wget https://github.com/DennisMitchell/jellylanguage/archive/master.zip
 unzip master.zip
 cd jellylanguage-master
-pip3.8 install .
+python3.8 -m pip install .
+sed -i 's/\/usr\/local\/bin\/python3.8/\/opt\/python3\/Python-3.8.2\/python3.8/' /usr/local/bin/jelly
 
 # install julia
 # final binary: /opt/julia/julia-1.5.0/bin/julia
@@ -202,6 +203,7 @@ source /opt/.profile
 cd /opt && mkdir emacs && cd emacs
 wget https://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-26.3.tar.xz
 tar -xf emacs-26.3.tar.xz
+rm emacs-26.3.tar.xz
 cd emacs-26.3
 ./configure --with-gnutls=no
 make

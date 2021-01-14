@@ -6,4 +6,4 @@ cp -f executors/* /var/lib/lxc/piston/rootfs/exec
 chmod 700 /var/lib/lxc/piston/rootfs/exec/*
 chown -R root:root /var/lib/lxc/piston/rootfs/exec
 
-lxc-start -n piston -d
+#lxc-start -n piston -d

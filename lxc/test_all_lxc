@@ -9,7 +9,7 @@ echo 'testing cpp'
 ../execute cpp test.cpp
 echo 'testing cs'
 ../execute cs test.cs
-echo 'testing deno ts'
+echo 'testing deno'
 ../execute deno testdeno.ts
 echo 'testing elisp'
 ../execute elisp test.el
@@ -21,6 +21,8 @@ echo 'testing haskell'
 ../execute haskell test.hs
 echo 'testing java'
 ../execute java test.java
+echo 'testing jelly'
+../execute jelly test.jelly
 echo 'testing jl'
 ../execute jl test.jl
 echo 'testing js'

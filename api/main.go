@@ -28,6 +28,8 @@ type Outbound struct {
     Language string `json:"language"`
     Version  string `json:"version"`
     Output   string `json:"output"`
+    Stdout   string `json:"stdout"`
+    Stderr   string `json:"stderr"`
 }
 
 type Language struct {
@@ -124,6 +126,18 @@ func Versions(res http.ResponseWriter, req *http.Request) {
     res.Write(data)
 }
 
+type StdWriter struct {
+    combined *string
+    separate *string
+}
+
+func (writer *StdWriter) Write(data []byte) (int, error) {
+    *writer.combined += string(data)
+    *writer.separate += string(data)
+
+    return len(data), nil
+}
+
 func launch(request Inbound, res http.ResponseWriter) {
     stamp := time.Now().UnixNano()
 
@@ -136,9 +150,33 @@ func launch(request Inbound, res http.ResponseWriter) {
     cmd := exec.Command("../lxc/execute", request.Language, srcfile, strings.Join(request.Args, "\n"))
 
     // capture out/err
-    var stdout, stderr bytes.Buffer
-    cmd.Stdout = &stdout
-    cmd.Stderr = &stderr
+    var stdout, stderr, combined string
+
+    cmd.Stdout = &StdWriter{
+        combined: &combined,
+        separate: &stdout,
+    }
+
+    cmd.Stderr = &StdWriter{
+        combined: &combined,
+        separate: &stderr,
+    }
+
+    stdout = strings.TrimSpace(stdout)
+    stderr = strings.TrimSpace(stderr)
+    combined = strings.TrimSpace(combined)
+
+    if len(stdout) > 65536 {
+        stdout = stdout[:65536]
+    }
+
+    if len(stderr) > 65536 {
+        stderr = stdout[:65536]
+    }
+
+    if len(combined) > 65536 {
+        combined = combined[:65536]
+    }
 
     err := cmd.Run()
 
@@ -179,7 +217,9 @@ func launch(request Inbound, res http.ResponseWriter) {
         Ran:      err == nil,
         Language: request.Language,
         Version:  "",
-        Output:   strings.TrimSpace(stdout.String()),
+        Output:   combined,
+        Stdout:   stdout,
+        Stderr:   stderr,
     }
 
     // retrieve the language version

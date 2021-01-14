@@ -135,9 +135,9 @@ case "$lang" in
 esac
 
 # runner
-timeout -s KILL 10 \
+timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -l -c "bash /exec/$bin $newinc $epoch 2>&1 | head -c 65536"
+        /bin/bash -l -c "bash /exec/$bin $newinc $epoch"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
