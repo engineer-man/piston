@@ -12,7 +12,7 @@ const versions = execFileSync(__dirname + '/../../lxc/versions')
     .filter(section => section.length >= 2);
 
 function getVersion(language) {
-    return versions.find(section => section[0] === language?.name);
+    return versions.find(section => section[0] === language?.name)?.slice(1).join('\n');
 }
 
 for (const language of languages) {
@@ -35,12 +35,12 @@ app.post('/execute', (req, res) => {
             code: 'unsupported_language',
             message: `${body.language} is not supported by Piston`,
         });
-    } else if (!(body.source instanceof string)) {
+    } else if (typeof body.source !== 'string') {
         return res.status(400).json({
             code: 'missing_source',
             message: 'source field is invalid',
         });
-    } else if (body.args && !(body.args instanceof Array)) {
+    } else if (body.args && Array.isArray(body.args)) {
         return res.status(400).json({
             code: 'invalid_args',
             message: 'args field is not an array',
