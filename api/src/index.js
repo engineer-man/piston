@@ -30,7 +30,13 @@ const { spawn } = require('child_process');
             if (section.length >= 2) {
                 const language = section[0];
 
-                versions[language] = /\d.\d.\d/.exec(section.slice(1).join('\n'))?.[0];
+                if (language === 'java') {
+                    versions[language] = /\d+/.exec(section[2]);
+                } else if (language === 'emacs') {
+                    versions[language] = /\d+\.\d+/.exec(section[2]);
+                } else {
+                    versions[language] = /\d\.\d\.\d/.exec(section.slice(1).join('\n'))?.[0];
+                }
             }
         }
 
