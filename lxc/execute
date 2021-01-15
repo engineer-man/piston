@@ -4,11 +4,7 @@ dir="$( cd "$( dirname "$0" )" && pwd )"
 
 touch $dir/lockfile
 
-if [ -z "$1" ]; then
-    echo "invalid args"
-    exit
-fi
-if [ -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ]; then
     echo "invalid args"
     exit
 fi

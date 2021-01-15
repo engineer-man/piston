@@ -167,7 +167,7 @@ Content-Type: application/json
 - typescript
 
 #### Principle of Operation
-Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Go which takes
+Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Node which takes
 in execution requests and executes them in the container. High level, the API writes
 a temporary source and args file to `/tmp` and that gets mounted read-only along with the execution scripts into the container.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
