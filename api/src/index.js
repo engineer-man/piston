@@ -21,8 +21,6 @@ const { spawn } = require('child_process');
             if (lines.length >= 2) {
                 const language = lines[0];
 
-                console.log(language);
-
                 if (language === 'java') {
                     versions[language] = /\d+/.exec(lines[1])?.[0];
                 } else if (language === 'emacs') {
@@ -34,7 +32,6 @@ const { spawn } = require('child_process');
         }
 
         for (const language of languages) {
-            console.log(language.name, versions[language.name])
             language.version = versions[language.name];
         }
     });
