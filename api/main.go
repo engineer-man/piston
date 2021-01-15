@@ -162,6 +162,8 @@ func launch(request Inbound, res http.ResponseWriter) {
         separate: &stderr,
     }
 
+    err := cmd.Run()
+
     stdout = strings.TrimSpace(stdout)
     stderr = strings.TrimSpace(stderr)
     combined = strings.TrimSpace(combined)
@@ -177,8 +179,6 @@ func launch(request Inbound, res http.ResponseWriter) {
     if len(combined) > 65536 {
         combined = combined[:65536]
     }
-
-    err := cmd.Run()
 
     // get the executing version of the language
     execlang := request.Language
