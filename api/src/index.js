@@ -4,47 +4,41 @@ const app = express();
 const languages = require('./languages');
 const { spawn } = require('child_process');
 
-(function setVersions() {
-    let output = '';
-
+{
     const process = spawn(__dirname + '/../../lxc/versions');
 
-    process.stdout.setEncoding('utf-8');
-    process.stderr.setEncoding('utf-8');
+    let output = '';
+    process.stderr.on('data', chunk => output += chunk);
+    process.stdout.on('data', chunk => output += chunk);
 
-    process.stdout.addListener('data', chunk => {
-        output += chunk;
-    });
-
-    process.stderr.addListener('data', chunk => {
-        output += chunk;
-    });
-    
     process.on('exit', () => {
         const sections = output.toLowerCase().split('---');
         const versions = {};
 
-        for (let section of sections) {
-            section = section.trim().split('\n');
+        for (const section of sections) {
+            const lines = section.trim().split('\n');
             
-            if (section.length >= 2) {
-                const language = section[0];
+            if (lines.length >= 2) {
+                const language = lines[0];
+
+                console.log(language);
 
                 if (language === 'java') {
-                    versions[language] = /\d+/.exec(section[2]);
+                    versions[language] = /\d+/.exec(lines[1])?.[0];
                 } else if (language === 'emacs') {
-                    versions[language] = /\d+\.\d+/.exec(section[2]);
+                    versions[language] = /\d+\.\d+/.exec(lines[1])?.[0];
                 } else {
-                    versions[language] = /\d\.\d\.\d/.exec(section.slice(1).join('\n'))?.[0];
+                    versions[language] = /\d+\.\d+\.\d+/.exec(section)?.[0];
                 }
             }
         }
 
         for (const language of languages) {
+            console.log(language.name, versions[language.name])
             language.version = versions[language.name];
         }
     });
-})();
+}
 
 app.use(express.json());
 
@@ -93,9 +87,6 @@ async function launch(res, language, body) {
 
     if (language.version)
         result.version = language.version;
-
-    process.stderr.setEncoding('utf-8');
-    process.stdout.setEncoding('utf-8');
 
     process.stderr.addListener('data', chunk => {
         result.stderr += chunk;

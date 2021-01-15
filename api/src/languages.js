@@ -60,7 +60,7 @@ module.exports = [
     aliases: ['java'],
   },
   {
-    name: 'javascript',
+    name: 'node',
     aliases: ['javascript', 'js', 'node'],
   },
   {
@@ -98,10 +98,6 @@ module.exports = [
   {
     name: 'python2',
     aliases: ['python2'],
-  },
-  {
-    name: 'r',
-    aliases: ['r'],
   },
   {
     name: 'rust',
