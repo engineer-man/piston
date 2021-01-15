@@ -20,7 +20,7 @@ app.post(
                 errorMessage: 'Supplied language is not a string',
             },
             custom: {
-                options: value => languages.find(language => language.name === value?.toLowerCase()),
+                options: value => languages.find(language => language.aliases.includes(value?.toLowerCase())),
                 errorMessage: 'Supplied language is not supported by Piston',
             },
         },
