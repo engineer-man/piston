@@ -14,11 +14,11 @@ echo '1.0.0'
 echo '---'
 
 echo 'c'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc --version"
 echo '---'
 
 echo 'cpp'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ -v"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ --version"
 echo '---'
 
 echo 'csharp'
