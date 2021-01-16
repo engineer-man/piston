@@ -47,7 +47,7 @@ See `var/install.txt` for how to create a new LXC container and install all of t
 software.
 
 #### CLI Usage
-- `lxc/execute [language] [file path] [args]`
+- `cli/execute [language] [file path] [args]`
 
 #### API Usage
 To use the API, it must first be started. Please note that if root is required to access
@@ -79,14 +79,17 @@ Content-Type: application/json
 [
     {
         "name": "awk",
+        "aliases": ["awk"],
         "version": "1.3.3"
     },
     {
         "name": "bash",
+        "aliases": ["bash"],
         "version": "4.4.20"
     },
     {
         "name": "c",
+        "aliases": ["c"],
         "version": "7.5.0"
     }
 ]
@@ -130,8 +133,7 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-    "code": "unsupported_language",
-    "message": "whatever is not supported by Piston"
+    "message": "Provided language is not supported by Piston"
 }
 ```
 
