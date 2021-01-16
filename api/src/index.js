@@ -1,5 +1,5 @@
 const express = require('express');
-const { execute } = require('./execute');
+const { execute } = require('../../shared/execute');
 const { languages } = require('./languages');
 const { checkSchema, validationResult } = require('express-validator');
 
@@ -41,7 +41,7 @@ app.post(
             },
         }
     }),
-    (req, res) => {
+    async (req, res) => {
         const errors = validationResult(req).array();
 
         if (errors.length === 0) {
@@ -49,7 +49,16 @@ app.post(
                 language.aliases.includes(req.body.language.toLowerCase())
             );
 
-            execute(res, language, req.body);
+            const { stdout, stderr, output } = await execute(language, req.body.source, req.body.args);
+
+            res.status(200).json({
+                ran: true,
+                language: language.name,
+                version: language.version,
+                stdout,
+                stderr,
+                output,
+            });
         } else {
             res.status(400).json({
                 message: errors[0].msg,
