@@ -34,11 +34,13 @@ async function execute(res, language, body) {
         result.output += chunk;
     });
 
-    result.stderr = result.stderr.trim().substring(0, 65535);
-    result.stdout = result.stdout.trim().substring(0, 65535);
-    result.output = result.output.trim().substring(0, 65535);
+    process.on('exit', () => {
+        result.stderr = result.stderr.trim().substring(0, 65535);
+        result.stdout = result.stdout.trim().substring(0, 65535);
+        result.output = result.output.trim().substring(0, 65535);
 
-    process.on('exit', () => res.json(result));
+        res.json(result);
+    });
 }
 
 module.exports = {
