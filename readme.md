@@ -1,68 +1,175 @@
-## Piston
+<h1 align="center">Piston</h1>
+<h1 align="center">
+  <br>
+  <a href="https://github.com/engineer-man/piston"><img src="https://emkc.org/images/icon_circle_64.png" alt="engineer-man piston"></a>
+</h1>
+
+<h3 align="center">A high performance general purpose code execution engine.</h3>
+<br>
+
+<p align="center">
+    <a href="https://github.com/ArmynC/ArminC-AutoExec/commits/master">
+    <img src="https://img.shields.io/github/last-commit/engineer-man/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+         alt="GitHub last commit">
+    <a href="https://github.com/engineer-man/piston/issues">
+    <img src="https://img.shields.io/github/issues/engineer-man/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+         alt="GitHub issues">
+    <a href="https://github.com/engineer-man/piston/pulls">
+    <img src="https://img.shields.io/github/issues-pr-raw/engineer-man/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+         alt="GitHub pull requests">
+</p>
+
+---
+
+<h4 align="center">
+  <a href="#About">About</a> •
+  <a href="#Public-API">Public API</a> •
+  <a href="#Getting-Started">Getting Started</a> •
+  <a href="#Usage">Usage</a> •
+  <a href="#Supported-Languages">Supported Languages</a> •
+  <a href="#Principle-of-Operation">Principles</a> •
+  <a href="#Security">Security</a> •
+  <a href="#License">License</a>
+</h4>
+
+---
+<br>
+
+# About
+
+<h4>
 Piston is a high performance general purpose code execution engine. It excels at running untrusted and
 possibly malicious code without fear from any harmful effects.
-It's used in numerous places including
-[EMKC Challenges](https://emkc.org/challenges),
-[EMKC Weekly Contests](https://emkc.org/contests), the
-[Engineer Man Discord Server](https://discord.gg/engineerman) via
-[I Run Code](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers
-and 100+ direct integrations. To get it in your own server, go here: https://emkc.org/run.
+</h4>
+<br>
 
-#### Use Public API
-Requires no installation and you can use it immediately. Reference the Versions/Execute sections
-below to learn about the request and response formats.
-- `GET` `https://emkc.org/api/v1/piston/versions`
-- `POST` `https://emkc.org/api/v1/piston/execute`
+It's used in numerous places including:
+* [EMKC Challenges](https://emkc.org/challenges),
+* [EMKC Weekly Contests](https://emkc.org/contests),
+* [Engineer Man Discord Server](https://discord.gg/engineerman),
+* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers
+and 100+ direct integrations.
 
-Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
+To get it in your own server, go here: https://emkc.org/run.
+
+<br>
+
+# Public API
+
+- Requires no installation and you can use it immediately.
+- Reference the Versions/Execute sections below to learn about the request and response formats.
+
+<br>
+
+When using the public Piston API, use the base URL:
+
+```
+https://emkc.org/api/v1/piston
+```
+
+#### GET
+```
+https://emkc.org/api/v1/piston/versions
+```
+#### POST
+```
+https://emkc.org/api/v1/piston/execute
+```
+
+> Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
 and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
 so we can discuss potentially getting you an unlimited key.
 
-#### Cloning and System Dependencies
-```
-# clone and enter repo
-git clone https://github.com/engineer-man/piston
-cd piston/lxc
+<br>
 
-# centos/rhel dependencies:
+# Getting Started
+
+### Host System Package Dependencies
+
+* NodeJS
+* lxc
+* libvirt
+
+<br>
+
+If your OS is not documented below, please open pull requests with the correct commands for your OS.
+
+<details>
+<summary><span style="font-size:1.43em;">CentOS / RHEL</span></summary>
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+nvm install --lts
+nvm use --lts
+
 yum install -y epel-release
 yum install -y lxc lxc-templates debootstrap libvirt
 systemctl start libvirtd
+```
+</details>
 
-# ubuntu server 18.04 dependencies:
-apt install lxc lxc-templates debootstrap libvirt0
+<details>
+<summary><span style="font-size:1.43em;">Ubuntu (18.04)</span></summary>
 
-# arch dependencies:
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+nvm install --lts
+nvm use --lts
+
+apt install -y lxc lxc-templates debootstrap libvirt0
+```
+</details>
+
+<details>
+<summary><span style="font-size:1.43em;">Arch Linux</span></summary>
+
+```sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+nvm install --lts
+nvm use --lts
+
 sudo pacman -S lxc libvirt unzip
+```
+</details>
 
-# everything else:
-# not documented, please open pull requests with commands for debian/arch/macos/etc
+#### After system dependencies are installed, clone this repository:
+
+```sh
+# clone and enter repo
+git clone https://github.com/engineer-man/piston
+cd piston/lxc
 ```
 
 #### Installation (simple)
-Coming soon.
 
-#### Installation (advanced/manual)
-See `var/install.txt` for how to create a new LXC container and install all of the required
+- Coming soon.
+
+#### Installation (advanced)
+
+- See `var/install.txt` for how to create a new LXC container and install all of the required
 software.
 
-#### CLI Usage
-- `lxc/execute [language] [file path] [args]`
+<br>
 
-#### API Usage
+# Usage
+
+### CLI
+
+```sh
+lxc/execute [language] [file path] [args]
+```
+
+### API
 To use the API, it must first be started. Please note that if root is required to access
 LXC then the API must also be running as root. To start the API, run the following:
+
 ```
 cd api
 ./start
 ```
 
-#### Base URLs
-When using the public Piston API, use:
-```
-https://emkc.org/api/v1/piston
-```
-For your own local installation, use:
+For your own local installation, the API is available at</h3>
+
 ```
 http://127.0.0.1:2000
 ```
@@ -135,44 +242,38 @@ Content-Type: application/json
 }
 ```
 
-#### Supported Languages
-- awk
-- bash
-- brainfuck
-- c
-- cpp
-- csharp
-- deno
-- erlang
-- elixir
-- emacs
-- elisp
-- go
-- haskell
-- java
-- jelly
-- julia
-- kotlin
-- lua
-- nasm
-- node
-- paradoc
-- perl
-- php
-- python2
-- python3
-- ruby
-- rust
-- swift
-- typescript
+<br>
 
-#### Principle of Operation
+# Supported Languages
+|           |            |
+|:---------:|------------|
+|    awk    | julia      |
+|    bash   | kotlin     |
+| brainfuck | lua        |
+|     c     | nasm       |
+| cpp       | node       |
+| csharp    | paradoc    |
+| deno      | perl       |
+| erlang    | php        |
+| elixir    | python2    |
+| emacs     | python3    |
+| elisp     | ruby       |
+| go        | rust       |
+| haskell   | swift      |
+| java      | typescript |
+| jelly     |            |
+
+<br>
+
+# Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Node which takes
 in execution requests and executes them in the container. High level, the API writes
 a temporary source and args file to `/tmp` and that gets mounted read-only along with the execution scripts into the container.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
-#### Security
+<br>
+
+# Security
 LXC provides a great deal of security out of the box in that it's separate from the system.
 Piston takes additional steps to make it resistant to
 various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
@@ -186,5 +287,7 @@ various privilege escalation, denial-of-service, and resource saturation threats
 - Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
 - SIGKILLing misbehaving code
 
-#### License
+<br>
+
+# License
 Piston is licensed under the MIT license.
