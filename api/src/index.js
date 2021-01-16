@@ -56,7 +56,7 @@ app.post(
                 language.aliases.includes(req.body.language.toLowerCase())
             );
 
-            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.args, req.body.stdin);
+            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.stdin, req.body.args);
 
             res.status(200).json({
                 ran,

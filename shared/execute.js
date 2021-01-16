@@ -1,7 +1,7 @@
 const { writeFile } = require('fs/promises');
 const { spawn } = require('child_process');
 
-function execute(language, source, args, stdin) {
+function execute(language, source, stdin, args) {
     return new Promise(async resolve => {
         const stamp = new Date().getTime();
         const sourceFile = `/tmp/${stamp}.code`;
