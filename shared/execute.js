@@ -28,12 +28,17 @@ function execute(language, source, args) {
             output += chunk;
         });
         
-        process.on('exit', () => {
+        process.on('exit', code => {
             stderr = stderr.trim().substring(0, 65535);
             stdout = stdout.trim().substring(0, 65535);
             output = output.trim().substring(0, 65535);
 
-            resolve({ stdout, stderr, output });
+            resolve({
+                stdout,
+                stderr,
+                output,
+                ran: code === 0,
+            });
         });
     });
 }

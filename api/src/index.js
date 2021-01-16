@@ -49,10 +49,10 @@ app.post(
                 language.aliases.includes(req.body.language.toLowerCase())
             );
 
-            const { stdout, stderr, output } = await execute(language, req.body.source, req.body.args);
+            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.args);
 
             res.status(200).json({
-                ran: true,
+                ran,
                 language: language.name,
                 version: language.version,
                 stdout,
