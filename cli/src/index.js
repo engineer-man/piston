@@ -15,7 +15,7 @@ const [languageName, sourceFile, ...args] = process.argv.slice(2);
         return;
     }
 
-    const source = readFileSync(sourceFile);
+    const source = readFileSync(sourceFile).toString();
 
     const language = languages.find(language => language.name === languageName);
 
