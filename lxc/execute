@@ -36,6 +36,15 @@ else
 fi
 exec 200>&-
 
+# Prevent users from spying on each other
+lxc-attach --clear-env -n piston -- \
+        /bin/bash -l -c "\
+                chown runner$newinc: $filepath ;\
+                chown runner$newinc: $argpath ;\
+                chmod 700 $filepath ;\
+                chmod 700 $argpath ;\
+               " > /dev/null 2>&1
+
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
