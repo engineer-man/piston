@@ -39,6 +39,13 @@ app.post(
             isArray: {
                 errorMessage: 'Supplied args is not an array',
             },
+        },
+        stdin: {
+            in: 'body',
+            optional: true,
+            isString: {
+                errorMessage: 'Supplied stdin is not a string',
+            },
         }
     }),
     async (req, res) => {
@@ -49,7 +56,7 @@ app.post(
                 language.aliases.includes(req.body.language.toLowerCase())
             );
 
-            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.args);
+            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.args, req.body.stdin);
 
             res.status(200).json({
                 ran,

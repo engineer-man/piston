@@ -4,4 +4,4 @@ mv code.code code.hs
 runuser runner$1 -c "\
     cd /tmp/$2 ; \
     ghc -dynamic -o binary code.hs > /dev/null 2>&1 ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"
+    cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary < stdin.stdin"

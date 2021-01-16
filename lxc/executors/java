@@ -6,4 +6,4 @@ mv interim.java $name.java
 runuser runner$1 -c "\
     cd /tmp/$2 ; \
     javac $name.java ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"
+    cat args.args | xargs -d '\n' timeout -s KILL 3 java $name < stdin.stdin"

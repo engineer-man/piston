@@ -1,7 +1,7 @@
 const { writeFile } = require('fs/promises');
 const { spawn } = require('child_process');
 
-function execute(language, source, args) {
+function execute(language, source, args, stdin) {
     return new Promise(async resolve => {
         const stamp = new Date().getTime();
         const sourceFile = `/tmp/${stamp}.code`;
@@ -11,6 +11,7 @@ function execute(language, source, args) {
         const process = spawn(__dirname + '/../lxc/execute', [
             language.name,
             sourceFile,
+            stdin ?? '',
             args?.join('\n') ?? '',
         ]);
 

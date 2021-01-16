@@ -3,5 +3,5 @@ cd /tmp/$2
 if [[ -z $(grep '[^[:space:]]' args.args) ]]; then
     runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 elixir code.code"
 else
-    runuser runner$1 -c "cd /tmp/$2 ; cat args.args ; xargs -d '\n' timeout -s KILL 3 elixir code.code"
+    runuser runner$1 -c "cd /tmp/$2 ; cat args.args ; xargs -d '\n' timeout -s KILL 3 elixir code.code < stdin.stdin"
 fi

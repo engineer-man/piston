@@ -26,7 +26,7 @@ const [languageName, sourceFile, ...args] = process.argv.slice(2);
         return;
     }
 
-    const { output } = await execute(language, source, args);
+    const { output } = await execute(language, source, '', args);
 
     console.log(output);
 })();

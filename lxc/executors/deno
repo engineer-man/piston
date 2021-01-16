@@ -1,7 +1,7 @@
 cd /tmp/$2
 
 if [[ -z $(grep '[^[:space:]]' args.args) ]]; then
-    runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 deno run code.code"
+    runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 deno run code.code < stdin.stdin"
 else
-    runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 deno run code.code"
+    runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 deno run code.code < stdin.stdin"
 fi

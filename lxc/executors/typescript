@@ -4,4 +4,4 @@ runuser runner$1 -c "\
     tsc interim.ts ; \
     rm -f interim.ts ; \
     mv interim.js code.code ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 node code.code"
+    cat args.args | xargs -d '\n' timeout -s KILL 3 node code.code < stdin.stdin"

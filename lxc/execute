@@ -14,13 +14,15 @@ epoch=$(date +%s%N)
 basepath="/var/lib/lxc/piston/rootfs"
 filepath="/tmp/$epoch/code.code"
 argpath="/tmp/$epoch/args.args"
+stdinpath="/tmp/$epoch/stdin.stdin"
 arg=$(basename $argpath)
 
 # write arg file
 mkdir -p $basepath/tmp/$epoch
 chmod 777 $basepath/tmp/$epoch
 cat $2 > $basepath$filepath
-echo "${@:3}" > $basepath$argpath
+cat $3 > $basepath$argpath
+echo "${@:4}" > $basepath$argpath
 
 # process incrementor
 exec 200>$dir/lockfile
