@@ -1,9 +1,8 @@
-cd /tmp/$2
+cd /tmp/$1
 cp code.code interim.java
 name=$(grep -Po "(?<=\n|\A)\s*(public\s+)?(class|interface)\s+\K([^\/\\\n\s{]+)" interim.java)
 mv interim.java $name.java
 
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    javac $name.java ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"
+cd /tmp/$1 ;
+javac $name.java ;
+cat args.args | xargs -d '\n' timeout -s KILL 3 java $name

@@ -1,6 +1,4 @@
-cd /tmp/$2
+cd /tmp/$1
 cp code.code code.kt
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    kotlinc code.kt -include-runtime -d code.jar ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 java -jar code.jar"
+kotlinc code.kt -include-runtime -d code.jar ;
+cat args.args | xargs -d '\n' timeout -s KILL 3 java -jar code.jar

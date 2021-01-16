@@ -1,6 +1,6 @@
-cd /tmp/$2
+cd /tmp/$1
 cp code.code interim.go
 file="interim.go"
 go build $file
 file=${file%%.*}
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./$file"
+cd /tmp/$1 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./$file

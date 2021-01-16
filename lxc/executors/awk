@@ -1,4 +1,4 @@
-cd /tmp/$2
+cd /tmp/$1
 timeout -s KILL 2 sed "/___code___/Q" code.code > code.stdin
 timeout -s KILL 2 sed "1,/___code___/d" code.code > code.awk
-runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 awk -f code.awk < code.stdin"
+cd /tmp/$1 ; timeout -s KILL 3 awk -f code.awk < code.stdin

@@ -1,5 +1,4 @@
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    nasm -f elf32 -o binary.o code.code ; \
-    ld -m elf_i386 binary.o -o binary ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"
+cd /tmp/$1 ;
+nasm -f elf32 -o binary.o code.code ;
+ld -m elf_i386 binary.o -o binary ;
+cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary

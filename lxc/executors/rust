@@ -1,5 +1,3 @@
-cd /tmp/$2
+cd /tmp/$1
 rustc -o binary code.code
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"
+cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary
