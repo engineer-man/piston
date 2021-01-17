@@ -41,7 +41,7 @@ exec 200>&-
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -l -c "bash /exec/$lang $newinc $epoch"
+        /bin/bash -l -c "runuser runner$newinc /exec/$lang $newinc $epoch"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \

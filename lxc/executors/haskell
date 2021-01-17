@@ -1,8 +1,6 @@
 #!/bin/bash
 
-runuser runner$1 -c "\
-    cd /tmp/$2
-    cp code.code code.hs
-    ghc -dynamic -o binary code.hs > /dev/null 2>&1
-    timeout -s KILL 3 xargs -a args.args -d '\n' ./binary < stdin.stdin
-"
+cd /tmp/$2
+cp code.code code.hs
+ghc -dynamic -o binary code.hs > /dev/null 2>&1
+timeout -s KILL 3 xargs -a args.args -d '\n' ./binary < stdin.stdin

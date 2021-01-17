@@ -1,6 +1,4 @@
 #!/bin/bash
 
-runuser runner$1 -c "
-    cd /tmp/$2
-    timeout -s KILL 3 xargs -a args.args -d '\n' ruby code.code < stdin.stdin
-"
+cd /tmp/$2
+timeout -s KILL 3 xargs -a args.args -d '\n' ruby code.code < stdin.stdin
