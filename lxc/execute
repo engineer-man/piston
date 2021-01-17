@@ -45,13 +45,17 @@ timeout -s KILL 20 \
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
-    /bin/bash -l -c "\
-        for i in {1..100}; do pkill -u runner$newinc --signal SIGKILL; done ;\
-        find /tmp -user runner$newinc -exec /bin/rm -rf {} \; ;\
-        find /var/tmp -user runner$newinc -exec /bin/rm -rf {} \; ;\
-        find /var/lock -user runner$newinc -exec /bin/rm -rf {} \; ;\
-        find /dev/shm -user runner$newinc -exec /bin/rm -rf {} \; ;\
-        find /run/lock -user runner$newinc -exec /bin/rm -rf {} \; ;\
-        " > /dev/null 2>&1 &
+    /bin/bash -l -c "
+        for i in {1..100}
+        do
+            pkill -u runner$newinc --signal SIGKILL
+        done
+
+        find /tmp -user runner$newinc -delete
+        find /var/tmp -user runner$newinc -delete
+        find /var/lock -user runner$newinc -delete
+        find /dev/shm -user runner$newinc -delete
+        find /run/lock -user runner$newinc -delete
+    " > /dev/null 2>&1 &
 
 rm -rf $basepath/tmp/$epoch

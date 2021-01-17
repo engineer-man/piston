@@ -1,9 +1,7 @@
 #!/bin/bash
 
-cd /tmp/$2
-rustc -o binary code.code
-
 runuser runner$1 -c "
     cd /tmp/$2
+    rustc -o binary code.code
     timeout -s KILL 3 xargs -a args.args -d '\n' ./binary < stdin.stdin
 "
