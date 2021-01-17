@@ -1,2 +1,6 @@
-cd /tmp/$2
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 brainfuck code.code < stdin.stdin"
+#!/bin/bash
+
+runuser runner$1 -c "
+    cd /tmp/$2
+    timeout -s KILL 3 xargs -a args.args -d '\n' brainfuck code.code < stdin.stdin
+"

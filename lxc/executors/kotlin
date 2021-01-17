@@ -1,6 +1,8 @@
-cd /tmp/$2
-cp code.code code.kt
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    kotlinc code.kt -include-runtime -d code.jar ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 java -jar code.jar < stdin.stdin"
+#!/bin/bash
+
+runuser runner$1 -c "
+    cd /tmp/$2
+    cp code.code code.kt
+    kotlinc code.kt -include-runtime -d code.jar
+    timeout -s KILL 3 xargs -a args.args -d '\n' java -jar code.jar < stdin.stdin
+"
