@@ -1,7 +1,9 @@
-<h1 align="center">Piston</h1>
 <h1 align="center">
-  <br>
-  <a href="https://github.com/engineer-man/piston"><img src="https://emkc.org/images/icon_circle_64.png" alt="engineer-man piston"></a>
+    <a href="https://github.com/engineer-man/piston"><img src="https://emkc.org/images/icon_circle_24.png" alt="engineer-man piston"></a>
+  Piston
+</h1>
+<h1 align="center">
+
 </h1>
 
 <h3 align="center">A high performance general purpose code execution engine.</h3>
