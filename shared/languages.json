@@ -50,7 +50,9 @@
         "name": "cpp",
         "aliases": [
             "c++",
-            "cpp"
+            "cpp",
+            "cc",
+            "cxx"
         ]
     },
     {
@@ -80,7 +82,8 @@
     {
         "name": "elixir",
         "aliases": [
-            "elixir"
+            "elixir",
+            "exs"
         ]
     },
     {
@@ -93,7 +96,8 @@
     {
         "name": "go",
         "aliases": [
-            "go"
+            "go",
+            "golang"
         ]
     },
     {
@@ -107,7 +111,8 @@
         "aliases": [
             "javascript",
             "js",
-            "node"
+            "node",
+            "node.js"
         ]
     },
     {
@@ -126,7 +131,8 @@
     {
         "name": "kotlin",
         "aliases": [
-            "kotlin"
+            "kotlin",
+            "kt"
         ]
     },
     {
@@ -144,7 +150,8 @@
     {
         "name": "perl",
         "aliases": [
-            "perl"
+            "perl",
+            "pl"
         ]
     },
     {
@@ -168,7 +175,8 @@
     {
         "name": "python2",
         "aliases": [
-            "python2"
+            "python2",
+            "py2"
         ]
     },
     {
