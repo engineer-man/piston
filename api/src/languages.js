@@ -15,7 +15,7 @@ const languages = [
     },
     {
         name: 'bash',
-        aliases: ['bash'],
+        aliases: ['bash', "sh"],
     },
     {
         name: 'brainfuck',
