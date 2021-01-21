@@ -96,11 +96,13 @@ make
 make install
 
 # install rust
-# final binary: /opt/.cargo/bin/rustc
-# get version: /opt/.cargo/bin/rustc --version
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-echo 'export PATH=$PATH:/opt/.cargo/bin' >> /opt/.profile
-source /opt/.profile
+# final binary: /usr/local/bin/rustc
+# get version: /usr/local/bin/rustc --version
+cd /opt && mkdir rust && cd rust
+wget https://static.rust-lang.org/dist/rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz
+cd rust-1.49.0-x86_64-unknown-linux-gnu
+./install.sh
 
 # install swift
 # final binary: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift
