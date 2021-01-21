@@ -52,4 +52,4 @@ echo 'testing python2'
 echo 'testing python3'
 ../../cli/execute python3.8 test3.py
 echo 'testing paradoc'
-../../cli/execute python3.8 test_paradoc.py
+../../cli/execute bash test_paradoc.sh
