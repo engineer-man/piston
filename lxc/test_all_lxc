@@ -50,6 +50,6 @@ echo 'testing typescript'
 echo 'testing python2'
 ../../cli/execute python2 test2.py
 echo 'testing python3'
-../../cli/execute python3 test3.py
+../../cli/execute python3.8 test3.py
 echo 'testing paradoc'
-../../cli/execute python3 test_paradoc.py
+../../cli/execute python3.8 test_paradoc.py
