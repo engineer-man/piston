@@ -1,2 +1,4 @@
+#!/bin/bash
+
 cd /tmp/$2
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 bash code.code"
+xargs -a args.args -d '\n' timeout -s KILL 3 bash code.code < stdin.stdin

@@ -1,2 +1,4 @@
+#!/bin/bash
+
 cd /tmp/$2
-runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 python3 -m paradoc code.code <<< args.args"
+timeout -s KILL 3 python3 -m paradoc code.code < args.args

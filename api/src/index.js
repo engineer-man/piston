@@ -1,5 +1,5 @@
 const express = require('express');
-const { execute } = require('./execute');
+const { execute } = require('../../shared/execute');
 const { languages } = require('./languages');
 const { checkSchema, validationResult } = require('express-validator');
 
@@ -20,7 +20,7 @@ app.post(
                 errorMessage: 'Supplied language is not a string',
             },
             custom: {
-                options: value => languages.find(language => language.aliases.includes(value?.toLowerCase())),
+                options: value => value && languages.find(language => language.aliases.includes(value.toLowerCase())),
                 errorMessage: 'Supplied language is not supported by Piston',
             },
         },
@@ -39,9 +39,16 @@ app.post(
             isArray: {
                 errorMessage: 'Supplied args is not an array',
             },
+        },
+        stdin: {
+            in: 'body',
+            optional: true,
+            isString: {
+                errorMessage: 'Supplied stdin is not a string',
+            },
         }
     }),
-    (req, res) => {
+    async (req, res) => {
         const errors = validationResult(req).array();
 
         if (errors.length === 0) {
@@ -49,7 +56,16 @@ app.post(
                 language.aliases.includes(req.body.language.toLowerCase())
             );
 
-            execute(res, language, req.body);
+            const { stdout, stderr, output, ran } = await execute(language, req.body.source, req.body.stdin, req.body.args);
+
+            res.status(200).json({
+                ran,
+                language: language.name,
+                version: language.version,
+                stdout,
+                stderr,
+                output,
+            });
         } else {
             res.status(400).json({
                 message: errors[0].msg,
