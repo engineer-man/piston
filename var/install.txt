@@ -234,6 +234,10 @@ chmod -R o-w *
 rm -rf /home/ubuntu
 chmod 777 /tmp
 
+# disable cron
+systemctl stop cron
+systemctl disable cron
+
 # leave container
 exit
 
