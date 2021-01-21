@@ -1,9 +1,7 @@
-cd /tmp/$2
-cp code.code interim.java
-name=$(grep -Po "(?<=\n|\A)\s*(public\s+)?(class|interface)\s+\K([^\/\\\\\n\s{]+)" interim.java)
-mv interim.java $name.java
+#!/bin/bash
 
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    javac $name.java ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 java $name"
+cd /tmp/$2
+name=$(grep -Po "(?<=\n|\A)\s*(public\s+)?(class|interface)\s+\K([^\/\\\\\n\s{]+)" code.code)
+cp code.code $name.java
+javac $name.java
+timeout -s KILL 3 xargs -a args.args -d '\n' java $name < stdin.stdin

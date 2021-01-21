@@ -1,4 +1,5 @@
-runuser runner$1 -c "\
-    cd /tmp/$2 ; \
-    gcc -std=c11 -o binary -x c code.code ; \
-    cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"
+#!/usr/bin/bash
+
+cd /tmp/$2
+gcc -std=c11 -o binary -x c code.code
+timeout -s KILL 3 xargs -a args.args ./binary < stdin.stdin

@@ -1,7 +1,4 @@
-cd /tmp/$2
+#!/bin/bash
 
-if [[ -z $(grep '[^[:space:]]' args.args) ]]; then
-    runuser runner$1 -c "cd /tmp/$2 ; timeout -s KILL 3 emacs -Q --script code.code"
-else
-    runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 emacs -Q --script code.code"
-fi
+cd /tmp/$2
+timeout -s KILL 3 xargs -a args.args -d '\n' emacs -Q --script code.code < stdin.stdin
