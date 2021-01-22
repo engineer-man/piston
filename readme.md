@@ -248,23 +248,34 @@ Content-Type: application/json
 <br>
 
 # Supported Languages
-|           |            |
-|:---------:|------------|
-|    awk    | julia      |
-|    bash   | kotlin     |
-| brainfuck | lua        |
-|     c     | nasm       |
-| cpp       | node       |
-| csharp    | paradoc    |
-| deno      | perl       |
-| erlang    | php        |
-| elixir    | python2    |
-| emacs     | python3    |
-| elisp     | ruby       |
-| go        | rust       |
-| haskell   | swift      |
-| java      | typescript |
-| jelly     |            |
+`awk`,
+`bash`,
+`brainfuck`,
+`c`,
+`cpp`,
+`csharp`,
+`deno`,
+`elixir`,
+`emacs`,
+`elisp`,
+`go`,
+`haskell`,
+`java`,
+`jelly`,
+`julia`,
+`kotlin`,
+`lua`,
+`nasm`,
+`node`,
+`paradoc`,
+`perl`,
+`php`,
+`python2`,
+`python3`,
+`ruby`,
+`rust`,
+`swift`,
+`typescript`,
 
 <br>
 

@@ -1,55 +1,55 @@
 #!/usr/bin/env bash
 cd tests
 
-echo 'testing awk'
+echo -n 'testing awk = '
 ../../cli/execute awk awk.awk
-echo 'testing bash'
+echo -n 'testing bash = '
 ../../cli/execute bash bash.sh
-echo 'testing c'
+echo -n 'testing c = '
 ../../cli/execute c c.c
-echo 'testing cpp'
+echo -n 'testing cpp = '
 ../../cli/execute cpp cpp.cpp
-echo 'testing csharp'
+echo -n 'testing csharp = '
 ../../cli/execute csharp csharp.cs
-echo 'testing deno'
+echo -n 'testing deno = '
 ../../cli/execute deno deno.ts
-echo 'testing elixir'
+echo -n 'testing elixir = '
 ../../cli/execute elixir elixir.exs
-echo 'testing emacs'
+echo -n 'testing emacs = '
 ../../cli/execute emacs emacs.el
-echo 'testing go'
+echo -n 'testing go = '
 ../../cli/execute go go.go
-echo 'testing haskell'
+echo -n 'testing haskell = '
 ../../cli/execute haskell haskell.hs
-echo 'testing java'
+echo -n 'testing java = '
 ../../cli/execute java java.java
-echo 'testing jelly'
+echo -n 'testing jelly = '
 ../../cli/execute jelly jelly.jelly good
-echo 'testing julia'
+echo -n 'testing julia = '
 ../../cli/execute julia julia.jl
-echo 'testing kotlin'
+echo -n 'testing kotlin = '
 ../../cli/execute kotlin kotlin.kt
-echo 'testing nasm 32 bit'
+echo -n 'testing nasm 32 bit = '
 ../../cli/execute nasm nasm.nasm
-echo 'testing nasm 64 bit'
+echo -n 'testing nasm 64 bit = '
 ../../cli/execute nasm64 nasm64.nasm
-echo 'testing node'
+echo -n 'testing node = '
 ../../cli/execute node node.js
-echo 'testing paradoc'
+echo -n 'testing paradoc = '
 ../../cli/execute bash paradoc.sh
-echo 'testing perl'
+echo -n 'testing perl = '
 ../../cli/execute perl perl.pl
-echo 'testing php'
+echo -n 'testing php = '
 ../../cli/execute php php.php
-echo 'testing python2'
+echo -n 'testing python2 = '
 ../../cli/execute python2 python2.py
-echo 'testing python3'
+echo -n 'testing python3 = '
 ../../cli/execute python3 python3.py
-echo 'testing ruby'
+echo -n 'testing ruby = '
 ../../cli/execute ruby ruby.rb
-echo 'testing rust'
+echo -n 'testing rust = '
 ../../cli/execute rust rust.rs
-echo 'testing swift'
+echo -n 'testing swift = '
 ../../cli/execute swift swift.swift
-echo 'testing typescript'
+echo -n 'testing typescript = '
 ../../cli/execute typescript typescript.ts
