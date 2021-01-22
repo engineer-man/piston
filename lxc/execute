@@ -22,7 +22,7 @@ mkdir -p $basepath/tmp/$epoch
 chmod 777 $basepath/tmp/$epoch
 cat $2 > $basepath$filepath
 echo $3 > $basepath$stdinpath
-echo "${@:4}" > $basepath$argpath
+echo -n "${@:4}" > $basepath$argpath
 
 # process incrementor
 exec 200>$dir/lockfile
