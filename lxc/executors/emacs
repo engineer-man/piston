@@ -1,4 +1,8 @@
 #!/bin/bash
 
 cd /tmp/$2
-timeout -s KILL 3 xargs -a args.args -d '\n' emacs -Q --script code.code < stdin.stdin
+if [[ -z $(grep '[^[:space:]]' args.args) ]]; then
+    timeout -s KILL 3 emacs -Q --script code.code < stdin.stdin
+else
+    timeout -s KILL 3 xargs -a args.args -d '\n' emacs -Q --script code.code < stdin.stdin
+fi
