@@ -1,3 +1,1 @@
-good
-___code___
-{ print }
+{ print "good" }
