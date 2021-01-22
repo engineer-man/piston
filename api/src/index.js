@@ -14,7 +14,7 @@ app.post(
         language: {
             in: 'body',
             notEmpty: {
-                errorMessage: 'Supply a language field',
+                errorMessage: 'No language supplied',
             },
             isString: {
                 errorMessage: 'Supplied language is not a string',
@@ -27,7 +27,7 @@ app.post(
         source: {
             in: 'body',
             notEmpty: {
-                errorMessage: 'Supply a source field',
+                errorMessage: 'No source supplied',
             },
             isString: {
                 errorMessage: 'Supplied source is not a string',
