@@ -55,8 +55,6 @@ source /opt/.profile
 # therefore it cannot be run directly as it requires python3 to be installed
 cd /opt && mkdir paradoc && cd paradoc
 git clone https://github.com/betaveros/paradoc.git
-echo 'export PYTHONPATH=$PYTHONPATH:/opt/paradoc/paradoc' >> /opt/.profile
-source /opt/.profile
 
 # install node.js
 # final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/node
