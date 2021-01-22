@@ -169,7 +169,7 @@ cd api
 ./start
 ```
 
-For your own local installation, the API is available at</h3>
+For your own local installation, the API is available at:
 
 ```
 http://127.0.0.1:2000
@@ -177,9 +177,9 @@ http://127.0.0.1:2000
 
 #### Versions Endpoint
 `GET /versions`
-This endpoint takes no input and returns a JSON array of the currently installed languages.
-
-Truncated response sample:
+This endpoint will return the supported languages along with the current version and aliases. To execute
+code for a particular language using the `/execute` endpoint, either the name or one of the aliases must
+be provided.
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -205,13 +205,16 @@ Content-Type: application/json
 
 #### Execute Endpoint
 `POST /execute`
-This endpoint takes the following JSON payload and expects at least the language and source. If
-source is not provided, a blank file is passed as the source. If no `args` are desired, it can either
-be an empty array or left out entirely.
+This endpoint requests execution of some arbitrary code.
+- `language` (**required**) The language to use for execution, must be a string and supported by Piston (see list below).
+- `source` (**required**) The source code to execute, must be a string.
+- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string or left out of the request.
+- `args` (*optional*) The arguments to pass to the program. Must be an array or left out of the request.
 ```json
 {
     "language": "js",
     "source": "console.log(process.argv)",
+    "stdin": "",
     "args": [
         "1",
         "2",
@@ -235,13 +238,13 @@ Content-Type: application/json
     "stderr": ""
 }
 ```
-If an invalid language is supplied, a typical response will look like the following:
+If a problem exists with the request, a `400` status code is returned and the reason in the `message` key.
 ```json
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-    "message": "Provided language is not supported by Piston"
+    "message": "Supplied language is not supported by Piston"
 }
 ```
 
