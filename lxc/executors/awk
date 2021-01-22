@@ -1,6 +1,4 @@
 #!/bin/bash
 
 cd /tmp/$2
-timeout -s KILL 2 sed "/___code___/Q" code.code > code.stdin
-timeout -s KILL 2 sed "1,/___code___/d" code.code > code.awk
-timeout -s KILL 3 awk -f code.awk < code.stdin
+timeout -s KILL 3 xargs -a args.args -d '\n' awk -f code.code < stdin.stdin
