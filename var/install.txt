@@ -215,6 +215,14 @@ echo 'export DENO_INSTALL="/opt/.deno"' >> /opt/.profile
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> /opt/.profile
 source /opt/.profile
 
+# install brainfuck
+cd /opt && mkdir bf && cd bf
+git clone https://github.com/texus/Brainfuck-interpreter
+cd Brainfuck-interpreter
+echo 'export PATH=$PATH:/opt/bf/Brainfuck-interpreter' >> /opt/.profile
+source /opt/.profile
+
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i
