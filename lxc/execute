@@ -59,4 +59,3 @@ lxc-attach --clear-env -n piston -- \
     " > /dev/null 2>&1 &
 
 rm -rf $basepath/tmp/$epoch
-rm /tmp/$2
