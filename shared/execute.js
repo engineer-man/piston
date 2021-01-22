@@ -1,4 +1,4 @@
-const { writeFileSync } = require('fs');
+const { writeFileSync, unlinkSync } = require('fs');
 const { spawn } = require('child_process');
 
 function execute(language, source, stdin = '', args = []) {
@@ -28,8 +28,10 @@ function execute(language, source, stdin = '', args = []) {
             stdout += chunk;
             output += chunk;
         });
-        
+
         process.on('exit', code => {
+            unlinkSync(sourceFile);
+
             stderr = stderr.trim().substring(0, 65535);
             stdout = stdout.trim().substring(0, 65535);
             output = output.trim().substring(0, 65535);
