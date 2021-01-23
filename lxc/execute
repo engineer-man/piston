@@ -37,12 +37,14 @@ else
     echo $newinc > $dir/i
 fi
 exec 200>&-
-# Prevent users from spying on each other
+
+# prevent users from spying on each other
 lxc-attach --clear-env -n piston -- \
-	/bin/bash -l -c "\
-		chown runner$newinc: -R /tmp/$epoch ;\
-		chmod 700 /tmp/$epoch ;\
-		" > /dev/null 2>&1
+    /bin/bash -l -c "
+        chown runner$newinc: -R /tmp/$epoch
+        chmod 700 /tmp/$epoch
+    " > /dev/null 2>&1
+
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
