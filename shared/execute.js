@@ -1,6 +1,8 @@
 const { writeFileSync, unlinkSync } = require('fs');
 const { spawn } = require('child_process');
 
+const OUTPUT_LIMIT = 65535;
+
 function execute(language, source, stdin = '', args = []) {
     return new Promise(resolve => {
         const stamp = new Date().getTime();
@@ -20,11 +22,15 @@ function execute(language, source, stdin = '', args = []) {
         let output = '';
 
         process.stderr.on('data', chunk => {
+            if (stderr.length >= OUTPUT_LIMIT) return;
+
             stderr += chunk;
             output += chunk;
         });
 
         process.stdout.on('data', chunk => {
+            if (stdout.length >= OUTPUT_LIMIT) return;
+
             stdout += chunk;
             output += chunk;
         });
@@ -32,9 +38,9 @@ function execute(language, source, stdin = '', args = []) {
         process.on('exit', code => {
             unlinkSync(sourceFile);
 
-            stderr = stderr.trim().substring(0, 65535);
-            stdout = stdout.trim().substring(0, 65535);
-            output = output.trim().substring(0, 65535);
+            stderr = stderr.trim().substring(0, OUTPUT_LIMIT);
+            stdout = stdout.trim().substring(0, OUTPUT_LIMIT);
+            output = output.trim().substring(0, OUTPUT_LIMIT);
 
             resolve({
                 stdout,
