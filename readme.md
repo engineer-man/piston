@@ -256,8 +256,10 @@ Content-Type: application/json
 `brainfuck`,
 `c`,
 `cpp`,
+`crystal`,
 `csharp`,
 `d`,
+`dash`,
 `deno`,
 `elixir`,
 `emacs`,
@@ -268,8 +270,10 @@ Content-Type: application/json
 `jelly`,
 `julia`,
 `kotlin`,
+`lisp`,
 `lua`,
 `nasm`,
+`nasm64`,
 `node`,
 `paradoc`,
 `perl`,
@@ -280,6 +284,7 @@ Content-Type: application/json
 `rust`,
 `swift`,
 `typescript`,
+`zig`,
 
 <br>
 
