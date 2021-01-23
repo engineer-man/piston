@@ -14,11 +14,11 @@ echo '1.0.0'
 echo '---'
 
 echo 'c'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc -v"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "gcc --version"
 echo '---'
 
 echo 'cpp'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ -v"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ --version"
 echo '---'
 
 echo 'csharp'
@@ -73,8 +73,8 @@ echo 'nasm'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 
-echo 'nim'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "nim -v | head -n1"
+echo 'nasm64'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 
 echo 'node'
@@ -94,11 +94,11 @@ lxc-attach --clear-env -n piston -- /bin/bash -l -c "python -V"
 echo '---'
 
 echo 'python3'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -V"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3.8 -V"
 echo '---'
 
 echo 'paradoc'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3 -m paradoc --version"
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "python3.8 -m paradoc --version"
 echo '---'
 
 echo 'ruby'

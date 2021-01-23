@@ -1,0 +1,24 @@
+# make piston image
+lxc-clone -KMP /mnt/piston_image piston piston
+sed -i 's/\/mnt\/piston_image/\/var\/lib\/lxc/' piston/config
+tar -czf piston.tar.gz piston/
+
+# restore piston image
+cd /var/lib/lxc
+tar -xzf piston.tar.gz
+
+
+
+
+
+```
+# get piston image
+cd /var/lib/lxc
+wget whatever url
+tar -xzf piston.tar.gz
+sed -i "s/virtbr0/$(ip a | grep br0: | cut -d' ' -f2 | sed 's/://gi')/" piston/config
+
+# start piston
+cd /path/to/piston/lxc
+./start
+```

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd /tmp/$2
-timeout -s KILL 10 mcs $(echo code.code | sed 's/\///') -nowarn:0219 -out:binary
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 mono binary"
+mcs $(echo code.code | sed 's/\///') -nowarn:0219 -out:binary
+timeout -s KILL 3 xargs -a args.args -d '\n' mono binary < stdin.stdin

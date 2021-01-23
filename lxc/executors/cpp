@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd /tmp/$2
-timeout -s KILL 10 g++ -std=c++17 -o binary -x c++ code.code
-runuser runner$1 -c "cd /tmp/$2 ; cat args.args | xargs -d '\n' timeout -s KILL 3 ./binary"
+g++ -std=c++17 -o binary -x c++ code.code
+timeout -s KILL 3 xargs -a args.args -d '\n' ./binary < stdin.stdin
