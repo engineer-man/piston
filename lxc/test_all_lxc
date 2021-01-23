@@ -14,7 +14,7 @@ echo -n 'testing crystal = '
 echo -n 'testing csharp = '
 ../../cli/execute csharp csharp.cs
 echo -n 'testing d = '
-../../cli/execute d test.d
+../../cli/execute d d.d
 echo -n 'testing dash = '
 ../../cli/execute dash dash.sh
 echo -n 'testing deno = '
