@@ -22,7 +22,8 @@
     {
         "name": "bash",
         "aliases": [
-            "bash"
+            "bash",
+            "sh"
         ]
     },
     {
