@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /tmp/$2
+crystal build code.code
+timeout -s KILL 3 xargs -a args.args -d '\n' ./code < stdin.stdin

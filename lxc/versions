@@ -21,6 +21,10 @@ echo 'cpp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ --version"
 echo '---'
 
+echo 'crystal'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "crystal -v"
+echo '---'
+
 echo 'csharp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "mcs --version"
 echo '---'

@@ -9,6 +9,8 @@ echo -n 'testing c = '
 ../../cli/execute c c.c
 echo -n 'testing cpp = '
 ../../cli/execute cpp cpp.cpp
+echo -n 'testing crystal = '
+../../cli/execute crystal crystal.cr
 echo -n 'testing csharp = '
 ../../cli/execute csharp csharp.cs
 echo -n 'testing deno = '

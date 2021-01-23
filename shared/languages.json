@@ -39,6 +39,13 @@
         ]
     },
     {
+        "name": "crystal",
+        "aliases": [
+            "crystal"
+            "cr"
+        ]
+    },
+    {
         "name": "lisp",
         "aliases": [
             "lisp",
