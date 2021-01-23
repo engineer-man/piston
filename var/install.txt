@@ -231,6 +231,16 @@ tar -xzf crystal-0.35.1-1-linux-x86_64.tar.gz
 echo 'export PATH="$PATH:/opt/crystal/crystal-0.35.1-1/bin:$PATH"' >> /opt/.profile
 source /opt/.profile
 
+# install d
+# final binary: /opt/d/dmd2/linux/bin64/dmd
+# get version: /opt/d/dmd2/linux/bin64/dmd --version
+cd /opt && mkdir d && cd d
+wget http://downloads.dlang.org/releases/2.x/2.095.0/dmd.2.095.0.linux.tar.xz
+unxz dmd.2.095.0.linux.tar.xz
+tar -xf dmd.2.095.0.linux.tar
+echo 'export PATH=$PATH:/opt/d/dmd2/linux/bin64' >> /opt/.profile
+source /opt/.profile
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i

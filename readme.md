@@ -257,6 +257,7 @@ Content-Type: application/json
 `c`,
 `cpp`,
 `csharp`,
+`d`,
 `deno`,
 `elixir`,
 `emacs`,
