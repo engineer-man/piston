@@ -37,6 +37,10 @@ echo 'd'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "dmd --version"
 echo '---'
 
+echo 'dash'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "dpkg -s dash"
+echo '---'
+
 echo 'deno'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "deno --version"
 echo '---'

@@ -88,6 +88,12 @@
         ]
     },
     {
+        "name": "dash",
+        "aliases": [
+            "dash"
+        ]
+    },
+    {
         "name": "ruby",
         "aliases": [
             "duby",
