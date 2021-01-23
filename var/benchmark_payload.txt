@@ -1,0 +1,6 @@
+{
+    "language": "python",
+    "source": "print('test')",
+    "stdin": "",
+    "args": []
+}

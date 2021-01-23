@@ -7,7 +7,7 @@
 <br>
 
 <p align="center">
-    <a href="https://github.com/ArmynC/ArminC-AutoExec/commits/master">
+    <a href="https://github.com/engineer-man/piston/commits/master">
     <img src="https://img.shields.io/github/last-commit/engineer-man/piston.svg?style=for-the-badge&logo=github&logoColor=white"
          alt="GitHub last commit">
     <a href="https://github.com/engineer-man/piston/issues">

@@ -1,0 +1,12 @@
+ab -c 30 -n 1000 \
+    https://emkc.org/api/v1/piston/versions
+
+ab -c 30 -n 1000 \
+    -p benchmark_payload.txt \
+    -T 'application/json' \
+    https://emkc.org/api/v1/piston/execute
+
+
+time for i in {1..100}; do
+    timeout -s KILL 3 lxc-attach --clear-env -n piston -- /bin/bash -l -c "runuser runner1 /bin/bash -c 'ls -l '"
+done
