@@ -13,6 +13,8 @@ echo -n 'testing crystal = '
 ../../cli/execute crystal crystal.cr
 echo -n 'testing csharp = '
 ../../cli/execute csharp csharp.cs
+echo -n 'testing d = '
+../../cli/execute d test.d
 echo -n 'testing deno = '
 ../../cli/execute deno deno.ts
 echo -n 'testing elixir = '

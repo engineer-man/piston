@@ -72,6 +72,13 @@
         ]
     },
     {
+        "name": "d",
+        "aliases": [
+            "dlang",
+            "d"
+        ]
+    },
+    {
         "name": "deno",
         "aliases": [
             "deno",

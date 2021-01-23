@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd /tmp/$2
+cp code.code code.d
+timeout -s KILL 10 dmd code.d
+xtimeout -s KILL 3 args -a args.args -d '\n' ./code
