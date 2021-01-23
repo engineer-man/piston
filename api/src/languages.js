@@ -14,7 +14,7 @@ const languages = require('../../shared/languages.json');
 
         for (const section of sections) {
             const lines = section.trim().split('\n');
-            
+
             if (lines.length >= 2) {
                 const language = lines[0];
 
