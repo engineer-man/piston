@@ -61,3 +61,5 @@ echo -n 'testing swift = '
 ../../cli/execute swift swift.swift
 echo -n 'testing typescript = '
 ../../cli/execute typescript typescript.ts
+echo -n 'testing zig = '
+../../cli/execute zig zig.zig
