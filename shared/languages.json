@@ -39,6 +39,15 @@
         ]
     },
     {
+        "name": "lisp",
+        "aliases": [
+            "lisp",
+            "commonlisp",
+            "clisp",
+            "cl"
+        ]
+    },
+    {
         "name": "csharp",
         "aliases": [
             "c#",

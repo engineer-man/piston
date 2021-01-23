@@ -29,6 +29,8 @@ echo -n 'testing julia = '
 ../../cli/execute julia julia.jl
 echo -n 'testing kotlin = '
 ../../cli/execute kotlin kotlin.kt
+echo -n 'testing lisp = '
+../../cli/execute lisp lisp.cl
 echo -n 'testing nasm 32 bit = '
 ../../cli/execute nasm nasm.nasm
 echo -n 'testing nasm 64 bit = '

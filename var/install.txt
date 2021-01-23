@@ -20,7 +20,7 @@ apt-get update
 apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
-    ruby libtinfo-dev unzip git openssl libssl-dev
+    ruby libtinfo-dev unzip git openssl libssl-dev sbcl
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python
@@ -221,7 +221,6 @@ git clone https://github.com/texus/Brainfuck-interpreter
 cd Brainfuck-interpreter
 echo 'export PATH=$PATH:/opt/bf/Brainfuck-interpreter' >> /opt/.profile
 source /opt/.profile
-
 
 # create runnable users and apply limits
 for i in {1..150}; do
