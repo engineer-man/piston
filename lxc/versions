@@ -61,6 +61,10 @@ echo 'kotlin'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "kotlinc -version 2>&1 | grep kotlin"
 echo '---'
 
+echo 'lisp'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "sbcl --version"
+echo '---'
+
 echo 'lua'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "lua -v"
 echo '---'
