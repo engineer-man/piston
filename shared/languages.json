@@ -221,5 +221,11 @@
             "ts",
             "typescript"
         ]
+    },
+    {
+        "name": "zig",
+        "aliases": [
+            "zig"
+        ]
     }
 ]
