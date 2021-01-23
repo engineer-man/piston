@@ -274,6 +274,7 @@ Content-Type: application/json
 `lua`,
 `nasm`,
 `nasm64`,
+`nim`,
 `node`,
 `paradoc`,
 `perl`,

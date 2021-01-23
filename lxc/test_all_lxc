@@ -41,6 +41,8 @@ echo -n 'testing nasm 32 bit = '
 ../../cli/execute nasm nasm.nasm
 echo -n 'testing nasm 64 bit = '
 ../../cli/execute nasm64 nasm64.nasm
+echo -n 'testing nim = '
+../../cli/execute nim nim.nim
 echo -n 'testing node = '
 ../../cli/execute node node.js
 echo -n 'testing paradoc = '

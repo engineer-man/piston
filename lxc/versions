@@ -89,6 +89,10 @@ echo 'nasm64'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "nasm -version"
 echo '---'
 
+echo 'nim'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "nim -v"
+echo '---'
+
 echo 'node'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "node --version"
 echo '---'
