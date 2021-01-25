@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { execute } = require('../shared/execute');
+const { execute } = require('../lxc/execute.js');
 const { readFileSync } = require('fs');
-const languages = require('../shared/languages.json');
+const languages = require('../config/languages.json');
 
 const [languageName, sourceFile, ...args] = process.argv.slice(2);
 
@@ -11,7 +11,7 @@ const [languageName, sourceFile, ...args] = process.argv.slice(2);
         console.error('Provide a language name');
         return;
     }
-    
+
     if (!sourceFile) {
         console.error('Provide a source file');
         return;

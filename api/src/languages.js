@@ -1,8 +1,8 @@
 const { spawn } = require('child_process');
-const languages = require('../../shared/languages.json');
+const languages = require('../../config/languages.json');
 
 {
-    const process = spawn(__dirname + '/../../lxc/versions');
+    const process = spawn(__dirname + '/../../lxc/util/versions');
 
     let output = '';
     process.stderr.on('data', chunk => output += chunk);

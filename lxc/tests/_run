@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-cd tests
 
 echo -n 'testing awk = '
 ../../cli/execute awk awk.awk

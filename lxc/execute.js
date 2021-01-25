@@ -13,7 +13,7 @@ function execute(language, source, stdin = '', args = []) {
         writeFileSync(`${LXC_ROOT}/tmp/${id}/stdin.stdin`, stdin);
         writeFileSync(`${LXC_ROOT}/tmp/${id}/args.args`, args.join('\n'));
 
-        const process = spawn(__dirname + '/../lxc/execute', [
+        const process = spawn(__dirname + '/execute', [
             language.name,
             id,
         ]);
