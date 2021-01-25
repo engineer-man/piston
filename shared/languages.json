@@ -137,6 +137,12 @@
         ]
     },
     {
+        "name": "nim",
+        "aliases": [
+            "nim"
+        ]
+    },
+    {
         "name": "node",
         "aliases": [
             "javascript",
