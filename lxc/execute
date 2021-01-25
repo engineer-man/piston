@@ -18,6 +18,7 @@ basepath="/var/lib/lxc/piston/rootfs"
 exec 200>$dir/lockfile
 flock 200
 
+touch $dir/i
 runner=$(cat $dir/i)
 let 'runner = runner % 150 + 1'
 

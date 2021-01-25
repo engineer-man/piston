@@ -37,8 +37,6 @@ function execute(language, source, stdin = '', args = []) {
         });
 
         process.on('exit', code => {
-            unlinkSync(sourceFile);
-
             stderr = stderr.trim().substring(0, OUTPUT_LIMIT);
             stdout = stdout.trim().substring(0, OUTPUT_LIMIT);
             output = output.trim().substring(0, OUTPUT_LIMIT);
