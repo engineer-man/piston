@@ -28,7 +28,7 @@ exec 200>&-
 # prevent users from spying on each other
 lxc-attach --clear-env -n piston -- \
     /bin/bash -l -c "
-        chown runner$runner -R /tmp/$id
+        chown runner$runner: -R /tmp/$id
         chmod 700 /tmp/$id
     " > /dev/null 2>&1
 
