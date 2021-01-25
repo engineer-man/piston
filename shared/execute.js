@@ -7,7 +7,6 @@ const LXC_ROOT = '/var/lib/lxc/piston/rootfs';
 function execute(language, source, stdin = '', args = []) {
     return new Promise(resolve => {
         const id = new Date().getTime() + '_' + Math.floor(Math.random() * 10000000);
-        const sourceFile = `/tmp/${stamp}.code`;
 
         mkdirSync(`${LXC_ROOT}/tmp/${id}`);
         writeFileSync(`${LXC_ROOT}/tmp/${id}/code.code`, source);
