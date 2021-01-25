@@ -1,20 +1,22 @@
-const { writeFileSync, unlinkSync } = require('fs');
+const { writeFileSync, unlinkSync, mkdirSync } = require('fs');
 const { spawn } = require('child_process');
 
 const OUTPUT_LIMIT = 65535;
+const LXC_ROOT = '/var/lib/lxc/piston/rootfs';
 
 function execute(language, source, stdin = '', args = []) {
     return new Promise(resolve => {
-        const stamp = new Date().getTime();
+        const id = new Date().getTime() + '_' + Math.floor(Math.random() * 10000000);
         const sourceFile = `/tmp/${stamp}.code`;
 
-        writeFileSync(sourceFile, source);
+        mkdirSync(`${LXC_ROOT}/tmp/${id}`);
+        writeFileSync(`${LXC_ROOT}/tmp/${id}/code.code`, source);
+        writeFileSync(`${LXC_ROOT}/tmp/${id}/stdin.stdin`, stdin);
+        writeFileSync(`${LXC_ROOT}/tmp/${id}/args.args`, args.join('\n'));
 
         const process = spawn(__dirname + '/../lxc/execute', [
             language.name,
-            sourceFile,
-            stdin,
-            args.join('\n'),
+            id,
         ]);
 
         let stdout = '';

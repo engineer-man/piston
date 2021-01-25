@@ -9,60 +9,46 @@ if [ -z "$1" ] || [ -z "$2" ]; then
     exit
 fi
 
-lang=$1
-epoch=$(date +%s%N)
-basepath="/var/lib/lxc/piston/rootfs"
-filepath="/tmp/$epoch/code.code"
-argpath="/tmp/$epoch/args.args"
-stdinpath="/tmp/$epoch/stdin.stdin"
-arg=$(basename $argpath)
+language=$1
+id=$2
 
-# write arg file
-mkdir -p $basepath/tmp/$epoch
-chmod 777 $basepath/tmp/$epoch
-cat $2 > $basepath$filepath
-echo $3 > $basepath$stdinpath
-echo -n "${@:4}" > $basepath$argpath
+basepath="/var/lib/lxc/piston/rootfs"
 
 # process incrementor
 exec 200>$dir/lockfile
-flock -x 200
-oldinc=$(cat $dir/i | awk '{$1=$1};1')
-newinc=$(expr $oldinc + 1)
+flock 200
 
-if (( newinc >= 151 )); then
-    newinc=1
-    echo 1 > $dir/i
-else
-    echo $newinc > $dir/i
-fi
+runner=$(cat $dir/i)
+let 'runner = runner % 150 + 1'
+
+echo $runner > $dir/i
 exec 200>&-
 
 # prevent users from spying on each other
 lxc-attach --clear-env -n piston -- \
     /bin/bash -l -c "
-        chown runner$newinc: -R /tmp/$epoch
-        chmod 700 /tmp/$epoch
+        chown runner$runner -R /tmp/$id
+        chmod 700 /tmp/$id
     " > /dev/null 2>&1
 
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -l -c "runuser runner$newinc /exec/$lang $newinc $epoch"
+        /bin/bash -l -c "runuser runner$runner /exec/$language runner$runner $id"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
     /bin/bash -l -c "
         for i in {1..100}
         do
-            pkill -u runner$newinc --signal SIGKILL
+            pkill -u runner$runner --signal SIGKILL
         done
 
-        find /tmp -user runner$newinc -delete
-        find /var/tmp -user runner$newinc -delete
-        find /var/lock -user runner$newinc -delete
-        find /dev/shm -user runner$newinc -delete
-        find /run/lock -user runner$newinc -delete
+        find /tmp -user runner$runner -delete
+        find /var/tmp -user runner$runner -delete
+        find /var/lock -user runner$runner -delete
+        find /dev/shm -user runner$runner -delete
+        find /run/lock -user runner$runner -delete
     " > /dev/null 2>&1 &
 
-rm -rf $basepath/tmp/$epoch
+rm -rf $basepath/tmp/$id
