@@ -20,7 +20,7 @@ apt-get update
 apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
-    ruby libtinfo-dev unzip git openssl libssl-dev sbcl
+    ruby libtinfo-dev unzip git openssl libssl-dev sbcl libevent-dev
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python
