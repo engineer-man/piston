@@ -1,1 +1,1 @@
-{ print "good" }
+BEGIN{ print "good" }
