@@ -141,7 +141,10 @@ cd piston/lxc
 
 #### Installation (simple)
 
-- Coming soon.
+- `cd container && ./install.sh`
+- Wait, it may take up to an hour.
+- `cd ../lxc && ./start && cd ..`
+- Good to go!
 
 #### Installation (advanced)
 

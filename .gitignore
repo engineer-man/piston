@@ -1,3 +1,4 @@
 api/api
 lxc/i
 lxc/lockfile
+container/output-*
