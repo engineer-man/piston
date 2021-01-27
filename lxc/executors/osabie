@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# osabie uses Elixir, which expects UTF-8 native encoding
+export LC_ALL="en_US.UTF-8"
+
+# osabie will break if you try using it with xargs
+cd /tmp/$2
+timeout -s KILL 3 osabie code.code < args.args
