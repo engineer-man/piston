@@ -240,5 +240,14 @@
         "aliases": [
             "zig"
         ]
+    },
+    {
+        "name": "osabie",
+        "aliases": [
+            "osabie",
+            "05AB1E",
+            "osable",
+            "usable"
+        ]
     }
 ]

@@ -276,6 +276,7 @@ Content-Type: application/json
 `nasm64`,
 `nim`,
 `node`,
+`osabie`,
 `paradoc`,
 `perl`,
 `php`,

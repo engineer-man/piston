@@ -136,3 +136,7 @@ echo '---'
 echo 'zig'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "zig version"
 echo '---'
+
+echo 'osabie'
+echo '1.0.1'
+echo '---'
