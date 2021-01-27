@@ -44,6 +44,8 @@ echo -n 'testing nim = '
 ../../cli/execute nim nim.nim
 echo -n 'testing node = '
 ../../cli/execute node node.js
+echo -n 'testing osabie = '
+../../cli/execute osabie osabie.abe
 echo -n 'testing paradoc = '
 ../../cli/execute bash paradoc.sh
 echo -n 'testing perl = '
@@ -64,5 +66,3 @@ echo -n 'testing typescript = '
 ../../cli/execute typescript typescript.ts
 echo -n 'testing zig = '
 ../../cli/execute zig zig.zig
-echo -n 'testing osabie = '
-../../cli/execute osabie osabie.abe
