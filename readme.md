@@ -141,15 +141,23 @@ cd piston/lxc
 
 #### Installation (simple)
 
-- `cd container && ./install.sh`
+- `mkdir -p /var/lib/lxc/piston`
+- `cd /var/lib/lxc/piston`
+- `wget [latest container url] -o container.zip`
+- `unzip container.zip`
+- `tar xzf rootfs.tar.gz`
+- `rm rootfs.tar.gz container.zip`
+- Good to go!
+
+
+#### Installation (advanced)
+
+- `cd ../container && ./install.sh`
 - Wait, it may take up to an hour.
 - `cd ../lxc && ./start && cd ..`
 - Good to go!
 
-#### Installation (advanced)
-
-- See `var/install.txt` for how to create a new LXC container and install all of the required
-software.
+Alternatively, see `var/install.txt` for how to build the container manually
 
 #### CLI Usage
 - `cli/execute [language] [file path] [args]`

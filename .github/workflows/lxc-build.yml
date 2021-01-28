@@ -1,0 +1,38 @@
+---
+
+name: LXC Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+    name: packer
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # validate templates
+      - name: Validate Container
+        run: packer validate piston.pkr.hcl
+        working-directory: container
+
+      # build container
+      - name: Build Artifact
+        run: packer build -var 'make_threads=32' piston.pkr.hcl 
+        working-directory: container
+
+      - name: Rename config
+        run: mv lxc-config config
+        working-directory: container
+      
+      #  Upload container 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: lxc-container
+          path: |
+            container/output-piston-bionic/config
+            container/output-piston-bionic/rootfs.tar.gz
