@@ -33,9 +33,12 @@ jobs:
 
       # build container
       - name: Build Artifact
-        run: packer build -var 'make_threads=32' -var 'apt_mirror=http://azure.archive.ubuntu.com/ubuntu' piston.pkr.hcl 
+        run: sudo packer build -var 'make_threads=32' -var 'apt_mirror=http://azure.archive.ubuntu.com/ubuntu' piston.pkr.hcl 
         working-directory: container
-
+      - name: chown everything
+        run: |
+          sudo chown -R runner:runner .
+        working-directory: container
       - name: Rename config
         run: mv lxc-config config
         working-directory: container
