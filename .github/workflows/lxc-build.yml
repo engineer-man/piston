@@ -18,7 +18,7 @@ jobs:
       - name: Install Distrobuilder
         run: |
           sudo apt update
-          sudo apt install -y golang-go debootstrap rsync gpg squashfs-tools git
+          sudo apt install -y debootstrap rsync gpg squashfs-tools git
           sudo go get -x github.com/lxc/distrobuilder/distrobuilder
           sudo python3 -m pip install pyyaml
       # build container
