@@ -20,12 +20,17 @@ jobs:
         run: packer validate piston.pkr.hcl
         working-directory: container
       
-      - name: Install LXC
+      - name: Install LXC and Packer
         run: |
-          apt install -y lxc lxc-templates debootstrap libvirt0
-          echo "lxc.net.0.type = veth" > /etc/lxc/default.conf
-          echo "lxc.net.0.link = lxcbr0" >> /etc/lxc/default.conf
-          echo "lxc.net.0.flags = up" >> /etc/lxc/default.conf
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update -y
+          sudo apt install -y lxc lxc-templates debootstrap libvirt0 packer
+          echo "lxc.net.0.type = veth" > default.conf
+          echo "lxc.net.0.link = lxcbr0" >> default.conf
+          echo "lxc.net.0.flags = up" >> default.conf
+          sudo rm /etc/lxc/default.conf
+          sudo cp default.conf /etc/lxc
           systemctl start lxc-net
 
       # build container
