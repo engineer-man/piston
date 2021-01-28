@@ -19,6 +19,14 @@ jobs:
       - name: Validate Container
         run: packer validate piston.pkr.hcl
         working-directory: container
+      
+      - name: Install LXC
+        run: |
+          apt install -y lxc lxc-templates debootstrap libvirt0
+          echo "lxc.net.0.type = veth" > /etc/lxc/default.conf
+          echo "lxc.net.0.link = lxcbr0" >> /etc/lxc/default.conf
+          echo "lxc.net.0.flags = up" >> /etc/lxc/default.conf
+          systemctl start lxc-net
 
       # build container
       - name: Build Artifact
