@@ -1,4 +1,5 @@
 api/api
 lxc/i
 lxc/lockfile
-container/output-*
+container/build.yaml
+container/*.tar.xz

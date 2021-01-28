@@ -15,32 +15,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # validate templates
-      - name: Validate Container
-        run: packer validate piston.pkr.hcl
-        working-directory: container
-      
-      - name: Install LXC and Packer
-        run: |
-          sudo apt update
-          sudo apt install -y lxc lxc-templates debootstrap libvirt0 packer
-          echo "lxc.net.0.type = veth" > default.conf
-          echo "lxc.net.0.link = lxcbr0" >> default.conf
-          echo "lxc.net.0.flags = up" >> default.conf
-          sudo rm /etc/lxc/default.conf
-          sudo cp default.conf /etc/lxc
-          sudo systemctl start lxc-net
-
+      - name: Install Distrobuilder
+        run: sudo apt-get install -y distrobuilder
       # build container
       - name: Build Artifact
-        run: sudo packer build -var 'make_threads=32' -var 'apt_mirror=http://azure.archive.ubuntu.com/ubuntu' piston.pkr.hcl 
+        run: sudo ./build.sh
+        working-directory: container
+
         working-directory: container
       - name: chown everything
         run: |
           sudo chown -R runner:runner .
-        working-directory: container
-      - name: Rename config
-        run: mv lxc-config config
         working-directory: container
       
       #  Upload container 
@@ -48,5 +33,5 @@ jobs:
         with:
           name: lxc-container
           path: |
-            container/output-piston-bionic/config
-            container/output-piston-bionic/rootfs.tar.gz
+            container/output-piston-bionic/meta.tar.xz
+            container/output-piston-bionic/rootfs.tar.xz
