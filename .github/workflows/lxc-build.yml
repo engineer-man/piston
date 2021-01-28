@@ -22,6 +22,7 @@ jobs:
       
       - name: Install LXC and Packer
         run: |
+          sudo apt update
           sudo apt install -y lxc lxc-templates debootstrap libvirt0 packer
           echo "lxc.net.0.type = veth" > default.conf
           echo "lxc.net.0.link = lxcbr0" >> default.conf
