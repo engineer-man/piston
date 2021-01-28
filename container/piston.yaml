@@ -1,14 +1,14 @@
 image:
-  name: ubuntu-disco-x86_64-piston
+  name: ubuntu-bionic-x86_64-piston
   distribution: ubuntu
-  release: focal
+  release: bionic
   description: |-
     Ubuntu {{ image.release }} preconfigured for Piston
   architecture: x86_64
 
 source:
   downloader: debootstrap
-  same_as: gutsy
+  same_as: bionic
   url: http://archive.ubuntu.com/ubuntu
   keyserver: keyserver.ubuntu.com
   keys:

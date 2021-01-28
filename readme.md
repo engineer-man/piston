@@ -141,20 +141,20 @@ cd piston/lxc
 
 #### Installation (simple)
 
-- `mkdir -p /var/lib/lxc/piston`
-- `cd /var/lib/lxc/piston`
 - `wget [latest container url] -o container.zip`
 - `unzip container.zip`
-- `tar xzf rootfs.tar.gz`
-- `rm rootfs.tar.gz container.zip`
+- `lxc-create -n piston -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz`
+- `cd ../lxc && ./start`
 - Good to go!
 
 
 #### Installation (advanced)
 
-- `cd ../container && ./install.sh`
+- Install additional dependencies python3, pip and distrobuilder
+- `cd ../container && ./build.sh`
 - Wait, it may take up to an hour.
-- `cd ../lxc && ./start && cd ..`
+- `lxc-create -n piston -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz`
+- `cd ../lxc && ./start`
 - Good to go!
 
 Alternatively, see `var/install.txt` for how to build the container manually
