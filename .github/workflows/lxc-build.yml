@@ -22,7 +22,6 @@ jobs:
         run: sudo ./build.sh
         working-directory: container
 
-        working-directory: container
       - name: chown everything
         run: |
           sudo chown -R runner:runner .
