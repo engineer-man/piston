@@ -16,10 +16,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install Distrobuilder
-        run: sudo go get -v -x github.com/lxc/distrobuilder/distrobuilder
+        run: |
+          sudo go get -v -x github.com/lxc/distrobuilder/distrobuilder
+          sudo python3 -m pip install pyyaml
       # build container
       - name: Build Artifact
-        run: sudo ./build.sh
+        run: |
+          python3 configure.py
+          sudo /home/runner/go/bin/distrobuilder build-lxc build.yaml
         working-directory: container
 
       - name: chown everything
