@@ -22,9 +22,6 @@ jobs:
       
       - name: Install LXC and Packer
         run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get update -y
           sudo apt install -y lxc lxc-templates debootstrap libvirt0 packer
           echo "lxc.net.0.type = veth" > default.conf
           echo "lxc.net.0.link = lxcbr0" >> default.conf
