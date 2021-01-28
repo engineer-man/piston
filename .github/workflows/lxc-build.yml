@@ -29,11 +29,11 @@ jobs:
           echo "lxc.net.0.flags = up" >> default.conf
           sudo rm /etc/lxc/default.conf
           sudo cp default.conf /etc/lxc
-          systemctl start lxc-net
+          sudo systemctl start lxc-net
 
       # build container
       - name: Build Artifact
-        run: packer build -var 'make_threads=32' piston.pkr.hcl 
+        run: packer build -var 'make_threads=32' -var 'apt_mirror=http://azure.archive.ubuntu.com/ubuntu' piston.pkr.hcl 
         working-directory: container
 
       - name: Rename config
