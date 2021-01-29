@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a href="https://github.com/engineer-man/piston"><img src="https://emkc.org/images/icon_circle_24.png" alt="engineer-man piston"></a>
+    <a href="https://github.com/engineer-man/piston"><img src="images/icon_circle.svg" width="25" height="25" alt="engineer-man piston"></a>
   Piston
 </h1>
 
