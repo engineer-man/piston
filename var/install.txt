@@ -37,17 +37,17 @@ echo 'export PATH=$PATH:/opt/python2/Python-2.7.17' >> /opt/.profile
 source /opt/.profile
 
 # install python3
-# final binary: /opt/python3/Python-3.8.2/python
-# get version: /opt/python3/Python-3.8.2/python -V
+# final binary: /opt/python3/Python-3.9.1/python
+# get version: /opt/python3/Python-3.9.1/python -V
 cd /opt && mkdir python3 && cd python3
-wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz
-unxz Python-3.8.2.tar.xz
-tar -xf Python-3.8.2.tar
-cd Python-3.8.2
+wget https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz
+unxz Python-3.9.1.tar.xz
+tar -xf Python-3.9.1.tar
+cd Python-3.9.2
 ./configure
 make
-ln -s python python3.8
-echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
+ln -s python python3.9
+echo 'export PATH=$PATH:/opt/python3/Python-3.9.1' >> /opt/.profile
 source /opt/.profile
 
 # install paradoc
