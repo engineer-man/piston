@@ -43,7 +43,7 @@ cd /opt && mkdir python3 && cd python3
 wget https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz
 unxz Python-3.9.1.tar.xz
 tar -xf Python-3.9.1.tar
-cd Python-3.9.2
+cd Python-3.9.1
 ./configure
 make
 ln -s python python3.9
