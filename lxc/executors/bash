@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /tmp/$2
+cd /tmp/$1
 xargs -a args.args -d '\n' timeout -s KILL 3 bash code.code < stdin.stdin

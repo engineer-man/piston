@@ -2,5 +2,5 @@
 
 export LC_ALL="en_US.UTF-8"
 
-cd /tmp/$2
+cd /tmp/$1
 timeout -s KILL 3 xargs -a args.args -d '\n' elixir code.code < stdin.stdin

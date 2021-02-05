@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /tmp/$2
+cd /tmp/$1
 cp code.code main.zig
 timeout -s KILL 10 zig build-exe main.zig
 timeout -s KILL 3 xargs -a args.args -d '\n' ./main
