@@ -30,21 +30,21 @@ cd Python-2.7.17
 # open Modules/Setup and uncomment zlib line
 make
 echo 'export PATH=$PATH:/opt/python2/Python-2.7.17' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install python3
-# final binary: /opt/python3/Python-3.8.2/python
-# get version: /opt/python3/Python-3.8.2/python -V
+# final binary: /opt/python3/Python-3.9.1/python
+# get version: /opt/python3/Python-3.9.1/python -V
 cd /opt && mkdir python3 && cd python3
-wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz
-unxz Python-3.8.2.tar.xz
-tar -xf Python-3.8.2.tar
-cd Python-3.8.2
+wget https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz
+unxz Python-3.9.1.tar.xz
+tar -xf Python-3.9.1.tar
+cd Python-3.9.1
 ./configure
 make
-ln -s python python3.8
-echo 'export PATH=$PATH:/opt/python3/Python-3.8.2' >> /opt/.profile
-. /opt/.profile
+ln -s python python3.9
+echo 'export PATH=$PATH:/opt/python3/Python-3.9.1' >> /opt/.profile
+source /opt/.profile
 
 # install paradoc
 # this is not a binary, it is a python module
@@ -60,7 +60,7 @@ wget https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz
 unxz node-v12.16.1-linux-x64.tar.xz
 tar -xf node-v12.16.1-linux-x64.tar
 echo 'export PATH=$PATH:/opt/nodejs/node-v12.16.1-linux-x64/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install typescript
 # final binary: /opt/nodejs/node-v12.16.1-linux-x64/bin/tsc
@@ -76,7 +76,7 @@ tar -xzf go1.14.1.linux-amd64.tar.gz
 echo 'export PATH=$PATH:/opt/go/go/bin' >> /opt/.profile
 echo 'export GOROOT=/opt/go/go' >> /opt/.profile
 echo 'export GOCACHE=/tmp' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install php
 # final binary: /usr/local/bin/php
@@ -98,6 +98,15 @@ tar -xzf rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz
 cd rust-1.49.0-x86_64-unknown-linux-gnu
 ./install.sh
 
+# install scala
+# final binary: /opt/scala/scala3-3.0.0-M3/bin/scala
+# get version: /opt/scala/scala3-3.0.0-M3/bin/scala -version
+cd /opt && mkdir scala && cd scala
+wget https://github.com/lampepfl/dotty/releases/download/3.0.0-M3/scala3-3.0.0-M3.tar.gz
+tar -xzf scala3-3.0.0-M3.tar.gz
+echo 'export PATH=$PATH:/opt/scala/scala3-3.0.0-M3/bin' >> /opt/.profile
+source /opt/.profile
+
 # install swift
 # final binary: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift
 # get version: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift --version
@@ -105,7 +114,7 @@ cd /opt && mkdir swift && cd swift
 wget https://swift.org/builds/swift-5.1.5-release/ubuntu1804/swift-5.1.5-RELEASE/swift-5.1.5-RELEASE-ubuntu18.04.tar.gz
 tar -xzf swift-5.1.5-RELEASE-ubuntu18.04.tar.gz
 echo 'export PATH=$PATH:/opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install nasm
 # final binary: /opt/nasm/nasm-2.14.02/nasm
@@ -117,7 +126,7 @@ cd nasm-2.14.02
 ./configure
 make
 echo 'export PATH=$PATH:/opt/nasm/nasm-2.14.02' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install java
 # final binary: /opt/java/jdk-14/bin/java
@@ -126,7 +135,9 @@ cd /opt && mkdir java && cd java
 wget https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
 tar -xzf openjdk-14_linux-x64_bin.tar.gz
 echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
-. /opt/.profile
+# Scala will complain if JAVA_HOME isn't set
+echo 'export JAVA_HOME=/opt/java/jdk-14' >> /opt/.profile
+source /opt/.profile
 
 # install jelly
 cd /opt && mkdir jelly && cd jelly
@@ -143,7 +154,7 @@ cd /opt && mkdir julia && cd julia
 wget https://julialang-s3.julialang.org/bin/linux/x64/1.5/julia-1.5.0-linux-x86_64.tar.gz
 tar -xzf julia-1.5.0-linux-x86_64.tar.gz
 echo 'export PATH=$PATH:/opt/julia/julia-1.5.0/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install kotlin
 # final binary: /opt/kotlinc/bin/kotlinc
@@ -153,7 +164,7 @@ wget https://github.com/JetBrains/kotlin/releases/download/v1.4.10/kotlin-compil
 unzip kotlin-compiler-1.4.10.zip
 rm kotlin-compiler-1.4.10.zip
 echo 'export PATH=$PATH:/opt/kotlinc/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install elixir and erlang
 # final binary: /opt/elixir/bin/elixir
@@ -165,13 +176,13 @@ gunzip -c otp_src_23.0.tar.gz | tar xf -
 cd otp_src_23.0 && ./configure
 make
 echo 'export PATH=$PATH:/opt/erlang/otp_src_23.0/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 # elixir
 cd /opt && mkdir elixir && cd elixir
 wget https://github.com/elixir-lang/elixir/releases/download/v1.10.3/Precompiled.zip
 mkdir elixir-1.10.3 && unzip Precompiled.zip -d elixir-1.10.3/
 echo 'export PATH=$PATH:/opt/elixir/elixir-1.10.3/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install emacs
 # final binary: /opt/emacs/emacs-26.3/src/emacs
@@ -184,7 +195,7 @@ cd emacs-26.3
 ./configure --with-gnutls=no
 make
 echo 'export PATH=$PATH:/opt/emacs/emacs-26.3/src' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install lua
 # final binary: /opt/lua/lua54/src/lua
@@ -195,7 +206,7 @@ tar -xzf download
 cd lua54
 make
 echo 'export PATH=$PATH:/opt/lua/lua54/src' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install haskell
 # final binary: /usr/bin/ghc
@@ -209,14 +220,14 @@ cd /opt && mkdir deno && cd deno
 curl -fsSL https://deno.land/x/install/install.sh | sh
 echo 'export DENO_INSTALL="/opt/.deno"' >> /opt/.profile
 echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install brainfuck
 cd /opt && mkdir bf && cd bf
 git clone https://github.com/texus/Brainfuck-interpreter
 cd Brainfuck-interpreter
 echo 'export PATH=$PATH:/opt/bf/Brainfuck-interpreter' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install crystal
 # final binary: /opt/crystal/crystal-0.35.1-1/bin/crystal
@@ -225,7 +236,7 @@ cd /opt && mkdir crystal && cd crystal
 wget https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-x86_64.tar.gz
 tar -xzf crystal-0.35.1-1-linux-x86_64.tar.gz
 echo 'export PATH="$PATH:/opt/crystal/crystal-0.35.1-1/bin:$PATH"' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install d
 # final binary: /opt/d/dmd2/linux/bin64/dmd
@@ -235,7 +246,7 @@ wget http://downloads.dlang.org/releases/2.x/2.095.0/dmd.2.095.0.linux.tar.xz
 unxz dmd.2.095.0.linux.tar.xz
 tar -xf dmd.2.095.0.linux.tar
 echo 'export PATH=$PATH:/opt/d/dmd2/linux/bin64' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install zig
 # final binary: /opt/zig/zig
@@ -246,7 +257,7 @@ tar -xf zig-linux-x86_64-0.7.1.tar.xz
 mv zig-linux-x86_64-0.7.1 zig
 rm zig-linux-x86_64-0.7.1.tar.xz
 echo 'export PATH=$PATH:/opt/zig/zig' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
 
 # install nim
 # final binary: /opt/nim/bin/nim
@@ -258,7 +269,19 @@ tar -xf nim-1.4.0-linux_x64.tar
 cd nim-1.4.0
 ./install.sh /opt
 echo 'export PATH=$PATH:/opt/nim/bin' >> /opt/.profile
-. /opt/.profile
+source /opt/.profile
+
+# install 05AB1E
+# final binary: /opt/05AB1E/05AB1E/osabie
+# requires Elixir to install
+cd /opt && mkdir 05AB1E && cd 05AB1E
+git clone https://github.com/Adriandmen/05AB1E.git
+cd 05AB1E
+mix local.hex --force
+mix deps.get --force
+MIX_ENV=prod mix escript.build --force
+echo 'export PATH=$PATH:/opt/05AB1E/05AB1E' >> /opt/.profile
+source /opt/.profile
 
 # create runnable users and apply limits
 for i in {1..150}; do

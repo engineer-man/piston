@@ -136,16 +136,15 @@ pacman -S lxc libvirt unzip
 ```sh
 # clone and enter repo
 git clone https://github.com/engineer-man/piston
-cd piston/lxc
 ```
 
 #### Installation (simple)
 
 - Install additional dependencies python3, pip and distrobuilder
-- `cd ../container && ./build.sh`
+- `cd container && ./build.sh`
 - Wait, it may take up to an hour.
 - `lxc-create -n piston -t local -- --metadata meta.tar.xz --fstree rootfs.tar.xz`
-- `cd ../lxc && ./start`
+- `cd lxc && ./start`
 - Good to go!
 
 
