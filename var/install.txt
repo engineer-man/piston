@@ -139,6 +139,8 @@ cd /opt && mkdir java && cd java
 wget https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
 tar -xzf openjdk-14_linux-x64_bin.tar.gz
 echo 'export PATH=$PATH:/opt/java/jdk-14/bin' >> /opt/.profile
+# Scala will complain if JAVA_HOME isn't set
+echo 'export JAVA_HOME=/opt/java/jdk-14' >> /opt/.profile
 source /opt/.profile
 
 # install jelly

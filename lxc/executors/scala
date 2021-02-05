@@ -1,7 +1,4 @@
 #!/bin/bash
 
-# Scala will complain if JAVA_HOME isn't set
-export JAVA_HOME=/opt/java/jdk-14
-
 cp code.code interim.scala
 timeout -s KILL 10 xargs -a args.args -d '\n' scala interim.scala < stdin.stdin
