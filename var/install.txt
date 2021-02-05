@@ -102,6 +102,15 @@ tar -xzf rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz
 cd rust-1.49.0-x86_64-unknown-linux-gnu
 ./install.sh
 
+# install scala
+# final binary: /opt/scala/scala-2.12.13/bin/scala
+# get version: /opt/scala/scala-2.12.13/bin/scala -version
+cd /opt && mkdir scala && cd scala
+wget https://downloads.lightbend.com/scala/2.12.13/scala-2.12.13.tgz
+tar -xzf scala-2.12.13.tgz
+echo 'export PATH=$PATH:/opt/scala/scala-2.12.13/bin' >> /opt/.profile
+source /opt/.profile
+
 # install swift
 # final binary: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift
 # get version: /opt/swift/swift-5.1.5-RELEASE-ubuntu18.04/usr/bin/swift --version
