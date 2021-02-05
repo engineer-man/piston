@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /tmp/$2
+cd /tmp/$1
 mv code.code interim.ts
 tsc interim.ts
 rm -f interim.ts
