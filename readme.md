@@ -284,6 +284,7 @@ Content-Type: application/json
 `python3`,
 `ruby`,
 `rust`,
+`scala`,
 `swift`,
 `typescript`,
 `zig`,

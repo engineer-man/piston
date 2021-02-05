@@ -223,6 +223,13 @@
         ]
     },
     {
+        "name": "scala",
+        "aliases": [
+            "scala",
+            "sc"
+        ]
+    },
+    {
         "name": "swift",
         "aliases": [
             "swift"

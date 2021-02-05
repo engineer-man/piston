@@ -60,6 +60,8 @@ echo -n 'testing ruby = '
 ../../cli/execute ruby ruby.rb
 echo -n 'testing rust = '
 ../../cli/execute rust rust.rs
+echo -n 'testing scala = '
+../../cli/execute scala scala.scala
 echo -n 'testing swift = '
 ../../cli/execute swift swift.swift
 echo -n 'testing typescript = '

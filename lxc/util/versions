@@ -125,6 +125,10 @@ echo 'rust'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "rustc --version"
 echo '---'
 
+echo 'scala'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "scala -version"
+echo '---'
+
 echo 'swift'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "swift --version"
 echo '---'

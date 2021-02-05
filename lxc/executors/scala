@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp code.code interim.scala
+timeout -s KILL 10 xargs -a args.args -d '\n' scala interim.scala < stdin.stdin
