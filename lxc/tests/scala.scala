@@ -1,3 +1,3 @@
-object Test extends App {
+@main def run(): Unit = {
   println("good")
 }
