@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd /tmp/$2
 cp code.code interim.java
 timeout -s KILL 10 xargs -a args.args -d '\n' java interim.java < stdin.stdin
 
