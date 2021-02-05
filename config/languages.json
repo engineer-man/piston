@@ -225,6 +225,7 @@
     {
         "name": "scala",
         "aliases": [
+            "scala",
             "sc"
         ]
     },
