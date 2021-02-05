@@ -2,3 +2,5 @@ api/api
 api/package-lock.json
 lxc/i
 lxc/lockfile
+container/build.yaml
+container/*.tar.xz
