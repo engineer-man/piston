@@ -52,6 +52,8 @@ echo -n 'testing perl = '
 ../../cli/execute perl perl.pl
 echo -n 'testing php = '
 ../../cli/execute php php.php
+echo -n 'testing prolog = '
+../../cli/execute prolog prolog.pl
 echo -n 'testing python2 = '
 ../../cli/execute python2 python2.py
 echo -n 'testing python3 = '

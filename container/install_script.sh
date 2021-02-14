@@ -283,6 +283,22 @@ MIX_ENV=prod mix escript.build --force
 echo 'export PATH=$PATH:/opt/05AB1E/05AB1E' >> /opt/.profile
 source /opt/.profile
 
+
+# install prolog
+# final binary: /opt/swipl/swipl-<version>/build/src/swipl
+cd /opt && mkdir swipl && cd swipl
+SUB_DIR=swipl-8.2.4
+wget https://www.swi-prolog.org/download/stable/src/$SUB_DIR.tar.gz
+tar -xf $SUB_DIR.tar.gz
+rm $SUB_DIR.tar.gz
+cd $SUB_DIR
+mkdir build
+cd build
+cmake -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DMULTI_THREADED=OFF -G Ninja ..
+ninja
+echo "export PATH=\$PATH:/opt/swipl/$SUB_DIR/build/src" >> /opt/.profile
+source /opt/.profile
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i
