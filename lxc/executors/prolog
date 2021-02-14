@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# cd /tmp/$1
+cd /tmp/$1
 
 sed 's/^.*$/:- forall((Goal = (\0), call(Goal)), (write(Goal), nl))./' input.input |
 	cat code.code - > code.pl
