@@ -200,6 +200,13 @@
         ]
     },
     {
+        "name": "prolog",
+        "aliases": [
+            "prolog",
+            "plg"
+        ]
+    },
+    {
         "name": "python3",
         "aliases": [
             "py",
