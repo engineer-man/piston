@@ -29,5 +29,8 @@ int main() {
 EOF
 timeout -s KILL 3 gcc -std=c11 -o binary code.c
 
+# Merging args.args and stdin.stdin for emkc challenges
+cat stdin.stdin >> args.args
+
 # execution
-timeout -s KILL 3 ./binary < args.args < stdin.stdin
+timeout -s KILL 3 ./binary < args.args
