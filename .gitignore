@@ -4,3 +4,4 @@ lxc/i
 lxc/lockfile
 container/build.yaml
 container/*.tar.xz
+node_modules

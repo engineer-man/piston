@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-cp code.code code.kt
-kotlinc code.kt -include-runtime -d code.jar
-timeout -s KILL 3 xargs -a args.args -d '\n' java -jar code.jar < stdin.stdin

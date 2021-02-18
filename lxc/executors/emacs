@@ -1,4 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-timeout -s KILL 3 xargs -a args.args -d '\n' emacs -Q --script code.code < stdin.stdin

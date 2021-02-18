@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-export PYTHONPATH=$PYTHONPATH:/opt/paradoc
-timeout -s KILL 3 python3.8 -m paradoc code.code < args.args

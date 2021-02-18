@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-lxc-attach --clear-env -n piston

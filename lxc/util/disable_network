@@ -1,2 +1,0 @@
-iptables -I INPUT -i virbr0 -j REJECT
-iptables -I OUTPUT -o virbr0 -j DROP
