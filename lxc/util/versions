@@ -105,6 +105,10 @@ echo 'php'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "php -v"
 echo '---'
 
+echo 'prolog'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "swipl --version"
+echo '---'
+
 echo 'python2'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "python -V"
 echo '---'

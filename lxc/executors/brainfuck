@@ -1,4 +1,36 @@
 #!/bin/bash
 
 cd /tmp/$1
-timeout -s KILL 3 xargs -a args.args -d '\n' brainfuck code.code < stdin.stdin
+sedarg="\
+s/+/P/g;\
+s/-/M/g;\
+s/>/++p;/g;\
+s/</--p;/g;\
+s/P/++*p;/g;\
+s/M/--*p;/g;\
+s/\\./putchar(*p);/g;\
+s/,/*p=(c=getchar())==EOF?0:c;/g;\
+s/\\[/while(*p){/g;\
+s/]/}/g\
+"
+
+# compilation
+MEMSIZE=15
+cat <<EOF > code.c
+#include <stdio.h>
+
+char mem[1<<$MEMSIZE];
+char *p = mem + (1<<$((MEMSIZE - 1)));
+int c;
+
+int main() {
+	$(timeout -s KILL 3 sed 's/[^][<>.,+-]//g' code.code | timeout -s KILL 3 sed $sedarg)
+}
+EOF
+timeout -s KILL 3 gcc -std=c11 -o binary code.c
+
+# Merging args.args and stdin.stdin for emkc challenges
+cat stdin.stdin >> args.args
+
+# execution
+timeout -s KILL 3 ./binary < args.args
