@@ -1,0 +1,71 @@
+== Breif ==
+
+This document covers the overall architecture of Piston v3, and not the
+individual components and their implementations.
+
+In Piston v2 we saw 2 ways of using piston - through the CLI and the API.
+These 2 methods would call the same load of bash scripts contained within
+a LXC container which would then resolve your request.
+There are a number of issues with this approach:
+  1. This uses bash - which isn't the best language for performance
+  2. It relied on calling through a `lxc-attach` command to access
+        inside the container
+  3. This isn't easy to distribute
+  4. It was difficult to add languages - having to edit 4 different files
+        in 4 different places to add a single language
+
+Piston v3 aims to tackle these 4 issues.
+Firstly, v3 will be less reliant on bash, only using it as an option
+for running different interpreters.
+Secondly, v3 can run on bare-metal or in a container, but a core API will be
+exposed from within the container, instead of running external to it.
+Thirdly, v3 will provide a simple docker container, which will expose both the
+piston API, and run all the runners within it.
+Finally, v3 will provide a repository of precompiled language executers, so its
+1 command away from installing a language
+
+
+
+== Piston API ==
+
+Piston v3 exposes a REST API, allowing the user to control the entire thing
+over one simple JSON based protocol. This eliminates the need to connect into
+the container to do maintainace such as adding new languages, or checking
+usage statistics.
+
+See design/api.txt for more information.
+
+
+
+== Package Manager ==
+
+Piston v3 includes a package manager right out of the box. The package manager
+manages the different languages and versions that it can run.
+The package manager is hooked directly into the API and addresses our point
+of easy distibution, as users now can easily enable/disable different
+components built into piston as they see fit.
+
+See design/ppman.txt for more information.
+
+
+
+== Runtime Environment ==
+
+The new architecture moves to a more bare-metal approach, where the code can be
+run without the overhead of a container manager such as LXC or Docker, making
+piston much easier to manage this way
+
+It is still possible to run Piston v3 in a contain, but now a container engine
+is not required for usage, however it is still recommended.
+
+
+
+== Proxy API ==
+
+The in-container API is more powerful than a simple execution API and thus
+should be limited, however to keep the weight down, and speed up there is a
+reference implementation of a proxy API included, which passes through
+execution commands to many different piston instances and allows for
+security with rate limiting and API keys.
+
+See design/proxy.txt
