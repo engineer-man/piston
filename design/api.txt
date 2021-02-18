@@ -1,0 +1,75 @@
+== Piston API ==                                                     [ Piston ]
+
+When we speak of piston, what we actually talk about is the Piston API.
+This API provides unrestricted, unlimited access to managing piston and
+thus shouldn't be publicly exposed. This API is comparable to one of the
+docker engine, where everything regarding control of docker goes directly
+through the api.
+
+The API is responsible for managing the execution lifecycle of any given
+job, as well as managing the different languages which it can execute a
+job in. 
+
+
+
+== Job Execution ==
+
+Piston v3 exposes an endpoint per package `/execute`, which when called takes
+in both a string of code, and an array of arguments to pass into the program
+as well as data to write to STDIN. The stdout and stderr from the process are
+then both returned seperately, along with the error code returned.
+
+All of this is has no rate-limiting built in making it lightning fast as a call
+will directly start the runner process and get under way instantly.
+
+The 2 stages of this process - compile and run are both run in sequence, with
+different timeouts configurable in the runners config file located in the
+data directory.
+
+Requests to this endpoint can have caching enabled at 3 different levels.
+The first option is to have no caching, which is the default for all
+interpreted language. The second option is for the compiled binaries to be
+cached, which is the default for all compiled languages. The final option is
+for output to be cached, which isn't used by default but can be enabled per
+package or per request. This is done for the reason that code may choose to
+source data from /dev/(u)random or similar sources and as such may not be as
+reliable when their outputs are cached. Caching is per package and is used as
+an acceleration method to help boost performance of Piston. Cache entries are
+automatically purged after the set time, or can be manually purged through the
+API on a per package basis.
+
+
+== Package Manager ==
+
+Piston v3 has an inbuilt package manager which is responsible for
+(un)installing different packages. Piston v3 by default has access to a single
+offical repository hosting various versions of various common languages. These
+packages and repositories conform to the specifications set out in ppman.txt
+
+The Piston API service downloads the repository index whenever a `/packages`
+request is issued to a repository with the `sync` flag is set. This will cause
+the service to download the latest repostiory index off the mirror.
+
+In piston there is no concept of a package being "outdated" as each package is
+a specific version of a language, and different languages can be installed in
+paralleland function without any issues. Each package should be considered the
+final version of that language. If there is a new version of a language
+available (i.e. Python 3.9.1 -> 3.9.2), a new package should be created for
+this.
+
+Invidual languages can be queried from the repo using the
+`/repos/{repo}/packages/{package}/{package-version}` endpoint. This endpoint
+allows for the metadata of the package to be accessed, such as the author,
+size, checksums, dependencies, build file git url and download url.
+
+To install packages, a request to `/install` can be made to the package
+endpoint and it will download and install it, making it available on the
+`/packages/{package}/{version}` endpoint.
+
+There is a meta-repository name `all` which can be used to access all
+repositories.
+
+Internally the install process involved downloading and unpacking the package,
+ensuring any dependencies are also downloaded and installed, mounting the
+squashfs filesystem to a folder, then overlaying it with all its dependencies
+in another folder.

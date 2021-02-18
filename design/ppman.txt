@@ -1,0 +1,74 @@
+== Package Manager (ppman) ==                                        [ Piston ]
+
+The package manager is the part of the API responsible for managing different
+versions of different languages, managing their installation, uninstallation
+and their dependencies. The package manager talks over the piston api and is
+built directly into piston, although has parts which are not directly built
+into the API (i.e. the repositories and the cli utility).
+
+The package manager is a complex part of piston, and requires 2 different file
+specifications - the repository index file and the package file.
+
+
+
+== Repository Index File ==
+
+The piston repository is the central place where packages are hosted and
+downloaded from. This repository can either be a webserver or a local file
+containing the right content - as long as its accessable by a URL, its
+considered a valid repository by piston. A repository URL is simply a URL
+pointing to a repository index file, as set out by the following information.
+
+A repository index file is a YAML file containing the keys: `schema`, `baseurl`
+and `packages`.
+
+The schema key simply should have a value of `ppman-repo-1`. This indicates the
+version and file format for the client to recieve.
+
+The baseurl key contains the base url that relative URLs should be based off,
+this doesn't need to be related to the url that the repository index is hosted
+at, only the downloadable files, which are possible to split over many domains
+by using absolute paths.
+
+The packages key contains a list of packages, which contain the keys: `author`,
+`language`, `version`, `checksums`, `dependencies`, `size`, `buildfile` and
+`download`.
+
+The author field is self explainatory, it is simply the authors name and email,
+formatted similar to git's default format: `Full Name <email@address>`. If the
+repository index is automatically generated, it is best to use the commit
+author's name in here.
+
+The language and version fields define the version and name of the compiler or
+interpreter contained within. The language should not include a version at all.
+In the case of python, use the name python for both python 2 and 3, using the
+version field to differentiate between the 2.
+
+The checksums field is simply a map of hash types to hashes, hash types include
+md5, sha1, sha256, sha512. The digests should simply be written as lowercase
+hex characters. Only one checksum is required, but if more are supplied the
+most secure one is picked, with sha512 as the highest possible.
+
+The dependencies is simply a map of language names to versions, which should be
+installed for the package to run correctly. An example of this would be
+typescript requires node to run.
+
+The size field is the number of bytes the package file is in size, while
+uncompressed. This is used to determine if there is enough room, and thus
+should be accurate.
+
+The buildfile field is a URL pointing to the exact build script for this build.
+This should always point to a URL either containing steps, a script or other
+means of reproducing the build. This field is purely so people can understand
+how the image was built, and to make sure you aren't packing any mallicious
+code into it.
+
+The final field is download, this points to a URL of which the package file can
+be obtained from. If this is a relative url, the baseurl will be appended to
+it. This is particularly useful if everything is stored within 1 s3 bucket, or
+you have a repository in a folder.
+
+
+== Package File ==
+
+TODO
