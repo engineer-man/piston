@@ -35,7 +35,7 @@ lxc-attach --clear-env -n piston -- \
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -c "runuser runner$runner /exec/$language $id"
+        /bin/bash -l -c "runuser runner$runner /exec/$language $id"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
