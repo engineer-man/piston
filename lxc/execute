@@ -27,7 +27,7 @@ exec 200>&-
 
 # prevent users from spying on each other
 lxc-attach --clear-env -n piston -- \
-    /bin/bash -l -c "
+    /bin/bash -c "
         chown runner$runner: -R /tmp/$id
         chmod 700 /tmp/$id
     " > /dev/null 2>&1
@@ -35,12 +35,12 @@ lxc-attach --clear-env -n piston -- \
 # runner
 timeout -s KILL 20 \
     lxc-attach --clear-env -n piston -- \
-        /bin/bash -l -c "runuser runner$runner /exec/$language $id"
+        /bin/bash -c "runuser runner$runner /exec/$language $id"
 
 # process janitor
 lxc-attach --clear-env -n piston -- \
-    /bin/bash -l -c "
-        for i in {1..100}
+    /bin/bash -c "
+        while pgrep -u runner$runner > /dev/null
         do
             pkill -u runner$runner --signal SIGKILL
         done
