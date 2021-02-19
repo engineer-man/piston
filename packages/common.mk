@@ -20,6 +20,7 @@ pkg-info.jq:
 	echo '.version="${LANG_VERSION}"' >> pkg-info.jq
 	echo '.author="${LANG_AUTHOR}"' >> pkg-info.jq
 	echo '.dependencies={}' >> pkg-info.jq
+	echo '.distro="$(shell grep -oP "^ID=\K\w+" /etc/os-release )"'
 	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
 
 %.asc: %
