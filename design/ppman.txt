@@ -19,8 +19,8 @@ containing the right content - as long as its accessable by a URL, its
 considered a valid repository by piston. A repository URL is simply a URL
 pointing to a repository index file, as set out by the following information.
 
-A repository index file is a YAML file containing the keys: `schema`, `baseurl`
-and `packages`.
+A repository index file is a YAML file containing the keys: `schema`,
+`baseurl`, `keys` and `packages`.
 
 The schema key simply should have a value of `ppman-repo-1`. This indicates the
 version and file format for the client to recieve.
@@ -30,9 +30,12 @@ this doesn't need to be related to the url that the repository index is hosted
 at, only the downloadable files, which are possible to split over many domains
 by using absolute paths.
 
+The keys key contains a list of GPG key ids which should be used when
+verifying.
+
 The packages key contains a list of packages, which contain the keys: `author`,
-`language`, `version`, `checksums`, `dependencies`, `size`, `buildfile` and
-`download`.
+`language`, `version`, `checksums`, `dependencies`, `size`, `buildfile`,
+`download` and `signature`.
 
 The author field is self explainatory, it is simply the authors name and email,
 formatted similar to git's default format: `Full Name <email@address>`. If the
@@ -63,12 +66,71 @@ means of reproducing the build. This field is purely so people can understand
 how the image was built, and to make sure you aren't packing any mallicious
 code into it.
 
-The final field is download, this points to a URL of which the package file can
+The download field is a URL pointing to a place of which the package file can
 be obtained from. If this is a relative url, the baseurl will be appended to
 it. This is particularly useful if everything is stored within 1 s3 bucket, or
 you have a repository in a folder.
 
+The signature field is an armored signature 
+
 
 == Package File ==
 
-TODO
+Within a repository, many package files are contained. These files are
+downloaded and installed into `/piston`. They need to all follow the format
+as listed below for the API to properly utilize them.
+
+A package file is a gzipped tar archive, containing 4/5 things - `run`,
+`compile` (optional), `pkg-info.json`, `lang-ver` and `lang-ver/environment`.
+Replacing lang-ver with the language name and the version respectively.
+
+
+The `pkg-info.json` file contains 5 different keys: `language`, `version`,
+`author`, `dependencies` and `build_platform`.
+
+The language field is simply the name of the language, all lowercase and not
+containing any version number. This is important in the case of python
+specifically as python3 and python2 come under the same language, just
+different versions.
+
+The version field is a sem-ver compliant version number for the interpreter
+contained wthin the package. It should be a string.
+
+The author field contains the author name, and should be formatted exactly like
+shown previously in the repo index spec.
+
+The dependencies field is simply a map containing packages which this package
+depends on. This should only be used when one language is a requirement for
+another, like how typescript is dependent on node. The key should be the name
+of the package, with the value being the version selector.
+
+The build_platform field is used for defining which type of system the package
+was built on, this helps resolve system compatability errors. It consists of 2
+parts - environment and disto. The environment is simply one of `baremetal`,
+`docker`, `lxc` or any other type of environment you can run piston on. The
+distro is the ID of the distro as contained in /etc/os-release on the system 
+which built the package. This is done to ensure system compatability,
+especially inside the offically supported Docker container.
+
+
+The `run` and `compile` files are used in the execution of a job, being used
+to both compile and run the source code provided. They are both treated the
+same inputs-wise but can have timeouts independently set per stage. The
+arguments fed both these files are the same, with the first argument being a
+path to the code file, and the rest being the arguments to passed in. These
+files are run in a temporary directory contained within the cache folder.
+Depending on the cache control level the code and associated files will either
+be disposed of or kept. By default only files named `binary` will be kept.
+STDIN is only passed into the `run` file, but both files have their output
+captured and returned through the API
+
+The `lang-ver` folder should contain any interpreter specific files, such as
+the binary to execute and any other files that may be required to run the
+interpreter/compiler contained within the package.
+
+The `environment` file contained within `lang-ver` should contain export
+commands like a ~/.bashrc file should, as this is its intended purpose. Firstly
+the language which is being executed has its environment file sources, then it
+walks down the dependency tree sourcing files. The environment variables are
+eventually cached to speed up the execution process.
+
