@@ -22,7 +22,12 @@ pkg-info.jq:
 	echo '.dependencies={}' >> pkg-info.jq
 	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
 
+%.asc: %
+	gpg --detach-sig --armor --output $@ $< 
+
 .PHONY: clean
 clean: 
 	rm -rf $(filter-out Makefile, $(wildcard *))
 	
+.PHONY: sign
+sign: ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz.asc
