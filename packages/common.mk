@@ -6,6 +6,8 @@ LANG_COMPILED=$(or ${COMPILED}, false)
 
 LANG_PKG_TARGETS=pkg-info.json ${LANG_NAME}-${LANG_VERSION}/ ${LANG_NAME}-${LANG_VERSION}/environment run
 
+BUILD_PLATFORM=$(or ${PLATFORM}, baremetal-$(shell grep -oP "^ID=\K\w+" /etc/os-release ))
+
 ifeq (${LANG_COMPILED}, true)
 ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS) compile
 endif
@@ -20,7 +22,7 @@ pkg-info.jq:
 	echo '.version="${LANG_VERSION}"' >> pkg-info.jq
 	echo '.author="${LANG_AUTHOR}"' >> pkg-info.jq
 	echo '.dependencies={}' >> pkg-info.jq
-	echo '.distro="$(shell grep -oP "^ID=\K\w+" /etc/os-release )"'
+	echo '.build_platform="${BUILD_PLATFORM}"'
 	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
 
 %.asc: %
