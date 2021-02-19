@@ -2,13 +2,15 @@ LANG_NAME=$(or ${NAME},none)
 LANG_VERSION=$(or ${VERSION},0.0.0)
 LANG_AUTHOR=$(or ${AUTHOR},HexF <thomas@hexf.me>)
 LANG_DEPS=$(or ${DEPS})
-LANG_BINARY_FILES=$(or ${BINARY_FILES},)
+LANG_COMPILED=$(or ${COMPILED}, false)
 
-${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: pkg-info.json package.squashfs
+LANG_PKG_TARGETS=pkg-info.json ${LANG_NAME}-${LANG_VERSION}/ ${LANG_NAME}-${LANG_VERSION}/environment run
+
+ifeq (${LANG_COMPILED}, true)
+${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS) compile
+endif
+${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS)
 	tar czvf $@ $?
-
-package.squashfs: ${LANG_BINARY_FILES}
-	mksquashfs $? $@	
 
 %.json: %.jq
 	jq '$(shell tr '\n' '|' < $<).' <<< "{}" > $@

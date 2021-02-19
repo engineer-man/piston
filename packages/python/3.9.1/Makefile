@@ -2,22 +2,25 @@ NAME=python
 VERSION=3.9.1
 AUTHOR=Thomas Hobson <thomas@hexf.me>
 DEPS=
-BINARY_FILES=out/ run
+COMPILED=false
 
 MAKE_JOBS=64
 
 include ../../Makefile
 
 run:
-	echo "bin/python3.9 $*" > run
+	echo "python3.9 $*" > run
 
-out/: Python-${VERSION}/
+python-${VERSION}/environment:
+	echo 'export PATH=$$PWD/python-${VERSION}/bin:$$PATH' > $@
+
+python-${VERSION}/: Python-${VERSION}/
 	cd $< && ./configure --prefix /
 	make -j${MAKE_JOBS} -C $<
-	DESTDIR=../out make -j${MAKE_JOBS} -C $< altinstall
+	DESTDIR=../$@ make -j${MAKE_JOBS} -C $< altinstall || true
 
 Python-${VERSION}.tgz: 
-	curl "https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz" -o $@
+	curl "https://www.python.org/ftp/python/${VERSION}/$@" -o $@
 
 %/: %.tgz
 	tar xzvf $<
