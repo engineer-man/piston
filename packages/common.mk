@@ -22,7 +22,7 @@ pkg-info.jq:
 	echo '.version="${LANG_VERSION}"' >> pkg-info.jq
 	echo '.author="${LANG_AUTHOR}"' >> pkg-info.jq
 	echo '.dependencies={}' >> pkg-info.jq
-	echo '.build_platform="${BUILD_PLATFORM}"'
+	echo '.build_platform="${BUILD_PLATFORM}"' >> pkg-info.jq
 	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
 
 %.asc: %
