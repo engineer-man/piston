@@ -122,7 +122,7 @@ files are run in a temporary directory contained within the cache folder.
 Depending on the cache control level the code and associated files will either
 be disposed of or kept. By default only files named `binary` will be kept.
 STDIN is only passed into the `run` file, but both files have their output
-captured and returned through the API
+captured and returned along with their exit codes through the API
 
 The `lang-ver` folder should contain any interpreter specific files, such as
 the binary to execute and any other files that may be required to run the
