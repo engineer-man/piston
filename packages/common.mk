@@ -10,7 +10,7 @@ ifeq (${LANG_COMPILED}, true)
 ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS) compile
 endif
 ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS)
-	tar czvf $@ $?
+	tar czf $@ $?
 
 %.json: %.jq
 	jq '$(shell tr '\n' '|' < $<).' <<< "{}" > $@
@@ -25,9 +25,16 @@ pkg-info.jq:
 %.asc: %
 	gpg --detach-sig --armor --output $@ $< 
 
+%/: %.tgz
+	tar xzf $<
+
 .PHONY: clean
 clean: 
 	rm -rf $(filter-out Makefile, $(wildcard *))
+
+,PHONY: cleanup
+cleanup:
+	rm -rf $(filter-out ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz.asc, $(filter-out ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz, $(filter-out Makefile, $(wildcard *))))
 	
 .PHONY: sign
 sign: ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz.asc
