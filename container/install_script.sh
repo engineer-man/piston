@@ -16,7 +16,8 @@ apt-get update
 apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
-    ruby libtinfo-dev unzip git openssl libssl-dev sbcl libevent-dev
+    ruby libtinfo-dev unzip git openssl libssl-dev sbcl libevent-dev \
+    ninja-build
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python
@@ -294,7 +295,7 @@ rm $SUB_DIR.tar.gz
 cd $SUB_DIR
 mkdir build
 cd build
-cmake -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DMULTI_THREADED=OFF -G Ninja ..
+cmake -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DMULTI_THREADED=OFF -DINSTALL_DOCUMENTATION=OFF -G Ninja ..
 ninja
 echo "export PATH=\$PATH:/opt/swipl/$SUB_DIR/build/src" >> /opt/.profile
 source /opt/.profile

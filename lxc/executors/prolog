@@ -2,8 +2,7 @@
 
 cd /tmp/$1
 
-sed 's/^.*$/:- forall((Goal = (\0), call(Goal)), (write(Goal), nl))./' input.input |
-	cat code.code - > code.pl
+sed 's/^.*$/:- forall((Goal = (\0), call(Goal)), (write(Goal), nl))./' stdin.stdin |
+    cat code.code - > code.pl
 
 timeout -s KILL 3 swipl -g true -t halt code.pl
-
