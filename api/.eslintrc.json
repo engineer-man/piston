@@ -1,0 +1,39 @@
+{
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "plugins": [
+        "snakecasejs"
+    ],
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "settings":
+    {
+        "snakecasejs/filter": ["ClassDeclaration", "NewExpression"],
+        "snakecasejs/whitelist": []
+    },
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "semi": [
+            "error",
+            "never"
+        ],
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_"}],
+        "snakecasejs/snakecasejs": "warn"
+    }
+}
