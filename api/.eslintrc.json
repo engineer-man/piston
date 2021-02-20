@@ -8,6 +8,7 @@
         "snakecasejs"
     ],
     "extends": "eslint:recommended",
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 12
     },
@@ -27,11 +28,11 @@
         ],
         "quotes": [
             "error",
-            "double"
+            "single"
         ],
         "semi": [
             "error",
-            "never"
+            "always"
         ],
         "no-unused-vars": ["error", { "argsIgnorePattern": "^_"}],
         "snakecasejs/snakecasejs": "warn"

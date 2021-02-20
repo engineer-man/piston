@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  piston_api:
+    build: api
+    restart: always
+    ports:
+      - 6969:6969
+    volumes: 
+      - ./data/piston:/piston
+      - ./repo:/repo
+    tmpfs:
+      - /piston/cache
+      - /piston/jobs
+
+  piston_fs_repo: #Temporary solution until CI works
+    build: repo
+    volumes:
+      - ./repo:/repo
+      - ./packages:/packages

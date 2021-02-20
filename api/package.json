@@ -16,6 +16,7 @@
     "yargs": "^16.2.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.20.0",
     "eslint-plugin-snakecasejs": "^2.2.0"
   }

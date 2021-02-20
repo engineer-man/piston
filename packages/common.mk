@@ -26,7 +26,7 @@ pkg-info.jq:
 	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
 
 %.asc: %
-	gpg --detach-sig --armor --output $@ $< 
+	gpg --detach-sig --armor --batch --output $@ $< 
 
 %/: %.tgz
 	tar xzf $<
