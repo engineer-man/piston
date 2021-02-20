@@ -6,7 +6,7 @@ const fs = require('fs/promises'),
 
 
 module.exports = {
-    async buffer_from_u_r_l(url){
+    async buffer_from_url(url){
         if(!(url instanceof URL))
             url = new URL(url);
         if(url.protocol == 'file:'){

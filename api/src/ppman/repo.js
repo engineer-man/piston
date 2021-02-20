@@ -24,7 +24,7 @@ class Repository {
     async load(){
         try{
             var index = await cache.get(this.cache_key,async ()=>{
-                return helpers.buffer_from_u_r_l(this.url);
+                return helpers.buffer_from_url(this.url);
             });
 
             var repo = yaml.load(index);

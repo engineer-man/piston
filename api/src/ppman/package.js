@@ -57,7 +57,7 @@ class Package {
         logger.debug(`Downloading package from ${this.download_url} in to ${this.install_path}`);
         const pkgfile = helpers.url_basename(this.download_url);
         const pkgpath = path.join(this.install_path, pkgfile);
-        await helpers.buffer_from_u_r_l(this.download_url)
+        await helpers.buffer_from_url(this.download_url)
             .then(buf=> fs.write_file(pkgpath, buf));
 
         logger.debug('Validating checksums');
@@ -73,23 +73,25 @@ class Package {
         await this.repo.import_keys();
 
         logger.debug('Validating signatutes');
-        await new Promise((resolve,reject)=>{
-            const gpgspawn = cp.spawn('gpg', ['--verify', '-', pkgpath], {
-                stdio: ['pipe', 'ignore', 'ignore']
+        if(this.signature != "")
+            await new Promise((resolve,reject)=>{
+                const gpgspawn = cp.spawn('gpg', ['--verify', '-', pkgpath], {
+                    stdio: ['pipe', 'ignore', 'ignore']
+                });
+
+                gpgspawn.once('exit', (code, _) => {
+                    if(code == 0) resolve();
+                    else reject(new Error('Invalid signature'));
+                });
+
+                gpgspawn.once('error', reject);
+
+                gpgspawn.stdin.write(this.signature);
+                gpgspawn.stdin.end();
+                
             });
-
-            gpgspawn.once('exit', (code, _) => {
-                if(code == 0) resolve();
-                else reject(new Error('Invalid signature'));
-            });
-
-            gpgspawn.once('error', reject);
-
-            gpgspawn.stdin.write(this.signature);
-            gpgspawn.stdin.end();
-            
-        });
-        
+        else
+            logger.warn("Package does not contain a signature - allowing install, but proceed with caution")
 
         logger.debug(`Extracting package files from archive ${pkgfile} in to ${this.install_path}`);
         await new Promise((resolve, reject)=>{
