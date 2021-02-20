@@ -72,10 +72,9 @@ class Job {
         if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
         logger.debug('Compiling');
-
         const compile = this.runtime.compiled && await new Promise((resolve, reject) => {
             var stderr, stdout = '';            
-            const proc = cp.spawn(path.join(this.runtime.pkgdir, 'compile'), [this.main, ...this.args] ,{
+            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.args] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
@@ -103,7 +102,7 @@ class Job {
 
         const run = await new Promise((resolve, reject) => {
             var stderr, stdout = '';            
-            const proc = cp.spawn(path.join(this.runtime.pkgdir, 'run'), [this.main, ...this.args] ,{
+            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'run'),this.main, ...this.args] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
