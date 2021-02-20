@@ -15,5 +15,5 @@ ${NAME}-${VERSION}/: Python-${VERSION}/
 	$(MAKE) -j$(or ${MAKE_JOBS},64) -C $<
 	DESTDIR=../$@ $(MAKE) -j$(or ${MAKE_JOBS},64) -C $< altinstall || true
 
-${NAME}-${VERSION}.tgz: 
+Python-${VERSION}.tgz: 
 	curl "https://www.python.org/ftp/python/${VERSION}/$@" -o $@
