@@ -39,3 +39,5 @@ The `compile` file contains instructions to compile source files into a final bi
 Examples:
 * `pkg(python 3.9.1): new version`
 * `pkg(python 3.9.1 2.7.1): refactor`
+
+6. Create a pull request, referencing the issue number of the language
