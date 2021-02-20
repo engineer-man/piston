@@ -8,7 +8,7 @@ run:
 	echo 'python$(shell grep -oP "\d+.\d+"<<<${VERSION}) $$*' > run
 
 ${NAME}-${VERSION}/environment:
-	echo 'export PATH=$$PWD/${NAME}-${VERSION}/bin:$$PATH' > $@
+	echo 'export PATH=$$PWD/bin:$$PATH' > $@
 
 ${NAME}-${VERSION}/: Python-${VERSION}/
 	cd $< && ./configure --prefix /
