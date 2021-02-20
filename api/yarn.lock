@@ -931,10 +931,9 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
-nocamel@*:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/nocamel/-/nocamel-1.0.2.tgz#13ff04ffacd5487ba65555c0dcafcf8c95c918ba"
-  integrity sha512-CRkRSRLChj+H6e4lHS851QS6YGCoTETnSG/z+XGanxLSsTbBkvEeIWaIYMKzuBznFwWM0YcLGXsFyXg4xWYnWA==
+nocamel@HexF/nocamel#patch-1:
+  version "1.1.0"
+  resolved "https://codeload.github.com/HexF/nocamel/tar.gz/89a5bfbbd07c72c302d968b967d0f4fe54846544"
 
 node-fetch@^2.6.1:
   version "2.6.1"

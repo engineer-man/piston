@@ -49,8 +49,7 @@ const app = express();
                 fs.readdir(path.join(pkgdir,lang))
                     .then(x=>x.map(y=>path.join(pkgdir, lang, y)))
             )))
-        //eslint-disable-next-line snakecasejs/snakecasejs
-        .then(pkgs=>pkgs.flat().filter(pkg=>fs.existsSync(path.join(pkg, globals.pkg_installed_file))))
+        .then(pkgs=>pkgs.flat().filter(pkg=>fss.exists_sync(path.join(pkg, globals.pkg_installed_file))))
         .then(pkgs=>pkgs.forEach(pkg => new runtime.Runtime(pkg)));
 
 

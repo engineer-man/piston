@@ -9,7 +9,7 @@
     "is-docker": "^2.1.1",
     "js-yaml": "^4.0.0",
     "logplease": "^1.2.15",
-    "nocamel": "*",
+    "nocamel": "HexF/nocamel#patch-1",
     "node-fetch": "^2.6.1",
     "semver": "^7.3.4",
     "uuid": "^8.3.2",
