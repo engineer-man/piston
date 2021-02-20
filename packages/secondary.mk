@@ -15,8 +15,9 @@ cleanup: $(patsubst %,%/cleanup,${VERSIONS})
 %/${LANGUAGE}-%.pkg.tar.gz: %/Makefile
 	$(MAKE) -C $(shell dirname $<)
 
+
 %/Makefile: 
 	@mkdir -p $(shell dirname $@)
 	@echo 'VERSION=$(patsubst %/Makefile,%,$@)' > $@
-	@echo 'NAME=${LANGUAGE}' > $@
+	@echo 'NAME=${LANGUAGE}' >> $@
 	@echo 'include ../base.mk' >> $@
