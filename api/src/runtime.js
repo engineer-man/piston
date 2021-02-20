@@ -59,10 +59,11 @@ class Runtime {
             const env_content = fss.read_file_sync(env_file).toString();
             this.#env_vars = {};
             env_content
+                .trim()
                 .split('\n')
                 .map(line => line.split('=',2))
                 .forEach(([key,val]) => {
-                    this.#env_vars[key] = val;
+                    this.#env_vars[key.trim()] = val.trim();
                 });
         }
         return this.#env_vars;
