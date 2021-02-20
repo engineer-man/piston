@@ -1,7 +1,13 @@
-#!/bin/bash
+#!/bin/bash -e
+
 cd /repo
-cat password.key | gpg --batch --import private.key
+
+# Make packages
 pushd ../packages/python
-cat password.key | make sign VERSIONS=3.9.1 && make cleanup
+make build VERSIONS=3.9.1
 popd
+
+
+# Make repo index
+
 ./mkindex.sh
