@@ -31,6 +31,9 @@ pkg-info.jq:
 %/: %.tgz
 	tar xzf $<
 
+%/: %.tar.gz
+	tar xzf $<
+
 .PHONY: clean
 clean: 
 	rm -rf $(filter-out Makefile, $(wildcard *))
