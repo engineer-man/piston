@@ -44,9 +44,8 @@ class Repository {
     async import_keys(){
         await this.load();
         logger.info(`Importing keys for repo ${this.slug}`);
-
         await new Promise((resolve,reject)=>{
-            const gpgspawn = cp.spawn('gpg', ['--receive-keys', this.keys], {
+            const gpgspawn = cp.spawn('gpg', ['--receive-keys', ...this.keys], {
                 stdio: ['ignore', 'ignore', 'ignore']
             });
 
