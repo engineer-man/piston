@@ -75,7 +75,7 @@ class Job {
         const compile = this.runtime.compiled && await new Promise((resolve, reject) => {
             var stdout = '';            
             var stderr = '';     
-            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files] ,{
+            const proc = cp.spawn('unshare', ['-n', 'bash', path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
@@ -104,7 +104,7 @@ class Job {
         const run = await new Promise((resolve, reject) => {
             var stdout = '';            
             var stderr = '';
-            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'run'),this.main, ...this.args] ,{
+            const proc = cp.spawn('unshare', ['-n', 'bash', path.join(this.runtime.pkgdir, 'run'),this.main, ...this.args] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
