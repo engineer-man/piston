@@ -73,8 +73,9 @@ class Job {
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
         logger.debug('Compiling');
         const compile = this.runtime.compiled && await new Promise((resolve, reject) => {
-            var stderr, stdout = '';            
-            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.args] ,{
+            var stdout = '';            
+            var stderr = '';     
+            const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
@@ -92,16 +93,17 @@ class Job {
                 resolve({stdout, stderr, code, signal});
             });
 
-            proc.on('error', (code, signal) => {
+            proc.on('error', (err) => {
                 clearTimeout(kill_timeout);
-                reject({stdout, stderr, code, signal});
+                reject({error: err, stdout, stderr});
             });
         });
 
         logger.debug('Running');
 
         const run = await new Promise((resolve, reject) => {
-            var stderr, stdout = '';            
+            var stdout = '';            
+            var stderr = '';
             const proc = cp.spawn('bash', [path.join(this.runtime.pkgdir, 'run'),this.main, ...this.args] ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
@@ -120,9 +122,9 @@ class Job {
                 resolve({stdout, stderr, code, signal});
             });
 
-            proc.on('error', (code, signal) => {
+            proc.on('error', (err) => {
                 clearTimeout(kill_timeout);
-                reject({stdout, stderr, code, signal});
+                reject({error: err, stdout, stderr});
             });
         });
 
