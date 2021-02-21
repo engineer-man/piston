@@ -95,6 +95,18 @@ const options = [
         desc: 'Maximum gid to use for runner',
         default: 1500,
         validators: []
+    },
+    {
+        key: 'enable_unshare',
+        desc: 'Enable using unshare to disable networking',
+        default: true,
+        validators: []
+    },
+    {
+        key: 'output_max_size',
+        desc: 'Max size of each stdio buffer',
+        default: 1024,
+        validators: []
     }
 ];
 
