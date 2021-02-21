@@ -73,7 +73,7 @@ class Package {
         await this.repo.import_keys();
 
         logger.debug('Validating signatutes');
-        if(this.signature != "")
+        if(this.signature != '')
             await new Promise((resolve,reject)=>{
                 const gpgspawn = cp.spawn('gpg', ['--verify', '-', pkgpath], {
                     stdio: ['pipe', 'ignore', 'ignore']
@@ -91,7 +91,7 @@ class Package {
                 
             });
         else
-            logger.warn("Package does not contain a signature - allowing install, but proceed with caution")
+            logger.warn('Package does not contain a signature - allowing install, but proceed with caution');
 
         logger.debug(`Extracting package files from archive ${pkgfile} in to ${this.install_path}`);
         await new Promise((resolve, reject)=>{
