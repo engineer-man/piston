@@ -73,9 +73,10 @@ class Job {
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
         logger.debug('Compiling');
         const compile = this.runtime.compiled && await new Promise((resolve, reject) => {
-            var stdout = '';            
-            var stderr = '';     
-            const proc = cp.spawn('unshare', ['-n', 'bash', path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files] ,{
+            const proc_call = ['unshare', '-n', '-r', 'bash', path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files].slice(!config.enable_unshare * 3)
+            var stdout = '';
+            var stderr = '';
+            const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
@@ -83,18 +84,24 @@ class Job {
                 gid: this.gid
             });
 
-            const kill_timeout = setTimeout(proc.kill, this.timeouts.compile, 'SIGKILL');
+            const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), this.timeouts.compile);
 
-            proc.stderr.on('data', d=>stderr += d);
-            proc.stdout.on('data', d=>stdout += d);
+            proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
+            proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
 
             proc.on('exit', (code, signal)=>{
                 clearTimeout(kill_timeout);
+                proc.stderr.destroy()
+                proc.stdout.destroy()
+                
                 resolve({stdout, stderr, code, signal});
             });
 
             proc.on('error', (err) => {
                 clearTimeout(kill_timeout);
+                proc.stderr.destroy()
+                proc.stdout.destroy()
+
                 reject({error: err, stdout, stderr});
             });
         });
@@ -102,28 +109,36 @@ class Job {
         logger.debug('Running');
 
         const run = await new Promise((resolve, reject) => {
+            const proc_call = ['unshare', '-n', '-r', 'bash', path.join(this.runtime.pkgdir, 'run'), this.main, ...this.args].slice(!config.enable_unshare * 3);
             var stdout = '';            
             var stderr = '';
-            const proc = cp.spawn('unshare', ['-n', 'bash', path.join(this.runtime.pkgdir, 'run'),this.main, ...this.args] ,{
+            const proc = cp.spawn(proc_call[0], proc_call.slice(1) ,{
                 env: this.runtime.env_vars,
                 stdio: ['pipe', 'pipe', 'pipe'],
                 cwd: this.dir,
                 uid: this.uid,
                 gid: this.gid
             });
+            
+            const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), this.timeouts.run);
 
-            const kill_timeout = setTimeout(proc.kill, this.timeouts.run, 'SIGKILL');
+            proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
+            proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
 
-            proc.stderr.on('data', d=>stderr += d);
-            proc.stdout.on('data', d=>stdout += d);
+            proc.stdin.write(this.stdin)
+            proc.stdin.end()
 
             proc.on('exit', (code, signal)=>{
                 clearTimeout(kill_timeout);
+                proc.stderr.destroy()
+                proc.stdout.destroy()
                 resolve({stdout, stderr, code, signal});
             });
 
             proc.on('error', (err) => {
                 clearTimeout(kill_timeout);
+                proc.stderr.destroy()
+                proc.stdout.destroy()
                 reject({error: err, stdout, stderr});
             });
         });
