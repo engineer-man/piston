@@ -70,7 +70,14 @@ class Job {
 
     async safe_call(file, args, timeout){
         return await new Promise((resolve, reject) => {
-            const proc_call = ['unshare','-n','-r','bash',file, ...args].slice(!config.enable_unshare*3)
+            const unshare = config.enable_unshare ? ['unshare','-n','-r'] : [];
+            const prlimit = ['prlimit','--nproc=64'];
+
+            const proc_call = [
+                ...prlimit,
+                ...unshare,
+                'bash',file, ...args
+            ];
             var stdout = '';
             var stderr = '';
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
@@ -88,23 +95,25 @@ class Job {
 
             proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
             proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
-            function exitCleanup(){
+            function exit_cleanup(){
                 clearTimeout(kill_timeout);
-                proc.stderr.destroy()
-                proc.stdout.destroy()
+                proc.stderr.destroy();
+                proc.stdout.destroy();
                 try{
-                    process.kill(-proc.pid, 'SIGKILL')
-                }catch{} //Probably already dead!
+                    process.kill(-proc.pid, 'SIGKILL');
+                }catch{
+                    // Process will be dead alread, so nothing to kill.
+                }
             }
 
             proc.on('exit', (code, signal)=>{
-                exitCleanup()
+                exit_cleanup();
                 
                 resolve({stdout, stderr, code, signal});
             });
 
             proc.on('error', (err) => {
-                exitCleanup()
+                exit_cleanup();
 
                 reject({error: err, stdout, stderr});
             });
@@ -118,14 +127,14 @@ class Job {
         const compile = this.runtime.compiled && await this.safe_call(
             path.join(this.runtime.pkgdir, 'compile'),
             [this.main, ...this.files],
-            this.timeouts.compile)
+            this.timeouts.compile);
 
         logger.debug('Running');
 
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.main, ...this.args],
-            this.timeouts.run)
+            this.timeouts.run);
 
         this.state = job_states.EXECUTED;
 
