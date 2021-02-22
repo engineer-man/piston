@@ -71,7 +71,11 @@ class Job {
     async safe_call(file, args, timeout){
         return await new Promise((resolve, reject) => {
             const unshare = config.enable_unshare ? ['unshare','-n','-r'] : [];
-            const prlimit = ['prlimit','--nproc=64','--nofile=2048'];
+            const prlimit = [
+                'prlimit',
+                '--nproc=' + config.max_process_count,
+                '--nofile=' + config.max_open_files
+            ];
 
             const proc_call = [
                 ...prlimit,

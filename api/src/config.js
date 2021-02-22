@@ -107,6 +107,18 @@ const options = [
         desc: 'Max size of each stdio buffer',
         default: 1024,
         validators: []
+    },
+    {
+        key: 'max_process_count',
+        desc: 'Max number of processes per job',
+        default: 64,
+        validators: []
+    },
+    {
+        key: 'max_open_files',
+        desc: 'Max number of open files per job',
+        default: 2048,
+        validators: []
     }
 ];
 
