@@ -68,80 +68,58 @@ class Job {
         logger.debug('Primed job');
     }
 
-    async execute(){
-        if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
-        logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
-        logger.debug('Compiling');
-        const compile = this.runtime.compiled && await new Promise((resolve, reject) => {
-            const proc_call = ['unshare', '-n', '-r', 'bash', path.join(this.runtime.pkgdir, 'compile'),this.main, ...this.files].slice(!config.enable_unshare * 3)
+    async safe_call(file, args){
+        return await new Promise((resolve, reject) => {
+            const proc_call = ['bash',file, ...args]
             var stdout = '';
             var stderr = '';
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
                 env: this.runtime.env_vars,
-                stdio: ['pipe', 'pipe', 'pipe'],
+                stdio: 'pipe',
                 cwd: this.dir,
                 uid: this.uid,
-                gid: this.gid
+                gid: this.gid,
+                detached: true //dont kill the main process when we kill the group
             });
+
+            
 
             const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), this.timeouts.compile);
 
             proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
             proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
-
-            proc.on('exit', (code, signal)=>{
+            function exitCleanup(){
                 clearTimeout(kill_timeout);
                 proc.stderr.destroy()
                 proc.stdout.destroy()
+                try{
+                    process.kill(-proc.pid, 'SIGKILL')
+                }catch{} //Probably already dead!
+            }
+
+            proc.on('exit', (code, signal)=>{
+                exitCleanup()
                 
                 resolve({stdout, stderr, code, signal});
             });
 
             proc.on('error', (err) => {
-                clearTimeout(kill_timeout);
-                proc.stderr.destroy()
-                proc.stdout.destroy()
+                exitCleanup()
 
                 reject({error: err, stdout, stderr});
             });
         });
+    }
+
+    async execute(){
+        if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
+        logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
+        logger.debug('Compiling');
+        const compile = this.runtime.compiled && await this.safe_call(path.join(this.runtime.pkgdir, 'compile'), [this.main, ...this.files])
 
         logger.debug('Running');
 
-        const run = await new Promise((resolve, reject) => {
-            const proc_call = ['unshare', '-n', '-r', 'bash', path.join(this.runtime.pkgdir, 'run'), this.main, ...this.args].slice(!config.enable_unshare * 3);
-            var stdout = '';            
-            var stderr = '';
-            const proc = cp.spawn(proc_call[0], proc_call.slice(1) ,{
-                env: this.runtime.env_vars,
-                stdio: ['pipe', 'pipe', 'pipe'],
-                cwd: this.dir,
-                uid: this.uid,
-                gid: this.gid
-            });
-            
-            const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), this.timeouts.run);
-
-            proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
-            proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
-
-            proc.stdin.write(this.stdin)
-            proc.stdin.end()
-
-            proc.on('exit', (code, signal)=>{
-                clearTimeout(kill_timeout);
-                proc.stderr.destroy()
-                proc.stdout.destroy()
-                resolve({stdout, stderr, code, signal});
-            });
-
-            proc.on('error', (err) => {
-                clearTimeout(kill_timeout);
-                proc.stderr.destroy()
-                proc.stdout.destroy()
-                reject({error: err, stdout, stderr});
-            });
-        });
+        const run = await this.safe_call(path.join(this.runtime.pkgdir, 'run'), [this.main, ...this.args])
 
         this.state = job_states.EXECUTED;
 
