@@ -68,7 +68,7 @@ class Job {
         logger.debug('Primed job');
     }
 
-    async safe_call(file, args){
+    async safe_call(file, args, timeout){
         return await new Promise((resolve, reject) => {
             const proc_call = ['unshare','-n','-r','bash',file, ...args].slice(!config.enable_unshare*3)
             var stdout = '';
@@ -84,7 +84,7 @@ class Job {
 
             
 
-            const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), this.timeouts.compile);
+            const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), timeout);
 
             proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
             proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
@@ -115,11 +115,17 @@ class Job {
         if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
         logger.debug('Compiling');
-        const compile = this.runtime.compiled && await this.safe_call(path.join(this.runtime.pkgdir, 'compile'), [this.main, ...this.files])
+        const compile = this.runtime.compiled && await this.safe_call(
+            path.join(this.runtime.pkgdir, 'compile'),
+            [this.main, ...this.files],
+            this.timeouts.compile)
 
         logger.debug('Running');
 
-        const run = await this.safe_call(path.join(this.runtime.pkgdir, 'run'), [this.main, ...this.args])
+        const run = await this.safe_call(
+            path.join(this.runtime.pkgdir, 'run'),
+            [this.main, ...this.args],
+            this.timeouts.run)
 
         this.state = job_states.EXECUTED;
 
