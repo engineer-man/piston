@@ -1,0 +1,11 @@
+{
+  "name": "piston-api-client",
+  "version": "1.0.0",
+  "description": "Wraps API of Piston Engine API",
+  "main": "index.cjs",
+  "author": "Thomas Hobson <thomas@hexf.me>",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}
