@@ -1,4 +1,4 @@
-const {PistonEngine} = require('piston-api-wrapper');
+const {PistonEngine} = require('piston-api-client');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
