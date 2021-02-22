@@ -1,0 +1,13 @@
+{
+  "name": "piston-cli",
+  "version": "1.0.0",
+  "description": "Piston Execution Engine CLI tools",
+  "main": "index.js",
+  "author": "Thomas Hobson <thomas@hexf.me>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "piston-api-client": "file:../api-client",
+    "yargs": "^16.2.0"
+  }
+}
