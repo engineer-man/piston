@@ -70,7 +70,7 @@ class Job {
 
     async safe_call(file, args){
         return await new Promise((resolve, reject) => {
-            const proc_call = ['bash',file, ...args]
+            const proc_call = ['unshare','-n','-r','bash',file, ...args].slice(!config.enable_unshare*3)
             var stdout = '';
             var stderr = '';
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
