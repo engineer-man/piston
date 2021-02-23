@@ -92,13 +92,16 @@ class Job {
                 gid: this.gid,
                 detached: true //dont kill the main process when we kill the group
             });
-
+            
+            proc.stdin.write(this.stdin);
+            proc.stdin.end();
             
 
             const kill_timeout = setTimeout(_ => proc.kill('SIGKILL'), timeout);
 
             proc.stderr.on('data', d=>{if(stderr.length>config.output_max_size) proc.kill('SIGKILL'); else stderr += d;});
             proc.stdout.on('data', d=>{if(stdout.length>config.output_max_size) proc.kill('SIGKILL'); else stdout += d;});
+
             function exit_cleanup(){
                 clearTimeout(kill_timeout);
                 proc.stderr.destroy();
