@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
 cd /tmp/$1
-timeout -s KILL 10 gcc -std=c11 -o binary -x c code.code
+timeout -s KILL 10 gcc -std=c11 -o binary -x c code.code -lm
 timeout -s KILL 3 xargs -a args.args -d '\n' ./binary < stdin.stdin
