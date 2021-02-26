@@ -11,6 +11,7 @@ const fs = require('fs/promises');
 const fss = require('fs');
 const body_parser = require('body-parser');
 const runtime = require('./runtime');
+const {validationResult} = require('express-validator');
 
 const logger = Logger.create('index');
 const app = express();
@@ -58,11 +59,6 @@ const app = express();
 
     logger.debug('Constructing Express App');
 
-    logger.debug('Registering middleware');
-
-    app.use(body_parser.urlencoded({extended: true}));
-    app.use(body_parser.json());
-
     logger.debug('Registering custom message wrappers');
 
     express.response.json_error = function(message, code) {
@@ -74,23 +70,33 @@ const app = express();
         return this.json({success: true, data: obj});
     };
 
+    logger.debug('Registering middleware');
+
+    app.use(body_parser.urlencoded({extended: true}));
+    app.use(body_parser.json());
+
+
+    function validate(req, res, next) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty())
+            return res.json_error(errors.array(), 422);
+        next();
+    }
+
     logger.debug('Registering Routes');
 
     const ppman_routes = require('./ppman/routes');
 
-    app.get   ('/repos', ppman_routes.repo_list);
-    app.post  ('/repos', ppman_routes.repo_add);
-    app.get   ('/repos/:repo_slug', ppman_routes.repo_info);
-    app.get   ('/repos/:repo_slug/packages', ppman_routes.repo_packages);
-    app.get   ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info);
-    app.post  ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_install);
-    app.delete('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_uninstall); //TODO
+    app.get   ('/repos', validate, ppman_routes.repo_list);
+    app.post  ('/repos', ppman_routes.repo_add_validators, validate, ppman_routes.repo_add);
+    app.get   ('/repos/:repo_slug', ppman_routes.repo_info_validators, validate, ppman_routes.repo_info);
+    app.get   ('/repos/:repo_slug/packages', ppman_routes.repo_packages_validators, validate, ppman_routes.repo_packages);
+    app.get   ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_info);
+    app.post  ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_install);
+    app.delete('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_uninstall); //TODO
 
     const executor_routes = require('./executor/routes');
-    app.post  ('/jobs', executor_routes.run_job);
-
-
-
+    app.post  ('/jobs', executor_routes.run_job_validators, validate, executor_routes.run_job);
 
     logger.debug('Calling app.listen');
     const [address,port] = config.bind_address.split(':');

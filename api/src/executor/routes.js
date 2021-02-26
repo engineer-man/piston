@@ -3,19 +3,35 @@
 
 const { get_latest_runtime_matching_language_version } = require('../runtime');
 const { Job } = require('./job');
+const { body } = require('express-validator');
 
 module.exports = {
+    run_job_validators: [
+        body('language')
+            .isString(),
+        body('version')
+            .isSemVer(),
+        body('files')
+            .isArray(),
+        body('files.*.name')
+            .isString()
+            .bail()
+            .not()
+            .contains('/'),
+        body('files.*.content')
+            .isString(),
+        body('*_timeout')
+            .isNumeric(),
+        body('stdin')
+            .isString(),
+        body('args')
+            .isArray(),
+        body('args.*')
+            .isString()
+    ],
     async run_job(req, res){
         // POST /jobs
-        var errored = false;
-        ['language', 'version',
-            'files', 'main',
-            'args', 'stdin',
-            'compile_timeout', 'run_timeout',
-        ].forEach(key => {
-            if(req.body[key] == undefined) errored = errored || res.json_error(`${key} is required`, 400);
-        });
-        if(errored) return errored;
+
 
         const runtime = get_latest_runtime_matching_language_version(req.body.language, req.body.version);
         if(runtime == undefined) return res.json_error(`${req.body.language}-${req.body.version} runtime is unknown`, 400);

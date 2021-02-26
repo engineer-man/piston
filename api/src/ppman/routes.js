@@ -3,6 +3,7 @@ const state = require('../state');
 const logger = require('logplease').create('ppman/routes');
 const {Repository} = require('./repo');
 const semver = require('semver');
+const { body, param } = require('express-validator');
 
 async function get_or_construct_repo(slug){
     if(repos.has(slug))return repos.get(slug);
@@ -39,31 +40,46 @@ module.exports = {
             }))
         });
     },
+    repo_add_validators: [
+        body('slug')
+            .notEmpty()
+            .bail()
+            .isSlug()
+            .bail()
+            .not()
+            .custom(value=>state.state.get('repositories').keys().includes(value))
+            .withMessage("slug is already in use"),
+        body('url')
+            .notEmpty()
+            .bail()
+            .isURL({require_protocol: true})
+
+    ],
     async repo_add(req, res){
         // POST /repos
 
         logger.debug(`Request for repoAdd slug=${req.body.slug} url=${req.body.url}`);
-        if(!req.body.slug)
-            return res.json_error('slug is missing from request body', 400);
-        if(!req.body.url)
-            return res.json_error('url is missing from request body', 400);
         
         const repo_state = state.state.get('repositories');
-
-        if(repo_state.has(req.body.slug)) return res.json_error(`repository ${req.body.slug} already exists`, 409);
         
         repo_state.set(req.body.slug, req.body.url);
         logger.info(`Repository ${req.body.slug} added url=${req.body.url}`);
 
         return res.json_success(req.body.slug);
     },
+    repo_info_validators: [
+        param('repo_slug')
+            .isSlug()
+            .bail()
+            .custom(value=>state.state.get('repositories').has(value))
+            .withMessage("repository does not exist")
+            .bail()
+    ],
     async repo_info(req, res){
         // GET /repos/:slug
 
         logger.debug(`Request for repoInfo for ${req.params.repo_slug}`);
         const repo = await get_or_construct_repo(req.params.repo_slug);        
-
-        if(repo == null) return res.json_error(`Requested repo ${req.params.repo_slug} does not exist`, 404);
         
         res.json_success({
             slug: repo.slug,
@@ -71,6 +87,14 @@ module.exports = {
             packages: repo.packages.length
         });
     },
+    repo_packages_validators: [
+        param('repo_slug')
+            .isSlug()
+            .bail()
+            .custom(value=>state.state.get('repositories').has(value))
+            .withMessage("repository does not exist")
+            .bail()
+    ],
     async repo_packages(req, res){
         // GET /repos/:slug/packages
         logger.debug('Request to repoPackages');
@@ -86,13 +110,20 @@ module.exports = {
             }))
         });
     },
+    package_info_validators: [
+        param('repo_slug')
+            .isSlug()
+            .bail()
+            .custom(value=>state.state.get('repositories').has(value))
+            .withMessage("repository does not exist")
+            .bail()
+    ],
     async package_info(req, res){
         // GET /repos/:slug/packages/:language/:version
 
         logger.debug('Request to packageInfo');
 
         const repo = await get_or_construct_repo(req.params.repo_slug);        
-        if(repo == null) return res.json_error(`Requested repo ${req.params.repo_slug} does not exist`, 404);
 
         const pkg = await get_package(repo, req.params.language, req.params.version);
         if(pkg == null) return res.json_error(`Requested package ${req.params.language}-${req.params.version} does not exist`, 404);
@@ -113,8 +144,6 @@ module.exports = {
         logger.debug('Request to packageInstall');
 
         const repo = await get_or_construct_repo(req.params.repo_slug);        
-        if(repo == null) return res.json_error(`Requested repo ${req.params.repo_slug} does not exist`, 404);
-
         const pkg = await get_package(repo, req.params.language, req.params.version);
         if(pkg == null) return res.json_error(`Requested package ${req.params.language}-${req.params.version} does not exist`, 404);
 
@@ -131,6 +160,7 @@ module.exports = {
     async package_uninstall(req,res){
         // DELETE /repos/:slug/packages/:language/:version
 
-        res.json(req.body); //TODO
+        //res.json(req.body); //TODO
+        res.json_error("not implemented", 500)
     }
 };
