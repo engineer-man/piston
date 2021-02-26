@@ -101,7 +101,7 @@ cd rust-1.49.0-x86_64-unknown-linux-gnu
 
 # install scala
 # final binary: /opt/scala/scala3-3.0.0-M3/bin/scala
-# get version: /opt/scala/scala3-3.0.0-M3/bin/scala -version
+# get version: /opt/scala/scala3-3.0.0-M3/bin/scalac -version
 cd /opt && mkdir scala && cd scala
 wget https://github.com/lampepfl/dotty/releases/download/3.0.0-M3/scala3-3.0.0-M3.tar.gz
 tar -xzf scala3-3.0.0-M3.tar.gz
