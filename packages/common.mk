@@ -60,9 +60,6 @@ ${INFO_FILE}:
 
 
 # Helpers
-
-%/: %.tgz
-	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
 %/: %.tar.gz
 	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
 
