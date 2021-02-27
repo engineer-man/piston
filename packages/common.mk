@@ -62,6 +62,8 @@ ${INFO_FILE}:
 # Helpers
 %/: %.tar.gz
 	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
+%/: %.tar.xz
+	cd ${BUILD_DIR} && tar xf $(patsubst ${BUILD_DIR}%,%,$<)
 
 %.json: %.jq
 	jq '$(shell tr '\n' '|' < $<).' <<< "{}" > $@
