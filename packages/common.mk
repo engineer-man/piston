@@ -31,7 +31,10 @@ versions:
 name:
 	@echo ${NAME}
 
+
+.NOTPARALLEL: build
 build: ${BUILD_DIR} ${PKG_FILE}
+
 clean: 
 	rm -rf ${BUILD_DIR}
 	rm -f ${PKG_FILE}
