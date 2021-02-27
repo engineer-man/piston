@@ -7,8 +7,8 @@ exports.describe = 'Installs the named package'
 
 
 const msg_format = {
-    'color': p => `${p.success ? chalk.green.bold('✓') : chalk.red.bold('❌')} Installation ${p.success ? "succeeded" : "failed: " + p.message}`,
-    'monochrome': p => `Installation ${p.success ? "succeeded" : "failed: " + p.message}`,
+    'color': p => `${p.language ? chalk.green.bold('✓') : chalk.red.bold('❌')} Installation ${p.language ? "succeeded" : "failed: " + p.message}`,
+    'monochrome': p => `Installation ${p.language ? "succeeded" : "failed: " + p.message}`,
     'json': JSON.stringify
 
 }
