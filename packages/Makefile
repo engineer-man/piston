@@ -2,7 +2,7 @@
 
 # Variables
 PKG_FILES=$(filter-out common.mk,$(wildcard *.mk))
-PKG_SLUGS=$(foreach pkg, ${PKG_FILES}, $(addprefix $(shell make -f ${pkg} name)-, $(shell make -f ${pkg} versions)))
+PKG_SLUGS=$(foreach pkg, ${PKG_FILES}, $(addprefix $(shell make -f ${pkg} name VERSION=UNKNOWN)-, $(shell make -f ${pkg} versions VERSION=UNKNOWN)))
 
 # Functions
 define pkg_info
@@ -14,7 +14,7 @@ endef
 
 # Targets
 
-build: $(foreach pkg, ${PKG_FILES}, $(addprefix build-$(shell make -f ${pkg} name)-, $(lastword $(shell make -f ${pkg} versions))))
+build: $(foreach pkg, ${PKG_FILES}, $(addprefix build-$(shell make -f ${pkg} name VERSION=UNKNOWN)-, $(lastword $(shell make -f ${pkg} versions VERSION=UNKNOWN))))
 
 $(addprefix build-, ${PKG_SLUGS}):
 	$(call pkg_info,build,$@)
@@ -22,7 +22,7 @@ $(addprefix build-, ${PKG_SLUGS}):
 
 
 
-clean: $(foreach pkg, ${PKG_FILES}, $(addprefix clean-$(shell make -f ${pkg} name)-, $(shell make -f ${pkg} versions)))
+clean: $(foreach pkg, ${PKG_FILES}, $(addprefix clean-$(shell make -f ${pkg} name VERSION=UNKNOWN)-, $(shell make -f ${pkg} versions VERSION=UNKNOWN)))
 	rm -rf build/
 $(addprefix clean-, ${PKG_SLUGS}):
 	$(call pkg_info,clean,$@)
