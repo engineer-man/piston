@@ -48,7 +48,7 @@ class Runtime {
         return res;
     }
 
-    get compile(){
+    get compiled(){
         if(this.#compiled === undefined) this.#compiled = fss.exists_sync(path.join(this.pkgdir, 'compile'));
         return this.#compiled;
     }

@@ -131,10 +131,12 @@ class Job {
         if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
         logger.debug('Compiling');
-        const compile = this.runtime.compiled && await this.safe_call(
-            path.join(this.runtime.pkgdir, 'compile'),
-            [this.main, ...this.files],
-            this.timeouts.compile);
+        var compile = undefined;
+        if(this.runtime.compiled)
+            compile = await this.safe_call(
+                path.join(this.runtime.pkgdir, 'compile'),
+                this.files.map(x=>x.name),
+                this.timeouts.compile);
 
         logger.debug('Running');
 
