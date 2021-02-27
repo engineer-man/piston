@@ -1,43 +1,61 @@
 # Contributing packages to the Piston Repository
 
+## Naming Lanaguages
+
+Some languages have multiple different wide-spread interpreters (node/deno for example) which need to be accounted for.
+
+If the given language has multiple incompatiable interpreters (e.g. deno/node/v8), these should be named as `[language]-[interpreter]`.
+For cases where the language has many compatable interpreters (e.g. gcc/llvm), pick one and name it `[language]`.
+For languages with only 1 wide-spread interpreter (e.g. Kotlin), name it `[language]`
+
+## File Naming Rules
+
+Different versions of interpreters require different steps to build, and in this case they should be given 2 different files, but keep the same language name.
+
+Use `[language-name].mk` (see naming languages) for languages with a common build script.
+When the build steps become obsolete, create a new file named `[language-name]-[version].mk`, with the first version where the new build steps were required.
+
 ## Creating new languages
 
-1. Create a new branch on your fork of engineer-man/piston.
-2. Create a directory (all lowercase) with the name of the language.
-3. Create a Makefile containing the following, filling in the fields marked with %
-Versions can be a list of version numbers, separated by spaces.
-Quotes are not required.
-```makefile
-LANGUAGE=%
-VERSIONS=%
+See [python.mk](python.mk) or any other `.mk` file (except `common.mk`) for an example.
 
-include ../secondary.mk
-```
-4. Create a `base.mk` file, this is the file which will hold the correct targets to make each build.
-It should download any sources it requires uring `curl` and use as much version templating as possible.
-You should include 3 variables: `AUTHOR`, `DEPS` and `COMPILED`.
+Please note that this is a regular Makefile, with a few extra varibles added by `common.mk`, any additional variables not listed here can be located in there.
 
-`AUTHOR` is simply your name, and email address formatted as `Your Name <your@email>`.
-`DEPS` is a list (separated by spaces) of packages which are required with this one for it to work correctly.
-This is mainly used in the case of golfing languages, which use other languages (e.g. python and eilxar) to interpret them. Give a package name and a SemVer selector (e.g. `python==3.x.x` for any python3 build).
-`COMPILED` is simply a true or false field indicating if the package contains a `compile` target (see below).
+1. Create a new branch on your fork of engineer-man/piston
 
-You should also include 3/4 targets: `run`, `${NAME}-${VERSION}`, `${NAME}-${VERSION}/environment` and optionally `compile` (only if the language is a compiled language, e.g. cpp/c)
+2. Create a new file for your language, following the naming rules as listed above
 
-The `run` file is one which is passed the main source file (first argument) and the arguments for the process (remaining arguments). STDIN data is also piped in. Generate this by using either a `cat` or an `echo` statement(s) and piping them into `$@` (it means the target name in Makefiles). You have to escape `$` symbols with `$$`.
+3. Add `NAME=[language name]` to this file, replacing `[language name]` with the language name all in lowercase, removing any punctuation and numbers (e.g. 05AB1E becomes osabie).
 
-The `${NAME}-${VERSION}` directory should contain all the binaries required to run the language.
-You should use this target to compile all the sources, and installing them into the `$@` location
+4. Add `AUTHOR=[author]` to this file, replacing `[author]` with your name and email address in the format `Full Name <your@email.address>` (standard git format).
 
-`${NAME}-${VERSION}/environment` should contain a bunch of environment variables which will be passed into the `run` and `compile` scripts of not only this language, but any which depend on it.
-If your package depends on any others, their environment variables are automatically sourced, then your packages ones are sourced after.
+5. Add `DEPENDENCIES=[dependencies list]` to this file, replacing `[dependencies list]` with a list of dependencies, seperated by spaces in the format `[language]==[version]`. If there are none, simply leave this as `DEPENDENCIES=`
 
-The `compile` file contains instructions to compile source files into a final binary which should be run by `run`. It's first argument is the main source file, with other source files being provided as other arguments. STDIN is left blank, but both STDOUT and STDERR are returned. The `run` file will be skipped if this file returns a non-zero error code.
+6. Add `COMPILED=[true/false]` to this file, set this to true if the language requires the compile stage, and false if it only requires run.
 
-5. Commit your new package with the following message format: `pkg([language name] [version(s)]): [description including versions]`
+7. Add `VERSIONS=[version list]` to this file, replacing `[version list]` with a list of [SemVer](https://semver.org/) compilant version numbers for the language which this build file can build. This value will be passed in as `${VERSION}` for you to access
 
-Examples:
-* `pkg(python 3.9.1): new version`
-* `pkg(python 3.9.1 2.7.1): refactor`
+8. Add `include common.mk`, to include all the common Makefile rules and variables.
 
-6. Create a pull request, referencing the issue number of the language
+9. Create the target for the run file by adding `${RUN_FILE}:`, followed by steps on new lines, indented by a tab (`\t`) to create a bash script, which is run for every job (`/execute` endpoint) for this language and returns on STDOUT/STDERR the output of the run.
+The script is expected to take in the first argument (`$1`) as the main code file, with subsequent arguments being passed in from the execute endpoint.
+The script is passed STDIN as specified in the job, and expects output on STDOUT/STDERR. It should also pass through the exit code from the interpreter.
+It is recommended to use `echo` statements, redirecting output to `$@` (a special Makefile variable expanding to the target file, in this case RUN_FILE).
+Make sure to escape any `$` with `$$`, as `$` will expand make variables.
+
+10. (optional, only use if language requires compliation)
+Create the target for the compile file by adding `${COMPILE_FILE}:`, followed by steps on new lines, indented by a tab (`\t`) to create a bash script, which is run for every job (`/execute` endpoint) for this language, if it requires compilation.
+This script is expected to take all code files in as arguements, and output binary files. STDERR/STDOUT are captured and passed out, along with error code. The job STDIN and args are not passed in to this script.
+This script should compile source code into a binary, and has a seperate time limit from run, and thus should split the stages.
+Follow all priciples from step 9, using echo statements and escaping `$`.
+
+11. Create the target for the environment file by adding `${ENV_FILE}:`, followed by steps on new lines, indented by a tab (`\t`) to create a bash script, which modifies environment variables exactly how you would a `.profile` or `.bashrc` file. Note that this file is only run at install time, and thus cannot dynamicly adjust to the arguements passed into it.
+The environment file is also appended with all dependencies before being cached.
+You should add in the path to any binaries. The current working directory for the script is contained within the `${BIN_DIR}` folder.
+
+12. Create the target for the binaries by adding `${BIN_DIR}:`, followed by steps on new lines, indented by a tab (`\t`) which will download sources, compile and output binaries in to the `${BIN_DIR}` (`$@`)
+
+13. Locally test your Makefile builds with `make build-[language]-[version]`.
+If everything went well, you should now have a `[language]-[version].pkg.tar.gz` file sitting in the root.
+If not, read through your error logs, and if in doubt ask for help in #emkc-felix-piston in Discord.
+

@@ -1,46 +1,70 @@
-LANG_NAME=$(or ${NAME},none)
-LANG_VERSION=$(or ${VERSION},0.0.0)
-LANG_AUTHOR=$(or ${AUTHOR},HexF <thomas@hexf.me>)
-LANG_DEPS=$(or ${DEPS})
-LANG_COMPILED=$(or ${COMPILED}, false)
+# Variables
+PKG_SLUG=${NAME}-${VERSION}
+BUILD_DIR=build/${PKG_SLUG}/
 
-LANG_PKG_TARGETS=pkg-info.json ${LANG_NAME}-${LANG_VERSION}/ ${LANG_NAME}-${LANG_VERSION}/environment run
+BIN_DIR=${BUILD_DIR}${PKG_SLUG}/
+RUN_FILE=${BUILD_DIR}run
+COMPILE_FILE=${BUILD_DIR}compile
+ENV_FILE=${BIN_DIR}environment
+INFO_FILE=${BUILD_DIR}pkg-info.jq
 
-BUILD_PLATFORM=$(or ${PLATFORM}, baremetal-$(shell grep -oP "^ID=\K\w+" /etc/os-release ))
+PKG_FILE=${PKG_SLUG}.pkg.tar.gz
 
-ifeq (${LANG_COMPILED}, true)
-${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS) compile
+VERSION_MINOR=$(shell grep -oP "\d+.\d+"<<<${VERSION})
+VERSION_MAJOR=$(shell grep -oP "\d+"<<<${VERSION})
+
+PKG_TARGETS=${BIN_DIR} ${ENV_FILE} ${RUN_FILE} ${INFO_FILE}
+
+
+# Command Targets
+
+.PHONY: catch versions name build clean
+catch:
+	# Catch manual calling
+	# This is done to make sure people don't call without ${VERSION}, which can cause problems
+	@echo "Don't directly call individual scripts, instead call the common Makefile"
+	@exit 1
+
+versions:
+	@echo ${VERSIONS}
+
+name:
+	@echo ${NAME}
+
+build: ${BUILD_DIR} ${PKG_FILE}
+clean: 
+	rm -rf ${BUILD_DIR}
+	rm -f ${PKG_FILE}
+
+# mkdir
+${BUILD_DIR}:
+	mkdir -p ${BUILD_DIR}
+
+
+# Generated files
+
+ifeq (${COMPILED}, true)
+${PKG_FILE}: ${PKG_TARGETS} ${COMPILE_FILE}
 endif
-${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz: $(LANG_PKG_TARGETS)
-	tar czf $@ $?
+${PKG_FILE}: ${PKG_TARGETS}
+	tar -czC ${BUILD_DIR} -f $@ ${patsubst ${BUILD_DIR}%,%,$?}
+	
+${INFO_FILE}:
+	echo '.language="${NAME}"' > $@
+	echo '.version="${VERSION}"' >> $@
+	echo '.author="${AUTHOR}"' >> $@
+	echo '.dependencies={}' >> $@
+	echo '.build_platform="$(or ${PLATFORM}, baremetal-$(shell grep -oP "^ID=\K\w+" /etc/os-release ))"' >> $@
+	$(foreach dep, ${DEPENDENCIES}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> $@)
+
+
+
+# Helpers
+
+%/: %.tgz
+	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
+%/: %.tar.gz
+	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
 
 %.json: %.jq
 	jq '$(shell tr '\n' '|' < $<).' <<< "{}" > $@
-	
-pkg-info.jq:
-	echo '.language="${LANG_NAME}"' > pkg-info.jq
-	echo '.version="${LANG_VERSION}"' >> pkg-info.jq
-	echo '.author="${LANG_AUTHOR}"' >> pkg-info.jq
-	echo '.dependencies={}' >> pkg-info.jq
-	echo '.build_platform="${BUILD_PLATFORM}"' >> pkg-info.jq
-	$(foreach dep, ${LANG_DEPS}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> pkg-info.jq)
-
-%.asc: %
-	gpg --detach-sig --armor --batch --output $@ $< 
-
-%/: %.tgz
-	tar xzf $<
-
-%/: %.tar.gz
-	tar xzf $<
-
-.PHONY: clean
-clean: 
-	rm -rf $(filter-out Makefile, $(wildcard *))
-
-,PHONY: cleanup
-cleanup:
-	rm -rf $(filter-out ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz.asc, $(filter-out ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz, $(filter-out Makefile, $(wildcard *))))
-	
-.PHONY: sign
-sign: ${LANG_NAME}-${LANG_VERSION}.pkg.tar.gz.asc
