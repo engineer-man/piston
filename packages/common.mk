@@ -65,9 +65,13 @@ $(patsubst %.json,%.jq,${INFO_FILE}):
 
 # Helpers
 %/: %.tar.gz
-	cd ${BUILD_DIR} && tar xzf $(patsubst ${BUILD_DIR}%,%,$<)
+	mkdir -p $@
+	tar xzf $< --strip-components=1 -C $@
 %/: %.tar.xz
-	cd ${BUILD_DIR} && tar xf $(patsubst ${BUILD_DIR}%,%,$<)
-
+	mkdir -p $@
+	tar xf $< --strip-components=1 -C $@
+%/: %.zip
+	mkdir -p $@
+	unzip $< -d $@
 %.json: %.jq
 	jq '$(shell tr '\n' '|' < $<).' <<< "{}" > $@
