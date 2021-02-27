@@ -1,5 +1,10 @@
 const fetch = require('node-fetch')
 
+function url_join(base, endpoint){
+    return base + endpoint
+    //return new URL(endpoint, base).href;
+}
+
 class APIWrapper {
     #base;
     constructor(base_url){
@@ -7,7 +12,7 @@ class APIWrapper {
     }
 
     async query(endpoint, options={}){
-        const url = new URL(endpoint, this.#base).href;
+        const url = url_join(this.#base, endpoint);
         return await fetch(url, options)
             .then(res=>res.json())
             .then(res=>{if(res.data)return res.data; throw new Error(res.message)});
@@ -44,7 +49,7 @@ class APIWrapper {
 
 class PistonEngineRepositoryPackage extends APIWrapper {
     constructor(repo, {language, language_version, author, buildfile, size, dependencies, installed}){
-        super(new URL(`/packages/${language}/${language_version}`,repo.url_base))
+        super(url_join(repo.url_base, `/packages/${language}/${language_version}`))
 
         this.language = language;
         this.language_version = language_version;
@@ -67,7 +72,7 @@ class PistonEngineRepositoryPackage extends APIWrapper {
 class PistonEngineRepository extends APIWrapper {
     
     constructor(engine, {slug, url, packages}){
-        super(new URL(`/repos/${slug}`, engine.url_base,))
+        super(url_join(engine.url_base,`/repos/${slug}`))
 
         this.slug = slug;
         this.url = url;
