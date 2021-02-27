@@ -93,10 +93,16 @@ const app = express();
     app.get   ('/repos/:repo_slug/packages', ppman_routes.repo_packages_validators, validate, ppman_routes.repo_packages);
     app.get   ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_info);
     app.post  ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_install);
-    app.delete('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_uninstall); //TODO
+    app.delete('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_uninstall);
 
     const executor_routes = require('./executor/routes');
     app.post  ('/jobs', executor_routes.run_job_validators, validate, executor_routes.run_job);
+
+    app.get   ('/runtimes', (_, res) => res.json_success({runtimes: runtime.map(rt=>({
+            language: rt.language,
+            version: rt.version.raw,
+            author: rt.author
+        }))}))
 
     logger.debug('Calling app.listen');
     const [address,port] = config.bind_address.split(':');
