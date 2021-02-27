@@ -7,6 +7,7 @@ RUN_FILE=${BUILD_DIR}run
 COMPILE_FILE=${BUILD_DIR}compile
 ENV_FILE=${BIN_DIR}environment
 INFO_FILE=${BUILD_DIR}pkg-info.jq
+PREFIX=/piston/packages/${NAME}/${VERSION}/${PKG_SLUG}
 
 PKG_FILE=${PKG_SLUG}.pkg.tar.gz
 
