@@ -3,8 +3,8 @@
 cd /repo
 
 # Make packages
-pushd ../packages/python
-make build VERSIONS=3.9.1
+pushd ../packages/
+make -j16
 popd
 
 
