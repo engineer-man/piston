@@ -6,7 +6,7 @@ BIN_DIR=${BUILD_DIR}${PKG_SLUG}/
 RUN_FILE=${BUILD_DIR}run
 COMPILE_FILE=${BUILD_DIR}compile
 ENV_FILE=${BIN_DIR}environment
-INFO_FILE=${BUILD_DIR}pkg-info.jq
+INFO_FILE=${BUILD_DIR}pkg-info.json
 PREFIX=/piston/packages/${NAME}/${VERSION}/${PKG_SLUG}
 
 PKG_FILE=${PKG_SLUG}.pkg.tar.gz
@@ -53,7 +53,7 @@ endif
 ${PKG_FILE}: ${PKG_TARGETS}
 	tar -czC ${BUILD_DIR} -f $@ ${patsubst ${BUILD_DIR}%,%,$?}
 	
-${INFO_FILE}:
+$(patsubst %.json,%.jq,${INFO_FILE}):
 	echo '.language="${NAME}"' > $@
 	echo '.version="${VERSION}"' >> $@
 	echo '.author="${AUTHOR}"' >> $@
