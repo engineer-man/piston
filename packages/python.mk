@@ -14,9 +14,12 @@ ${ENV_FILE}:
 	echo 'export PATH=$$PWD/bin:$$PATH' > $@
 
 ${BIN_DIR}: ${BUILD_DIR}Python-${VERSION}/
-	cd $< && ./configure --prefix /
+	$(eval TMP_DIR=${PWD}/${BUILD_DIR}tmpout/)
+	cd $< && ./configure --prefix ${PREFIX}
 	$(MAKE) -C $<
-	DESTDIR=../${PKG_SLUG} $(MAKE) -C $< altinstall || true
+	DESTDIR=${TMP_DIR} $(MAKE) -C $< altinstall
+	mv ${TMP_DIR}${PREFIX} ${BIN_DIR} && rm -rf ${TMP_DIR}
+
 
 ${BUILD_DIR}Python-${VERSION}.tar.gz: 
 	curl "https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz" -o $@
