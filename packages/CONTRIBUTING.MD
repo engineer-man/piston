@@ -59,3 +59,7 @@ You should add in the path to any binaries. The current working directory for th
 If everything went well, you should now have a `[language]-[version].pkg.tar.gz` file sitting in the root.
 If not, read through your error logs, and if in doubt ask for help in #emkc-felix-piston in Discord.
 
+14. Commit your changes, using message format of `pkg([language]): Added [language] [version]`
+Any additional commits regarding this package should start with `pkg([language]): `
+
+15. Create a pull request (currently to v3), referencing an Issue number (if there is one associated).
