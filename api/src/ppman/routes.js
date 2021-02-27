@@ -52,7 +52,7 @@ module.exports = {
         body('url')
             .notEmpty() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
-            .isURL({require_protocol: true}) // eslint-disable-line snakecasejs/snakecasejs
+            .isURL({require_host: false, require_protocol: true, protocols: ['http','https','file']}) // eslint-disable-line snakecasejs/snakecasejs
 
     ],
     async repo_add(req, res){

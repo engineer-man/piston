@@ -10,7 +10,8 @@ module.exports = {
         body('language')
             .isString(), // eslint-disable-line snakecasejs/snakecasejs
         body('version')
-            .isSemVer(), // eslint-disable-line snakecasejs/snakecasejs
+            .isString(), // eslint-disable-line snakecasejs/snakecasejs
+                         // isSemVer requires it to be a version, not a selector
         body('files')
             .isArray(), // eslint-disable-line snakecasejs/snakecasejs
         body('files.*.name')
@@ -20,7 +21,9 @@ module.exports = {
             .contains('/'),
         body('files.*.content')
             .isString(), // eslint-disable-line snakecasejs/snakecasejs
-        body('*_timeout')
+        body('compile_timeout')
+            .isNumeric(), // eslint-disable-line snakecasejs/snakecasejs
+        body('run_timeout')
             .isNumeric(), // eslint-disable-line snakecasejs/snakecasejs
         body('stdin')
             .isString(), // eslint-disable-line snakecasejs/snakecasejs
