@@ -15,8 +15,8 @@ ${ENV_FILE}:
 
 ${BIN_DIR}: ${BUILD_DIR}Python-${VERSION}/
 	cd $< && ./configure --prefix /
-	$(MAKE) -j64 -C $<
-	DESTDIR=../${PKG_SLUG} $(MAKE) -j64 -C $< altinstall || true
+	$(MAKE) -C $<
+	DESTDIR=../${PKG_SLUG} $(MAKE) -C $< altinstall || true
 
 ${BUILD_DIR}Python-${VERSION}.tar.gz: 
 	curl "https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz" -o $@
