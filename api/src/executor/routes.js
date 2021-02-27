@@ -8,26 +8,26 @@ const { body } = require('express-validator');
 module.exports = {
     run_job_validators: [
         body('language')
-            .isString(),
+            .isString(), // eslint-disable-line snakecasejs/snakecasejs
         body('version')
-            .isSemVer(),
+            .isSemVer(), // eslint-disable-line snakecasejs/snakecasejs
         body('files')
-            .isArray(),
+            .isArray(), // eslint-disable-line snakecasejs/snakecasejs
         body('files.*.name')
-            .isString()
+            .isString() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
             .not()
             .contains('/'),
         body('files.*.content')
-            .isString(),
+            .isString(), // eslint-disable-line snakecasejs/snakecasejs
         body('*_timeout')
-            .isNumeric(),
+            .isNumeric(), // eslint-disable-line snakecasejs/snakecasejs
         body('stdin')
-            .isString(),
+            .isString(), // eslint-disable-line snakecasejs/snakecasejs
         body('args')
             .isArray(),
         body('args.*')
-            .isString()
+            .isString() // eslint-disable-line snakecasejs/snakecasejs
     ],
     async run_job(req, res){
         // POST /jobs

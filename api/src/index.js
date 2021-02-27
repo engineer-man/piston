@@ -11,7 +11,7 @@ const fs = require('fs/promises');
 const fss = require('fs');
 const body_parser = require('body-parser');
 const runtime = require('./runtime');
-const {validationResult} = require('express-validator');
+const {validationResult} = require('express-validator'); //eslint-disable-line snakecasejs/snakecasejs
 
 const logger = Logger.create('index');
 const app = express();
@@ -77,8 +77,8 @@ const app = express();
 
 
     function validate(req, res, next) {
-        const errors = validationResult(req);
-        if (!errors.isEmpty())
+        const errors = validationResult(req); //eslint-disable-line snakecasejs/snakecasejs
+        if (!errors.isEmpty()) //eslint-disable-line snakecasejs/snakecasejs
             return res.json_error(errors.array(), 422);
         next();
     }

@@ -42,17 +42,17 @@ module.exports = {
     },
     repo_add_validators: [
         body('slug')
-            .notEmpty()
+            .notEmpty() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
-            .isSlug()
+            .isSlug() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
             .not()
             .custom(value=>state.state.get('repositories').keys().includes(value))
-            .withMessage("slug is already in use"),
+            .withMessage('slug is already in use'), // eslint-disable-line snakecasejs/snakecasejs
         body('url')
-            .notEmpty()
+            .notEmpty() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
-            .isURL({require_protocol: true})
+            .isURL({require_protocol: true}) // eslint-disable-line snakecasejs/snakecasejs
 
     ],
     async repo_add(req, res){
@@ -69,10 +69,10 @@ module.exports = {
     },
     repo_info_validators: [
         param('repo_slug')
-            .isSlug()
+            .isSlug() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
             .custom(value=>state.state.get('repositories').has(value))
-            .withMessage("repository does not exist")
+            .withMessage('repository does not exist') // eslint-disable-line snakecasejs/snakecasejs
             .bail()
     ],
     async repo_info(req, res){
@@ -89,10 +89,10 @@ module.exports = {
     },
     repo_packages_validators: [
         param('repo_slug')
-            .isSlug()
+            .isSlug() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
             .custom(value=>state.state.get('repositories').has(value))
-            .withMessage("repository does not exist")
+            .withMessage('repository does not exist') // eslint-disable-line snakecasejs/snakecasejs
             .bail()
     ],
     async repo_packages(req, res){
@@ -112,10 +112,10 @@ module.exports = {
     },
     package_info_validators: [
         param('repo_slug')
-            .isSlug()
+            .isSlug() // eslint-disable-line snakecasejs/snakecasejs
             .bail()
             .custom(value=>state.state.get('repositories').has(value))
-            .withMessage("repository does not exist")
+            .withMessage('repository does not exist') // eslint-disable-line snakecasejs/snakecasejs
             .bail()
     ],
     async package_info(req, res){
@@ -161,6 +161,6 @@ module.exports = {
         // DELETE /repos/:slug/packages/:language/:version
 
         //res.json(req.body); //TODO
-        res.json_error("not implemented", 500)
+        res.json_error('not implemented', 500);
     }
 };
