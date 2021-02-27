@@ -1,7 +1,9 @@
-FROM node:15.8.0-alpine3.13
-RUN apk add --no-cache gnupg tar bash coreutils shadow util-linux
-RUN userdel -r node
-RUN for i in $(seq 1000 1500); do \
+FROM node:15.8.0-buster-slim
+RUN dpkg-reconfigure -p critical dash
+RUN apt-get update && apt-get install -y gnupg tar coreutils util-linux \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN for i in $(seq 1001 1500); do \
         groupadd -g $i runner$i && \
         useradd -M runner$i -g $i -u $i ; \
     done

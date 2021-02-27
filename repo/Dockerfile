@@ -1,7 +1,8 @@
-FROM alpine:3.13
+FROM debian:buster-slim
 
-RUN apk add --no-cache python3 py3-pip gnupg jq zlib zlib-dev cmake cmake-doc extra-cmake-modules extra-cmake-modules-doc build-base gcc abuild binutils binutils-doc gcc-doc yq bash coreutils util-linux pciutils usbutils coreutils binutils findutils grep && \
+RUN apt-get update && apt-get install -y bc curl git linux-headers-amd64 perl xz-utils python3 python3-pip gnupg jq zlib1g-dev cmake cmake-doc extra-cmake-modules build-essential gcc binutils bash coreutils util-linux pciutils usbutils coreutils binutils findutils grep && \
         ln -sf /bin/bash /bin/sh && \
-        pip3 install 'yq==2.12.0'
+        pip3 install 'yq==2.12.0' && \
+        rm -rf /var/lib/apt/lists/*
 
 CMD [ "bash", "/repo/make.sh" ]
