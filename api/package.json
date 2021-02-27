@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "express-validator": "^6.10.0",
     "is-docker": "^2.1.1",
     "js-yaml": "^4.0.0",
     "logplease": "^1.2.15",
