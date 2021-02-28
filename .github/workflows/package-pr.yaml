@@ -1,0 +1,49 @@
+name: 'Package Pull Requests'
+
+on:
+  pull_requests:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+    paths:
+      - 'packages/**'
+
+jobs:
+  packages-affected:
+    name: List affected packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR Commits
+        id: 'get-pr-commits'
+        uses: tim-actions/get-pr-commits@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check subsystem
+        if: ${{ success() || failure() }}
+        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
+        with:
+          commits: ${{ steps.get-pr-commits.outputs.commits }}
+          pattern: '^[\h]*(pkg\([^:\h\n]+\))[\h]*:'
+          error: 'Your commit message must start with pkg([package])'
+      
+      - name: Get packages
+        id: 'get-packages'
+        shell: bash
+        run: |
+          PACKAGES=$(echo '${{ steps.get-pr-commits.outputs.commits }}' | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))'' | sort -u | sed 's/^/* /')
+          PACKAGES=${PACKAGES//$'%'/'%25'}
+          PACKAGES=${PACKAGES//$'\n'/'%0A'}
+          PACKAGES=${PACKAGES//$'\r'/'%0D'}
+          echo "::set-output name=packages::$PACKAGES"
+
+
+      - name: Comment on PR
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: "Affected packages:\n${{ steps.get-packages.outputs.packages }}"
+          check_for_duplicate_msg: true
+      
