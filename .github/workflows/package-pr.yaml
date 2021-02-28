@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           COMMITS='${{ steps.get-pr-commits.outputs.commits }}'
-          PACKAGES=$(echo $COMMITS | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))'' | sort -u | sed 's/^/* /')
+          PACKAGES=$(echo $COMMITS | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))' | sort -u | sed 's/^/* /')
           PACKAGES=${PACKAGES//$'%'/'%25'}
           PACKAGES=${PACKAGES//$'\n'/'%0A'}
           PACKAGES=${PACKAGES//$'\r'/'%0D'}
