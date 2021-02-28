@@ -59,7 +59,21 @@ You should add in the path to any binaries. The current working directory for th
 If everything went well, you should now have a `[language]-[version].pkg.tar.gz` file sitting in the root.
 If not, read through your error logs, and if in doubt ask for help in #emkc-felix-piston in Discord.
 
-14. Commit your changes, using message format of `pkg([language]): Added [language] [version]`
+14. Create a source file for the app, which outputs `OK`, naming the file `[language-name].test`
+For example, `mono` would have a file named `csharp-mono.test` containing:
+```cs
+using System;
+
+public class Test
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("OK");
+    }
+}
+```
+
+15. Commit your changes, using message format of `pkg([language]): Added [language] [version]`
 Any additional commits regarding this package should start with `pkg([language]): `
 
-15. Create a pull request (currently to v3), referencing an Issue number (if there is one associated).
+16. Create a pull request (currently to v3), referencing an Issue number (if there is one associated).
