@@ -1,7 +1,7 @@
 name: 'Package Pull Requests'
 
 on:
-  pull_requests:
+  pull_request:
     types:
       - opened
       - edited
@@ -25,7 +25,7 @@ jobs:
         uses: tim-actions/commit-message-checker-with-regex@v0.3.1
         with:
           commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '^[\h]*(pkg\([^:\h\n]+\))[\h]*:'
+          pattern: '^[\s]*(pkg\([^:\s\n]+\))[\s]*:'
           error: 'Your commit message must start with pkg([package])'
       
       - name: Get packages
