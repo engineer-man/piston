@@ -11,8 +11,8 @@ on:
       - 'packages/**'
 
 jobs:
-  packages-affected:
-    name: List affected packages
+  check-build:
+    name: Check that package builds
     runs-on: ubuntu-latest
     steps:
       - name: Get PR Commits
@@ -21,7 +21,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Check subsystem
-        if: ${{ success() || failure() }}
         uses: tim-actions/commit-message-checker-with-regex@v0.3.1
         with:
           commits: ${{ steps.get-pr-commits.outputs.commits }}
@@ -33,17 +32,44 @@ jobs:
         shell: bash
         run: |
           COMMITS='${{ steps.get-pr-commits.outputs.commits }}'
-          PACKAGES=$(echo $COMMITS | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))' | sort -u | sed 's/^/* /')
-          PACKAGES=${PACKAGES//$'%'/'%25'}
-          PACKAGES=${PACKAGES//$'\n'/'%0A'}
-          PACKAGES=${PACKAGES//$'\r'/'%0D'}
+          PACKAGES=$(echo $COMMITS | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))' | sort -u)
           echo "::set-output name=packages::$PACKAGES"
 
-      - name: 'Comment PR'
-        uses: actions/github-script@0.3.0
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
-            github.issues.createComment({ issue_number, owner, repo, body: "Affected packages:\n${{ steps.get-packages.outputs.packages }}" });
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build docker containers
+        run: |
+          docker build -t piston_fs_repo repo
+          docker build -t piston_api api
+          
+      - name: Build Packages
+        run: |
+          docker run -v './repo:/repo' -v './packages:/packages' piston_fs_repo ${{ steps.get-packages.outputs.packages }}
+
+      - name: Run tests
+        run: |
+          docker run -dp 6969:6969 -v './repo:/repo' --privileged --name api piston_api
+          echo Waiting for API to start..
+          bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:6969/runtimes)" != "200" ]]; do sleep 5; done'
+          echo Adding local repo
+          curl -s http://127.0.0.1:6969/repos -XPOST -d "slug=local&url=file:///repo/index.yaml"
+          echo Testing packages
+          for pkg in "$(curl -s http://127.0.0.1:6969/repos/local/packages/ | jq '.data.packages[] | "\(.language)/\(.language_version)"' -r)"
+          do
+            PKG_SLUG=${pkg/\//-}
+            PKG_NAME=$(echo $pkg | cut -d'/' -f 1)
+            PKG_VERSION=$(echo $pkg | cut -d'/' -f 2)
+            echo Installing ${PKG_SLUG}
+            curl -sXPOST http://127.0.0.1:6969/repos/local/packages/${pkg} | jq '.language' -r || exit 1
+            echo Testing ${PKG_SLUG} (using ${PKG_SLUG}.tf)
+            TEST_FILE=$(cat ${PKG_SLUG}.tf)
+            TEST_JSON=`jq -C '.language = "${PKG_NAME}" | .version = "${PKG_VERSION}" | .files=[] | .files[0]={} | .files[0].name="test" | .files[0].name.content="${TEST_FILE}" | .main = "test" | .args = [] | .stdin = "" | .compile_timeout = 10000 | .run_timeout = 3000' <<< '{}'`
+            curl -sXPOST http://127.0.0.1:6969/jobs -H 'Content-Type: application/json' -d "$TEST_JSON"
+          done
+
+
+
+
+
+
