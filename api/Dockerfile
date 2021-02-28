@@ -1,6 +1,6 @@
 FROM node:15.8.0-buster-slim
 RUN dpkg-reconfigure -p critical dash
-RUN apt-get update && apt-get install -y gnupg tar coreutils util-linux \
+RUN apt-get update && apt-get install -y libxml2 gnupg tar coreutils util-linux \
   && rm -rf /var/lib/apt/lists/*
 
 RUN for i in $(seq 1001 1500); do \
