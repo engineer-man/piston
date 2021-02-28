@@ -2,7 +2,7 @@ NAME=python
 AUTHOR=Thomas Hobson <thomas@hexf.me>
 DEPENDENCIES=
 COMPILED=false
-VERSIONS=2.7.1 3.5.1 3.9.1
+VERSIONS=3.5.1 3.9.1
 
 include common.mk
 
@@ -15,6 +15,7 @@ ${ENV_FILE}:
 
 ${BIN_DIR}: ${BUILD_DIR}Python-${VERSION}/
 	$(eval TMP_DIR=${PWD}/${BUILD_DIR}tmpout/)
+	
 	cd $< && ./configure --prefix ${PREFIX}
 	$(MAKE) -C $<
 	DESTDIR=${TMP_DIR} $(MAKE) -C $< altinstall
