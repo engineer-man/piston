@@ -45,11 +45,11 @@ jobs:
           
       - name: Build Packages
         run: |
-          docker run -v './repo:/repo' -v './packages:/packages' piston_fs_repo ${{ steps.get-packages.outputs.packages }}
+          docker run -v $(pwd)'/repo:/repo' -v $(pwd)'/packages:/packages' piston_fs_repo ${{ steps.get-packages.outputs.packages }}
 
       - name: Run tests
         run: |
-          docker run -dp 6969:6969 -v './repo:/repo' --privileged --name api piston_api
+          docker run -dp 6969:6969 -v $(pwd)'/repo:/repo' --privileged --name api piston_api
           echo Waiting for API to start..
           bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:6969/runtimes)" != "200" ]]; do sleep 5; done'
           echo Adding local repo
