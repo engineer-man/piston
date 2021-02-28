@@ -5,4 +5,7 @@ RUN apt-get update && apt-get install -y autoconf build-essential libssl-dev pkg
         pip3 install 'yq==2.12.0' && \
         rm -rf /var/lib/apt/lists/*
 
-CMD [ "bash", "/repo/make.sh" ]
+ADD *.sh /
+
+ENTRYPOINT ["bash","/entrypoint.sh"]
+CMD ["all"]
