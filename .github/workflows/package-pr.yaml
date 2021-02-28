@@ -49,9 +49,9 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -dp 6969:6969 -v $(pwd)'/repo:/repo' --privileged --name api piston_api
+          docker run -p 6969:6969 -v $(pwd)'/repo:/repo' --privileged --name api piston_api & 
           echo Waiting for API to start..
-          bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:6969/runtimes)" != "200" ]]; do sleep 5; done'
+          while [[ "$(curl -s -w '%{http_code}' http://127.0.0.1:6969/runtimes)" != "200" ]]; do sleep 5; done
           echo Adding local repo
           curl -s http://127.0.0.1:6969/repos -XPOST -d "slug=local&url=file:///repo/index.yaml"
           echo Testing packages
