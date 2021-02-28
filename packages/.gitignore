@@ -1,2 +1,3 @@
 build/
 *.pkg.tar.gz
+*.tf
