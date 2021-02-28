@@ -39,12 +39,11 @@ jobs:
           PACKAGES=${PACKAGES//$'\r'/'%0D'}
           echo "::set-output name=packages::$PACKAGES"
 
-
-      - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Comment PR'
+        uses: actions/github-script@0.3.0
+        if: github.event_name == 'pull_request'
         with:
-          msg: "Affected packages:\n${{ steps.get-packages.outputs.packages }}"
-          check_for_duplicate_msg: true
-      
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({ issue_number, owner, repo, body: "Affected packages:\n${{ steps.get-packages.outputs.packages }}" });
