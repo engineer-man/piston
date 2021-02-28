@@ -65,7 +65,8 @@ jobs:
             echo Testing ${PKG_SLUG} (using ${PKG_SLUG}.tf)
             TEST_FILE=$(cat ${PKG_SLUG}.tf)
             TEST_JSON=`jq -C '.language = "${PKG_NAME}" | .version = "${PKG_VERSION}" | .files=[] | .files[0]={} | .files[0].name="test" | .files[0].name.content="${TEST_FILE}" | .main = "test" | .args = [] | .stdin = "" | .compile_timeout = 10000 | .run_timeout = 3000' <<< '{}'`
-            curl -sXPOST http://127.0.0.1:6969/jobs -H 'Content-Type: application/json' -d "$TEST_JSON"
+            curl -sXPOST http://127.0.0.1:6969/jobs -H 'Content-Type: application/json' -d "$TEST_JSON" > ${PKG_SLUG}.tr
+            jq '.run.stdout' ${PKG_SLUG}.tr | grep "OK" || exit 1
           done
 
 
