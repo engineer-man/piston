@@ -34,11 +34,12 @@ name:
 
 
 .NOTPARALLEL: build
-build: ${BUILD_DIR} ${PKG_FILE}
+build: ${BUILD_DIR} ${PKG_FILE} ${PKG_SLUG}.tf
 
 clean: 
 	rm -rf ${BUILD_DIR}
 	rm -f ${PKG_FILE}
+	rm -f ${PKG_SLUG}.tf
 
 # mkdir
 ${BUILD_DIR}:
@@ -61,7 +62,8 @@ $(patsubst %.json,%.jq,${INFO_FILE}):
 	echo '.build_platform="$(or ${PLATFORM}, baremetal-$(shell grep -oP "^ID=\K\w+" /etc/os-release ))"' >> $@
 	$(foreach dep, ${DEPENDENCIES}, echo '.dependencies.$(word 1,$(subst =, ,${dep}))="$(word 2,$(subst =, ,${dep}))"' >> $@)
 
-
+${PKG_SLUG}.tf:
+	cp ${NAME}.test $@
 
 # Helpers
 %/: %.tar.gz

@@ -16,11 +16,7 @@ services:
 
   piston_fs_repo: #Temporary solution until CI works
     build: repo
-    command: >
-      bash -c '/repo/make.sh &&
-      curl http://piston_api:6969/repos -XPOST -d "slug=local&url=file:///repo/index.yaml";
-      echo -e "\nAn error here is fine, it just means its already added it. Perhaps you restarted this container"
-      '
+    command: ['python'] # Only build python
     volumes:
       - ./repo:/repo
       - ./packages:/packages
