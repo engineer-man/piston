@@ -1,7 +1,6 @@
 const globals = require('./globals');
 const logger = require('logplease').create('cache');
 const fs = require('fs/promises'),
-    fss = require('fs'),
     path = require('path');
 
 const cache = new Map();
@@ -13,43 +12,54 @@ module.exports = {
     },
     async get(key, callback, ttl=globals.cache_ttl){
         logger.debug('get:', key);
+
         if(module.exports.has(key)){
             logger.debug('hit:',key);
             return cache.get(key).data;
         }
+
         logger.debug('miss:', key);
         var data = await callback();
         cache.set(key, {data, expiry: Date.now() + ttl});
+
         return data;
     },
     async flush(cache_dir){
         logger.info('Flushing cache');
-        cache.forEach((v,k)=>{
-            var file_path = path.join(cache_dir, k);
-            if(v.expiry < Date.now()){
-                //remove from cache
-                cache.delete(k);
-                fs.stat(file_path, (err, stats)=>{
-                    if(err) return; //ignore - probably hasn't been flushed yet
+
+        async function flush_single(value, key){
+            const file_path = path.join(cache_dir, key);
+
+            if(value.expiry < Date.now()){
+                cache.delete(key);
+                try {
+                    const stats = await fs.stat(file_path);
                     if(stats.is_file())
-                        fs.rm(file_path, (err)=>{
-                            if(err) logger.warn(`Couldn't clean up on-disk cache file ${k}`);
-                        });
-                });
+                        await fs.rm(file_path);
+                }catch{
+                    // Ignore, file hasn't been flushed yet
+                }
             }else{
-                //flush to disk
-                fs.write_file(file_path, JSON.stringify(v),()=>{});
+                await fs.write_file(file_path, JSON.stringify(value));
             }
-        });
+
+        }
+
+        return Promise.all(
+            Array.from(cache).map(flush_single)
+        );
 
     },
     async load(cache_dir){
-        return fs.readdir(cache_dir)
-            .then(files => Promise.all(files.map(
-                async file => {
-                    cache.set(file, JSON.parse(fss.read_file_sync(path.join(cache_dir,file)).toString()));
-                }
-            )));
+        const files = await fs.readdir(cache_dir);
+
+        async function load_single(file_name){
+            const file_path = path.join(cache_dir,file_name);
+            const file_content = await fs.read_file(file_path).toString();
+            cache.set(file_name, JSON.parse(file_content));
+        }
+
+        return Promise.all(files.map(load_single));
     }
 
 };

@@ -122,61 +122,70 @@ const options = [
     }
 ];
 
-const default_config = [
-    ...header.split('\n'),
-    ...options.map(option => `
-${[
-        ...option.desc.split('\n'),
-        option.options?('Options: ' + option.options.join(', ')):''
-    ].filter(x=>x.length>0).map(x=>`# ${x}`).join('\n')}
-${option.key}: ${option.default}
-    `)].join('\n');
+function make_default_config(){
+    let content = header.split('\n');
+
+    options.forEach(option => {
+        content.concat(option.desc.split('\n').map(x=>`# ${x}`));
+
+        if(option.options)
+            content.append('# Options: ' + option.options.join(', '));
+
+        content.append(`${option.key}: ${option.default}`);
+
+        content.append(''); // New line between
+    });
+
+    return content.join('\n');
+}
 
 logger.info(`Loading Configuration from ${argv.config}`);
-!!argv['make-config'] && logger.debug('Make configuration flag is set');
+
+if(argv['make-config'])
+    logger.debug('Make configuration flag is set');
 
 if(!!argv['make-config'] && !fss.exists_sync(argv.config)){
     logger.info('Writing default configuration...');
     try {
-        fss.write_file_sync(argv.config, default_config);    
+        fss.write_file_sync(argv.config, make_default_config());    
     } catch (err) {
         logger.error('Error writing default configuration:', err.message);
         process.exit(1);
     }
-    
-
 }
+
 var config = {};
+
 logger.debug('Reading config file');
+
 try{
     const cfg_content = fss.read_file_sync(argv.config);
-    try{
-        config = yaml.load(cfg_content);
-    }catch(err){
-        logger.error('Error parsing configuration file:', err.message);
-        process.exit(1);
-    }
-
+    config = yaml.load(cfg_content);
 }catch(err){
-    logger.error('Error reading configuration from disk:', err.message);
+    logger.error('Error reading configuration file:', err.message);
     process.exit(1);
 }
 
 logger.debug('Validating config entries');
+
 var errored=false;
-options.forEach(opt => {
-    logger.debug('Checking key',opt.key);
-    var cfg_val = config[opt.key];
+
+options.forEach(option => {
+    logger.debug('Checking option', option.key);
+
+    var cfg_val = config[option.key];
+
     if(cfg_val == undefined){
         errored = true;
-        logger.error(`Config key ${opt.key} does not exist on currently loaded configuration`);
+        logger.error(`Config key ${option.key} does not exist on currently loaded configuration`);
         return;
     }
-    opt.validators.forEach(validator => {
+
+    option.validators.forEach(validator => {
         var response = validator(cfg_val);
         if(response !== true){
             errored = true;
-            logger.error(`Config key ${opt.key} failed validation:`, response);
+            logger.error(`Config option ${option.key} failed validation:`, response);
             return;
         }
     });

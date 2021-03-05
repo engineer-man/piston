@@ -11,7 +11,7 @@ module.exports = {
             .isString(), // eslint-disable-line snakecasejs/snakecasejs
         body('version')
             .isString(), // eslint-disable-line snakecasejs/snakecasejs
-                         // isSemVer requires it to be a version, not a selector
+        // isSemVer requires it to be a version, not a selector
         body('files')
             .isArray(), // eslint-disable-line snakecasejs/snakecasejs
         body('files.*.name')
@@ -39,15 +39,23 @@ module.exports = {
         const runtime = get_latest_runtime_matching_language_version(req.body.language, req.body.version);
         if(runtime == undefined) return res.json_error(`${req.body.language}-${req.body.version} runtime is unknown`, 400);
 
-        const job = new Job(runtime, req.body.files, req.body.args, req.body.stdin, {run: req.body.run_timeout, compile: req.body.compile_timeout}, req.body.main);
+        const job = new Job({
+            runtime,
+            files: req.body.files,
+            args: req.body.args,
+            stdin: req.body.stdin,
+            timeouts: {
+                run: req.body.run_timeout,
+                compile: req.body.compile_timeout
+            },
+            main: req.body.main
+        });
+
         await job.prime();
 
         const result = await job.execute();
         res.json_success(result);
 
         await job.cleanup();
-
-        
-
     }
 };

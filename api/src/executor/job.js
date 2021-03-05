@@ -6,7 +6,6 @@ const config = require('../config');
 const globals = require('../globals');
 const fs = require('fs/promises');
 
-
 const job_states = {
     READY: Symbol('Ready to be primed'),
     PRIMED: Symbol('Primed and ready for execution'),
@@ -17,7 +16,7 @@ var uid=0;
 var gid=0;
 
 class Job {
-    constructor(runtime, files, args, stdin, timeouts, main){
+    constructor({runtime, files, args, stdin, timeouts, main}){
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files;
@@ -71,6 +70,7 @@ class Job {
     async safe_call(file, args, timeout){
         return await new Promise((resolve, reject) => {
             const unshare = config.enable_unshare ? ['unshare','-n','-r'] : [];
+
             const prlimit = [
                 'prlimit',
                 '--nproc=' + config.max_process_count,
@@ -82,15 +82,17 @@ class Job {
                 ...unshare,
                 'bash',file, ...args
             ];
+
             var stdout = '';
             var stderr = '';
+
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
                 env: this.runtime.env_vars,
                 stdio: 'pipe',
                 cwd: this.dir,
                 uid: this.uid,
                 gid: this.gid,
-                detached: true //dont kill the main process when we kill the group
+                detached: true //give this process its own process group
             });
             
             proc.stdin.write(this.stdin);
@@ -109,7 +111,7 @@ class Job {
                 try{
                     process.kill(-proc.pid, 'SIGKILL');
                 }catch{
-                    // Process will be dead alread, so nothing to kill.
+                    // Process will be dead already, so nothing to kill.
                 }
             }
 
@@ -128,15 +130,20 @@ class Job {
     }
 
     async execute(){
-        if(this.state != job_states.PRIMED) throw new Error('Job must be in primed state, current state: ' + this.state.toString());
+        if(this.state != job_states.PRIMED)
+            throw new Error('Job must be in primed state, current state: ' + this.state.toString());
+
         logger.info(`Executing job uuid=${this.uuid} uid=${this.uid} gid=${this.gid} runtime=${this.runtime.toString()}`);
+
         logger.debug('Compiling');
+
         var compile = undefined;
         if(this.runtime.compiled)
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x=>x.name),
                 this.timeouts.compile);
+    
 
         logger.debug('Running');
 

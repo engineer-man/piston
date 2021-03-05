@@ -63,7 +63,9 @@ class Package {
         logger.debug('Validating checksums');
         Object.keys(this.checksums).forEach(algo => {
             var val = this.checksums[algo];
+
             logger.debug(`Assert ${algo}(${pkgpath}) == ${val}`);
+
             var cs = crypto.create_hash(algo)
                 .update(fss.read_file_sync(pkgpath))
                 .digest('hex');
@@ -72,7 +74,8 @@ class Package {
 
         await this.repo.import_keys();
 
-        logger.debug('Validating signatutes');
+        logger.debug('Validating signatures');
+
         if(this.signature != '')
             await new Promise((resolve,reject)=>{
                 const gpgspawn = cp.spawn('gpg', ['--verify', '-', pkgpath], {
@@ -94,6 +97,7 @@ class Package {
             logger.warn('Package does not contain a signature - allowing install, but proceed with caution');
 
         logger.debug(`Extracting package files from archive ${pkgfile} in to ${this.install_path}`);
+
         await new Promise((resolve, reject)=>{
             const proc = cp.exec(`bash -c 'cd "${this.install_path}" && tar xzf ${pkgfile}'`);
             proc.once('exit', (code,_)=>{
@@ -109,30 +113,35 @@ class Package {
         logger.debug('Ensuring binary files exist for package');
         const pkgbin = path.join(this.install_path, `${this.language}-${this.version.raw}`);
         try{
-            const pkgbinstat = await fs.stat(pkgbin);
+            const pkgbin_stat = await fs.stat(pkgbin);
             //eslint-disable-next-line snakecasejs/snakecasejs
-            if(!pkgbinstat.isDirectory()) throw new Error();
+            if(!pkgbin_stat.isDirectory()) throw new Error();
+            // Throw a blank error here, so it will be caught by the following catch, and output the correct error message
+            // The catch is used to catch fs.stat
         }catch(err){
             throw new Error(`Invalid package: could not find ${this.language}-${this.version.raw}/ contained within package files`);
         }
 
         logger.debug('Symlinking into runtimes');
+
         await fs.symlink(
             pkgbin,
             path.join(config.data_directory,
                 globals.data_directories.runtimes,
                 `${this.language}-${this.version.raw}`)
-        ).catch((err)=>err); //catch 
+        ).catch((err)=>err); //Ignore if we fail - probably means its already been installed and not cleaned up right
         
 
         logger.debug('Registering runtime');
-        const pkgruntime = new runtime.Runtime(this.install_path);
+        const pkg_runtime = new runtime.Runtime(this.install_path);
 
         
         logger.debug('Caching environment');
-        const required_pkgs = [pkgruntime, ...pkgruntime.get_all_dependencies()];
-        const get_env_command = [...required_pkgs.map(p=>`cd "${p.runtime_dir}"; source environment; `),
-            'env' ].join(' ');
+        const required_pkgs = [pkg_runtime, ...pkg_runtime.get_all_dependencies()];
+        const get_env_command = [
+            ...required_pkgs.map(pkg=>`cd "${pkg.runtime_dir}"; source environment; `),
+            'env'
+        ].join(' ');
 
         const envout = await new Promise((resolve, reject)=>{
             var stdout = '';

@@ -44,16 +44,17 @@ const app = express();
 
     logger.info('Loading packages');
     const pkgdir = path.join(config.data_directory,globals.data_directories.packages);
-    await fs.readdir(pkgdir)
-        .then(langs => Promise.all(
-            langs.map(lang=>
-                fs.readdir(path.join(pkgdir,lang))
-                    .then(x=>x.map(y=>path.join(pkgdir, lang, y)))
-            )))
-        .then(pkgs=>pkgs.flat().filter(pkg=>fss.exists_sync(path.join(pkg, globals.pkg_installed_file))))
-        .then(pkgs=>pkgs.forEach(pkg => new runtime.Runtime(pkg)));
 
+    const pkglist = await fs.readdir(pkgdir);
+    const languages = await Promise.all(
+        pkglist.map(lang=>
+            fs.readdir(path.join(pkgdir,lang))
+                .then(x=>x.map(y=>path.join(pkgdir, lang, y)))
+        ));
+    const installed_languages = languages.flat()
+        .filter(pkg=>fss.exists_sync(path.join(pkg, globals.pkg_installed_file)));
 
+    installed_languages.forEach(pkg => new runtime.Runtime(pkg));
 
     logger.info('Starting API Server');
 
@@ -86,23 +87,69 @@ const app = express();
     logger.debug('Registering Routes');
 
     const ppman_routes = require('./ppman/routes');
-
-    app.get   ('/repos', validate, ppman_routes.repo_list);
-    app.post  ('/repos', ppman_routes.repo_add_validators, validate, ppman_routes.repo_add);
-    app.get   ('/repos/:repo_slug', ppman_routes.repo_info_validators, validate, ppman_routes.repo_info);
-    app.get   ('/repos/:repo_slug/packages', ppman_routes.repo_packages_validators, validate, ppman_routes.repo_packages);
-    app.get   ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_info);
-    app.post  ('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_install);
-    app.delete('/repos/:repo_slug/packages/:language/:version', ppman_routes.package_info_validators, validate, ppman_routes.package_uninstall);
-
     const executor_routes = require('./executor/routes');
-    app.post  ('/jobs', executor_routes.run_job_validators, validate, executor_routes.run_job);
 
-    app.get   ('/runtimes', (_, res) => res.json_success({runtimes: runtime.map(rt=>({
-            language: rt.language,
-            version: rt.version.raw,
-            author: rt.author
-        }))}))
+    app.get('/repos',
+        validate,
+        ppman_routes.repo_list
+    );
+
+    app.post('/repos',
+        ppman_routes.repo_add_validators,
+        validate,
+        ppman_routes.repo_add
+    );
+
+    app.get('/repos/:repo_slug',
+        ppman_routes.repo_info_validators,
+        validate,
+        ppman_routes.repo_info
+    );
+
+    app.get('/repos/:repo_slug/packages',
+        ppman_routes.repo_packages_validators,
+        validate,
+        ppman_routes.repo_packages
+    );
+
+    app.get('/repos/:repo_slug/packages/:language/:version',
+        ppman_routes.package_info_validators,
+        validate,
+        ppman_routes.package_info
+    );
+
+    app.post('/repos/:repo_slug/packages/:language/:version',
+        ppman_routes.package_info_validators,
+        validate,
+        ppman_routes.package_install
+    );
+
+    app.delete('/repos/:repo_slug/packages/:language/:version',
+        ppman_routes.package_info_validators,
+        validate,
+        ppman_routes.package_uninstall
+    );
+    
+    app.post('/jobs',
+        executor_routes.run_job_validators,
+        validate,
+        executor_routes.run_job);
+
+    function list_runtimes(_, res){
+        const runtimes = runtime.map(rt => (
+            {
+                language: rt.language,
+                version: rt.version.raw,
+                author: rt.author
+            }
+        ));
+
+        return res.json_success({
+            runtimes
+        });
+    }
+
+    app.get('/runtimes', list_runtimes);
 
     logger.debug('Calling app.listen');
     const [address,port] = config.bind_address.split(':');
@@ -112,6 +159,16 @@ const app = express();
     });
 
     logger.debug('Setting up flush timers');
-    setInterval(cache.flush,config.cache_flush_time,path.join(config.data_directory,globals.data_directories.cache));
-    setInterval(state.save,config.state_flush_time,path.join(config.data_directory,globals.data_files.state));
+
+    setInterval(
+        cache.flush,
+        config.cache_flush_time,
+        path.join(config.data_directory,globals.data_directories.cache)
+    );
+
+    setInterval(
+        state.save,
+        config.state_flush_time,
+        path.join(config.data_directory,globals.data_files.state)
+    );
 })();

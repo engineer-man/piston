@@ -30,12 +30,12 @@ module.exports = {
     async load(data_file){
         if(fss.exists_sync(data_file)){
             logger.info('Loading state from file');
-            var content = await fs.read_file(data_file);
-            var obj = JSON.parse(content.toString(), reviver);
+            
+            const content = await fs.read_file(data_file);
+            const obj = JSON.parse(content.toString(), reviver);
             [...obj.keys()].forEach(k => state.set(k, obj.get(k)));
         }else{
-            logger.info('Creating new statefile');
-            state.set('repositories', new Map().set('offical', 'https://repo.pistonee.org/index.yaml'));
+            logger.info('Creating new state file');
         }
     },
     async save(data_file){
