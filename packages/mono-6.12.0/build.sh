@@ -10,7 +10,7 @@ cd mono
 
 ./configure --prefix /piston/packages/mono/6.12.0/mono-6.12.0
 
-make
-DESTDIR=build/tmp make install
+make -j$(nproc) 
+DESTDIR=build/tmp make install -j$(nproc)
 
 mv build/tmp/piston/packages/mono/6.12.0/mono-6.12.0 ../../output
