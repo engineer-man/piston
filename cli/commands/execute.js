@@ -55,7 +55,7 @@ exports.handler = async function(argv){
         version: argv['language-version'],
         files: files,
         main: argv.file,
-        arsg: argv.args,
+        args: argv.args,
         stdin,
         compile_timeout: argv.ct,
         run_timeout: argv.rt
