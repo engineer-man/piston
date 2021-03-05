@@ -1,5 +1,6 @@
 cd /packages
-for pkg in "$*"
+
+for pkg in "$@"
 do
     make -j16 build-$pkg
 done
