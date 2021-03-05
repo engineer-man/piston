@@ -1,3 +1,3 @@
-build/
+*/build
+*/output
 *.pkg.tar.gz
-*.tf
