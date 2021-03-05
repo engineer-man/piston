@@ -55,7 +55,7 @@ The dependencies map contains the keys as language names, and the values as semv
 9. Test your package builds with running `make [language]-[version].pkg.tar.gz`.
 If it all goes to plan, you should have a file named `[language]-[version].pkg.tar.gz`, in this case your good to go!
 
-10. Commit your changes, using message format of `pkg([language]): Added [language] [version]`
-Any additional commits regarding this package should start with `pkg([language]): `
+10. Commit your changes, using message format of `pkg([language]-[version]): Added [language] [version]`
+Any additional commits regarding this package should start with `pkg([language]-[version]): `
 
 11. Create a pull request (currently to v3 branch), referencing an Issue number (if there is one associated).
