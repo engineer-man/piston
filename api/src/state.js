@@ -30,12 +30,12 @@ module.exports = {
     async load(data_file){
         if(fss.exists_sync(data_file)){
             logger.info('Loading state from file');
-            
-            const content = await fs.read_file(data_file);
-            const obj = JSON.parse(content.toString(), reviver);
+            var content = await fs.read_file(data_file);
+            var obj = JSON.parse(content.toString(), reviver);
             [...obj.keys()].forEach(k => state.set(k, obj.get(k)));
         }else{
             logger.info('Creating new state file');
+            state.set('repositories', new Map());
         }
     },
     async save(data_file){

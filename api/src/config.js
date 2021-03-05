@@ -129,11 +129,11 @@ function make_default_config(){
         content.concat(option.desc.split('\n').map(x=>`# ${x}`));
 
         if(option.options)
-            content.append('# Options: ' + option.options.join(', '));
+            content.push('# Options: ' + option.options.join(', '));
 
-        content.append(`${option.key}: ${option.default}`);
-
-        content.append(''); // New line between
+        content.push(`${option.key}: ${option.default}`);
+        
+        content.push(''); // New line between
     });
 
     return content.join('\n');
