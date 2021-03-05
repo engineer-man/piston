@@ -17,11 +17,13 @@ exports.handler = async function(argv){
     const api = new PistonEngine(argv['piston-url']);
     
     const repos = await api.list_repos();
+    
     const repos_obj = await Promise.all(repos.repos.map(({slug}) => api.get_repo(slug)));
+
     const repo_pkgs = await Promise.all(repos_obj.map(
         async repo => ({
             repo: repo,
-            packages: await repo.list_packages().catch(x=>[])
+            packages: await repo.list_packages().catch(_=>[])
         })
     ))
 

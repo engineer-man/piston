@@ -50,16 +50,16 @@ exports.handler = async function(argv){
     })) || "";
 
 
-    const response = await api.run_job(
-        argv.language,
-        argv['language-version'],
-        files,
-        argv.file,
-        argv.args,
+    const response = await api.run_job({
+        language: argv.language,
+        version: argv['language-version'],
+        files: files,
+        main: argv.file,
+        arsg: argv.args,
         stdin,
-        argv.ct,
-        argv.rt
-    )
+        compile_timeout: argv.ct,
+        run_timeout: argv.rt
+    })
 
     function step(name, ctx){
         console.log(chalk.bold(`== ${name} ==`))
