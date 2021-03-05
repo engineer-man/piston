@@ -2,7 +2,7 @@ cd /packages
 
 for pkg in "$@"
 do
-    make -j16 build-$pkg
+    make -j16 $pkg.pkg.tar.gz
 done
 
 cd /repo
