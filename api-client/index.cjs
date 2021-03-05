@@ -106,7 +106,7 @@ class PistonEngine extends APIWrapper {
         return this.get_child_object(`/repos/${slug}`, PistonEngineRepository)
     }
 
-    run_job(language, version, files, main, args, stdin, compile_timeout, run_timeout){
+    run_job({language, version, files, main, args, stdin, compile_timeout, run_timeout}){
         return this.post(`/jobs`, {language, version, files, main, args, stdin, compile_timeout, run_timeout})
     }
 }
