@@ -1,3 +1,4 @@
 */build
 */output
 *.pkg.tar.gz
+*/pkg-info.json
