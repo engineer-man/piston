@@ -8,21 +8,14 @@ help:
 	@echo "Run $`make [language]-[version].pkg.tar.gz$` to build a specific language"
 
 build build-all: $(addsuffix .pkg.tar.gz, ${PACKAGES})
-clean clean-all: $(addprefix clean-, ${PACKAGES})
 
-clean-%: %/
-	rm -rf $</build $</output
-
-%.pkg.tar.gz: %/output %/run %/environment %/pkg-info.json
+%.pkg.tar.gz: %/ %/pkg-info.json
+	cd $< && chmod +x ./build.sh && ./build.sh
 	rm -f $@
-	tar czf $@ -C $* $(patsubst $*/%,%,output run environment pkg-info.json $(shell find $*/compile)) --transform='s|output|$*|;s|environment|$*/environment|'
+	tar czf $@ $* --transform='s|$*||'
 
 %/pkg-info.json: %/metadata.json
 	jq '.build_platform="${BUILD_PLATFORM}"' $< > $@
-
-%/output: %/ %/build.sh
-	cd $< && chmod +x ./build.sh && ./build.sh
-
 
 
 
