@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a href="https://github.com/engineer-man/piston"><img src="docs/images/icon_circle.svg" width="25" height="25" alt="engineer-man piston"></a>
+    <a href="https://github.com/engineer-man/piston"><img src="var/docs/images/icon_circle.svg" width="25" height="25" alt="engineer-man piston"></a>
   Piston
 </h1>
 
@@ -208,7 +208,7 @@ Content-Type: application/json
 
 
 <br>
-<!-- 
+<!--
 # Principle of Operation
 Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Node which takes
 in execution requests and executes them in the container. High level, the API writes
@@ -216,7 +216,7 @@ a temporary source and args file to `/tmp` and that gets mounted read-only along
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
 <br>
-<!-- 
+<!--
 # Security
 LXC provides a great deal of security out of the box in that it's separate from the system.
 Piston takes additional steps to make it resistant to
