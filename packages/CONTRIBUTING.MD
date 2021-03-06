@@ -16,7 +16,7 @@ See [deno-1.7.5/](deno-1.7.5/) or any other directory for examples.
 
 3. Create a file named `build.sh`, adding a shebang for bash `#!/bin/bash` on the first line.
 In this file put any steps to compile the specified langauge.
-It is allowed to use 2 directories, `output` and `build`, the former which contains files which should get packaged into the final output, and the latter containing intermediate build files.
+This script should download sources, compile sources and output binaries. They should be dumped into the current working directory, removing any files which aren't required in the process. 
 
 4. Create a file named `run`, containing bash script to run the interpreter.
 The first argument given to this script (`$1`) is the name of the main file, with the remaining ones as program arguments.
@@ -25,7 +25,7 @@ STDIN is piped directly into the run file, and as such nothing special is requir
 5. Create a file named `compile`, containing bash script to compile sources into binaries. This is only required if the language requires a compling stage.
 The first argument is always the main file, followed the names of the other files as additional arguements. If the language does not require a compile stage, don't create a compile file.
 
-6. Create a file named `environment`, containing `export` statements which edit the environment variables accordingly. The `$PWD` variable should be used, and is set inside the `output` directory, but when running on the target system.
+6. Create a file named `environment`, containing `export` statements which edit the environment variables accordingly. The `$PWD` variable should be used, and is set inside the package directory when running on the target system.
 
 7. Create a test script starting with test, with the file extension of the language. This script should simply output the phrase `OK`. For example, for mono we would create `test.cs` with the content: 
 ```cs
