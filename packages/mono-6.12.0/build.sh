@@ -13,4 +13,7 @@ cd mono
 make -j$(nproc) 
 DESTDIR=build/tmp make install -j$(nproc)
 
-mv build/tmp/piston/packages/mono/6.12.0/mono-6.12.0 ../../output
+mv build/tmp/piston/packages/mono/6.12.0/mono-6.12.0 ../../mono-6.12.0
+
+cd ../../
+rm -rf build
