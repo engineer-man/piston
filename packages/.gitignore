@@ -1,4 +1,8 @@
-*/build
-*/output
+*/*
 *.pkg.tar.gz
-*/pkg-info.json
+!*/metadata.json
+!*/build.sh
+!*/environment
+!*/run
+!*/compile
+!*/test.*
