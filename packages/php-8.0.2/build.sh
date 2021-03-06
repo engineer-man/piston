@@ -15,6 +15,6 @@ make -j$(nproc)
 INSTALL_ROOT=build/tmp make install -j$(nproc)
 
 
-mv build/tmp/piston/packages/php/8.0.2/php-8.0.2 ../../output
+mv build/tmp/piston/packages/php/8.0.2/php-8.0.2 ../../php-8.0.2
 
 
