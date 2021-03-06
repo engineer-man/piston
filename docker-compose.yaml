@@ -11,12 +11,11 @@ services:
       - ./data/piston:/piston
       - ./repo:/repo
     tmpfs:
-      - /piston/cache
       - /piston/jobs
 
   piston_fs_repo: #Temporary solution until CI works
     build: repo
-    command: ['python'] # Only build python
+    command: ['deno-1.7.5'] # Only build deno
     volumes:
       - ./repo:/repo
       - ./packages:/packages
