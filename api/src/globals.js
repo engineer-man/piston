@@ -11,13 +11,8 @@ const platform = `${is_docker() ? 'docker' : 'baremetal'}-${
 
 module.exports = {
     data_directories: {
-        cache: 'cache',
         packages: 'packages',
-        runtimes: 'runtimes',
         jobs: 'jobs'
-    },
-    data_files:{
-        state: 'state.json'
     },
     version: require('../package.json').version,
     platform,

@@ -4,8 +4,6 @@ const Logger = require('logplease');
 const express = require('express');
 const globals = require('./globals');
 const config = require('./config');
-const cache = require('./cache');
-const state = require('./state');
 const path = require('path');
 const fs = require('fs/promises');
 const fss = require('fs');
@@ -34,13 +32,6 @@ const app = express();
         }
         
     });
-
-
-    logger.info('Loading state');
-    await state.load(path.join(config.data_directory,globals.data_files.state));
-
-    logger.info('Loading cache');
-    await cache.load(path.join(config.data_directory,globals.data_directories.cache));
 
     logger.info('Loading packages');
     const pkgdir = path.join(config.data_directory,globals.data_directories.packages);
@@ -89,44 +80,16 @@ const app = express();
     const ppman_routes = require('./ppman/routes');
     const executor_routes = require('./executor/routes');
 
-    app.get('/repos',
-        validate,
-        ppman_routes.repo_list
+
+    app.get('/packages',
+        ppman_routes.package_list
     );
 
-    app.post('/repos',
-        ppman_routes.repo_add_validators,
-        validate,
-        ppman_routes.repo_add
-    );
-
-    app.get('/repos/:repo_slug',
-        ppman_routes.repo_info_validators,
-        validate,
-        ppman_routes.repo_info
-    );
-
-    app.get('/repos/:repo_slug/packages',
-        ppman_routes.repo_packages_validators,
-        validate,
-        ppman_routes.repo_packages
-    );
-
-    app.get('/repos/:repo_slug/packages/:language/:version',
-        ppman_routes.package_info_validators,
-        validate,
-        ppman_routes.package_info
-    );
-
-    app.post('/repos/:repo_slug/packages/:language/:version',
-        ppman_routes.package_info_validators,
-        validate,
+    app.post('/packages/:language/:version',
         ppman_routes.package_install
     );
 
-    app.delete('/repos/:repo_slug/packages/:language/:version',
-        ppman_routes.package_info_validators,
-        validate,
+    app.delete('/packages/:language/:version',
         ppman_routes.package_uninstall
     );
     
@@ -140,7 +103,8 @@ const app = express();
             {
                 language: rt.language,
                 version: rt.version.raw,
-                author: rt.author
+                author: rt.author,
+                aliases: rt.aliases
             }
         ));
 
@@ -158,17 +122,4 @@ const app = express();
         logger.info('API server started on', config.bind_address);
     });
 
-    logger.debug('Setting up flush timers');
-
-    setInterval(
-        cache.flush,
-        config.cache_flush_time,
-        path.join(config.data_directory,globals.data_directories.cache)
-    );
-
-    setInterval(
-        state.save,
-        config.state_flush_time,
-        path.join(config.data_directory,globals.data_files.state)
-    );
 })();

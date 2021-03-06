@@ -11,7 +11,7 @@ class Runtime {
     #env_vars
     #compiled
     constructor(package_dir){
-        const {language, version, author, dependencies, build_platform} = JSON.parse(
+        const {language, version, author, build_platform, aliases} = JSON.parse(
             fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
         );
 
@@ -19,7 +19,7 @@ class Runtime {
         this.language = language;
         this.version = semver.parse(version);
         this.author = author;
-        this.dependencies = dependencies;
+        this.aliases = aliases;
 
         if(build_platform != globals.platform){
             logger.warn(`Package ${language}-${version} was built for platform ${build_platform}, but our platform is ${globals.platform}`);
@@ -30,22 +30,7 @@ class Runtime {
     }
 
     get env_file_path(){
-        return path.join(this.runtime_dir, 'environment');
-    }
-
-    get runtime_dir(){
-        return path.join(config.data_directory,globals.data_directories.runtimes, this.toString());
-    }
-
-    get_all_dependencies(){
-        const res = [];
-        Object.keys(this.dependencies).forEach(dep => {
-            const selector = this.dependencies[dep];
-            const lang = module.exports.get_latest_runtime_matching_language_version(dep, selector);
-            res.push(lang);
-            res.concat(lang.get_all_dependencies(lang));
-        });
-        return res;
+        return path.join(this.pkgdir, 'environment');
     }
 
     get compiled(){
@@ -77,7 +62,7 @@ class Runtime {
 module.exports = runtimes;
 module.exports.Runtime = Runtime;
 module.exports.get_runtimes_matching_language_version = function(lang, ver){
-    return runtimes.filter(rt => rt.language == lang && semver.satisfies(rt.version, ver));
+    return runtimes.filter(rt => (rt.language == lang || rt.aliases.includes(lang)) && semver.satisfies(rt.version, ver));
 };
 module.exports.get_latest_runtime_matching_language_version = function(lang, ver){
     return module.exports.get_runtimes_matching_language_version(lang, ver)

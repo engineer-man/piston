@@ -55,24 +55,6 @@ const options = [
         validators: [x=> fss.exists_sync(x) || `Directory ${x} does not exist`]
     },
     {
-        key: 'cache_ttl',
-        desc: 'Time in milliseconds to keep data in cache for at a maximum',
-        default: 60 * 60 * 1000,
-        validators: []
-    },
-    {
-        key: 'cache_flush_time',
-        desc: 'Interval in milliseconds to flush cache to disk at',
-        default: 90 * 60 * 1000, //90 minutes
-        validators: []
-    },
-    {
-        key: 'state_flush_time',
-        desc: 'Interval in milliseconds to flush state to disk at',
-        default: 5000, // 5 seconds (file is tiny)
-        validators: []
-    },
-    {
         key: 'runner_uid_min',
         desc: 'Minimum uid to use for runner',
         default: 1000,
@@ -119,6 +101,12 @@ const options = [
         desc: 'Max number of open files per job',
         default: 2048,
         validators: []
+    },
+    {
+        key: 'repo_url',
+        desc: 'URL of repo index',
+        default: 'https://github.com',
+        validators: []
     }
 ];
 
@@ -126,7 +114,7 @@ function make_default_config(){
     let content = header.split('\n');
 
     options.forEach(option => {
-        content.concat(option.desc.split('\n').map(x=>`# ${x}`));
+        content = content.concat(option.desc.split('\n').map(x=>`# ${x}`));
 
         if(option.options)
             content.push('# Options: ' + option.options.join(', '));
