@@ -275,6 +275,7 @@ Content-Type: application/json
 `julia`,
 `kotlin`,
 `lisp`,
+`lolcode`,
 `lua`,
 `nasm`,
 `nasm64`,
