@@ -284,7 +284,6 @@ MIX_ENV=prod mix escript.build --force
 echo 'export PATH=$PATH:/opt/05AB1E/05AB1E' >> /opt/.profile
 source /opt/.profile
 
-
 # install prolog
 # final binary: /opt/swipl/swipl-<version>/build/src/swipl
 cd /opt && mkdir swipl && cd swipl
@@ -298,6 +297,17 @@ cd build
 cmake -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DMULTI_THREADED=OFF -DINSTALL_DOCUMENTATION=OFF -G Ninja ..
 ninja
 echo "export PATH=\$PATH:/opt/swipl/$SUB_DIR/build/src" >> /opt/.profile
+source /opt/.profile
+
+# install lolcode
+# final binary: /opt/lolcode/bin/lci
+cd /opt
+git clone https://github.com/justinmeza/lci.git lolcode
+cd lolcode
+mkdir bin
+cmake ..
+make
+echo 'export PATH=$PATH:/opt/lolcode/bin' >> /opt/.profile
 source /opt/.profile
 
 # create runnable users and apply limits

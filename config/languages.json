@@ -137,6 +137,12 @@
         ]
     },
     {
+        "name": "lolcode",
+        "aliases": [
+            "lolcode"
+        ]
+    },
+    {
         "name": "nim",
         "aliases": [
             "nim"
