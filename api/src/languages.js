@@ -22,6 +22,8 @@ const languages = require('../../config/languages.json');
                     versions[language] = /\d+/.exec(lines[1])?.[0];
                 } else if (language === 'emacs') {
                     versions[language] = /\d+\.\d+/.exec(lines[1])?.[0];
+                } else if (language === 'clojure') {
+                    versions[language] = /\d+\.\d+\.\d+\.\d+/.exec(lines[1])?.[0];
                 } else {
                     versions[language] = /\d+\.\d+\.\d+/.exec(section)?.[0];
                 }

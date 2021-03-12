@@ -82,7 +82,7 @@ lxc-attach --clear-env -n piston -- /bin/bash -l -c "sbcl --version"
 echo '---'
 
 echo 'lolcode'
-echo '1.0.0'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "lci --version"
 echo '---'
 
 echo 'lua'

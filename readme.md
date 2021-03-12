@@ -260,6 +260,7 @@ Content-Type: application/json
 `brainfuck`,
 `c`,
 `cpp`,
+`clojure`,
 `crystal`,
 `csharp`,
 `d`,
