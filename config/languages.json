@@ -40,6 +40,13 @@
         ]
     },
     {
+        "name": "clojure",
+        "aliases": [
+            "clojure",
+            "clj"
+        ]
+    },
+    {
         "name": "crystal",
         "aliases": [
             "crystal",

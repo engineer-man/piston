@@ -310,6 +310,15 @@ make
 echo 'export PATH=$PATH:/opt/lolcode/bin' >> /opt/.profile
 source /opt/.profile
 
+# install clojure
+# final binary: /opt/clojure/bin/clojure
+# get version: /opt/clojure/bin/clojure -version
+cd /opt && mkdir clojure && cd clojure
+curl -O https://download.clojure.org/install/linux-install-1.10.2.796.sh
+chmod +x linux-install-1.10.2.796.sh
+./linux-install-1.10.2.796.sh --prefix /opt/clojure
+echo 'export PATH=$PATH:/opt/clojure/bin' >> /opt/.profile
+
 # create runnable users and apply limits
 for i in {1..150}; do
     useradd -M runner$i

@@ -21,6 +21,10 @@ echo 'cpp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ --version"
 echo '---'
 
+echo 'clojure'
+lxc-attach --clear-env -n piston -- /bin/bash -l -c "clojure -version"
+echo '---'
+
 echo 'crystal'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "crystal -v"
 echo '---'
@@ -75,6 +79,10 @@ echo '---'
 
 echo 'lisp'
 lxc-attach --clear-env -n piston -- /bin/bash -l -c "sbcl --version"
+echo '---'
+
+echo 'lolcode'
+echo '1.0.0'
 echo '---'
 
 echo 'lua'
