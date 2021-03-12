@@ -305,6 +305,7 @@ cd /opt
 git clone https://github.com/justinmeza/lci.git lolcode
 cd lolcode
 mkdir bin
+cd bin
 cmake ..
 make
 echo 'export PATH=$PATH:/opt/lolcode/bin' >> /opt/.profile
