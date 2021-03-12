@@ -6,6 +6,8 @@ echo -n 'testing bash = '
 ../../cli/execute bash bash.sh
 echo -n 'testing c = '
 ../../cli/execute c c.c
+echo -n 'testing clojure = '
+../../cli/execute clojure clojure.clj
 echo -n 'testing cpp = '
 ../../cli/execute cpp cpp.cpp
 echo -n 'testing crystal = '
@@ -34,6 +36,8 @@ echo -n 'testing julia = '
 ../../cli/execute julia julia.jl
 echo -n 'testing kotlin = '
 ../../cli/execute kotlin kotlin.kt
+echo -n 'testing lolcode = '
+../../cli/execute lolcode lolcode.lol
 echo -n 'testing lisp = '
 ../../cli/execute lisp lisp.cl
 echo -n 'testing nasm 32 bit = '
