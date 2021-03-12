@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /tmp/$1
-timeout -s KILL 10 xargs -a args.args -d '\n' clojure -Sdeps '{:mvn/local-repo "/opt/.m2/repository"}' -M code.code < stdin.stdin
+timeout -s KILL 10 xargs -a args.args -d '\n' java -jar /opt/clojure/clojure/clojure.jar code.code < stdin.stdin

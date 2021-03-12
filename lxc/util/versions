@@ -22,7 +22,7 @@ lxc-attach --clear-env -n piston -- /bin/bash -l -c "g++ --version"
 echo '---'
 
 echo 'clojure'
-lxc-attach --clear-env -n piston -- /bin/bash -l -c "clojure -version"
+echo '1.10.2'
 echo '---'
 
 echo 'crystal'

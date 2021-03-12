@@ -17,7 +17,7 @@ apt-get install -y \
     nano wget build-essential pkg-config libxml2-dev \
     libsqlite3-dev mono-complete curl cmake libpython2.7-dev \
     ruby libtinfo-dev unzip git openssl libssl-dev sbcl libevent-dev \
-    ninja-build
+    ninja-build maven
 
 # install python2
 # final binary: /opt/python2/Python-2.7.17/python
@@ -315,10 +315,9 @@ source /opt/.profile
 # final binary: /opt/clojure/bin/clojure
 # get version: /opt/clojure/bin/clojure -version
 cd /opt && mkdir clojure && cd clojure
-curl -O https://download.clojure.org/install/linux-install-1.10.2.796.sh
-chmod +x linux-install-1.10.2.796.sh
-./linux-install-1.10.2.796.sh --prefix /opt/clojure
-echo 'export PATH=$PATH:/opt/clojure/bin' >> /opt/.profile
+git clone https://github.com/clojure/clojure.git
+cd clojure
+mvn -Plocal -Dmaven.test.skip=true package
 
 # create runnable users and apply limits
 for i in {1..150}; do
