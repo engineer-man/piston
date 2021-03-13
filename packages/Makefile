@@ -1,4 +1,4 @@
-PACKAGES=$(shell find * -maxdepth 0 -type d)
+PACKAGES=$(subst /,-,$(shell find * -maxdepth 1 -mindepth 1 -type d))
 BUILD_PLATFORM=$(or ${PLATFORM},baremetal-$(shell grep -oP "^ID=\K.+" /etc/os-release))
 
 help:
@@ -9,14 +9,16 @@ help:
 
 build build-all: $(addsuffix .pkg.tar.gz, ${PACKAGES})
 
-%.pkg.tar.gz: %/ %/pkg-info.json
-	cd $< && chmod +x ./build.sh && ./build.sh
-	rm -f $@
-	tar czf $@ $* --transform='s|$*||'
+
+define PKG_RULE
+$(1).pkg.tar.gz: $(subst -,/,$(1))/ $(subst -,/,$(1))/pkg-info.json
+	cd $$< && chmod +x ./build.sh && ./build.sh
+	rm -f $$@
+	tar czf $$@ $$< --transform='s|$$<||'
+endef
+
+$(foreach pkg,$(PACKAGES),$(eval $(call PKG_RULE,$(pkg))))
 
 %/pkg-info.json: %/metadata.json
 	jq '.build_platform="${BUILD_PLATFORM}"' $< > $@
-
-
-
 

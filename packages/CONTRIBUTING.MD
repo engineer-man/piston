@@ -8,11 +8,11 @@ In the example of NodeJS, we would call this `node`, after the main binary.
 
 ## Creating new languages
 
-See [deno-1.7.5/](deno-1.7.5/) or any other directory for examples.
+See [deno/1.7.5/](deno/1.7.5/) or any other directory for examples.
 
 1. Create a new branch on your fork of engineer-man/piston
 
-2. Create a directory named `[language]-[version]`. See Naming Languages for how to determine the name for your language
+2. Create directories named `[language]/[version]`. See Naming Languages for how to determine the name for your language
 
 3. Create a file named `build.sh`, adding a shebang for bash `#!/bin/bash` on the first line.
 In this file put any steps to compile the specified langauge.
