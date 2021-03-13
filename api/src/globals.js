@@ -5,7 +5,7 @@ const platform = `${is_docker() ? 'docker' : 'baremetal'}-${
     fss.read_file_sync('/etc/os-release')
         .toString()
         .split('\n')
-        .find(x=>x.startsWith('ID'))
+        .find(x => x.startsWith('ID'))
         .replace('ID=','')
 }`;
 

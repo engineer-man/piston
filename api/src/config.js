@@ -1,25 +1,25 @@
 const fss = require('fs');
 const yargs = require('yargs');
-const hide_bin = require('yargs/helpers').hideBin; //eslint-disable-line snakecasejs/snakecasejs
+const hide_bin = require('yargs/helpers').hideBin;
 const Logger = require('logplease');
 const logger = Logger.create('config');
 const yaml = require('js-yaml');
 
 const header = `#
-#      ____  _     _              
-#     |  _ \\(_)___| |_ ___  _ __  
-#     | |_) | / __| __/ _ \\| '_ \\ 
+#      ____  _     _
+#     |  _ \\(_)___| |_ ___  _ __
+#     | |_) | / __| __/ _ \\| '_ \\
 #     |  __/| \\__ \\ || (_) | | | |
 #     |_|   |_|___/\\__\\___/|_| |_|
 #
-# A High performance code execution engine                   
+# A High performance code execution engine
 #     github.com/engineer-man/piston
 #
 
 `;
 const argv = yargs(hide_bin(process.argv))
     .usage('Usage: $0 -c [config]')
-    .demandOption('c') //eslint-disable-line snakecasejs/snakecasejs
+    .demandOption('c')
     .option('config', {
         alias: 'c',
         describe: 'config file to load from',
@@ -29,18 +29,18 @@ const argv = yargs(hide_bin(process.argv))
         alias: 'm',
         type: 'boolean',
         describe: 'create config file and populate defaults if it does not already exist'
-    }).argv;
-
+    })
+    .argv;
 
 const options = [
     {
         key: 'log_level',
         desc: 'Level of data to log',
         default: 'INFO',
-        /* eslint-disable snakecasejs/snakecasejs */
         options: Object.values(Logger.LogLevels),
-        validators: [x=>Object.values(Logger.LogLevels).includes(x) || `Log level ${x} does not exist`]
-        /* eslint-enable snakecasejs/snakecasejs */
+        validators: [
+            x => Object.values(Logger.LogLevels).includes(x) || `Log level ${x} does not exist`
+        ]
     },
     {
         key: 'bind_address',
@@ -110,68 +110,71 @@ const options = [
     }
 ];
 
-function make_default_config(){
+const make_default_config = () => {
     let content = header.split('\n');
 
     options.forEach(option => {
         content = content.concat(option.desc.split('\n').map(x=>`# ${x}`));
 
-        if(option.options)
+        if (option.options) {
             content.push('# Options: ' + option.options.join(', '));
+        }
 
         content.push(`${option.key}: ${option.default}`);
-        
+
         content.push(''); // New line between
     });
 
     return content.join('\n');
-}
+};
 
 logger.info(`Loading Configuration from ${argv.config}`);
 
-if(argv['make-config'])
+if (argv['make-config']) {
     logger.debug('Make configuration flag is set');
+}
 
-if(!!argv['make-config'] && !fss.exists_sync(argv.config)){
+if (!!argv['make-config'] && !fss.exists_sync(argv.config)) {
     logger.info('Writing default configuration...');
     try {
-        fss.write_file_sync(argv.config, make_default_config());    
-    } catch (err) {
-        logger.error('Error writing default configuration:', err.message);
+        fss.write_file_sync(argv.config, make_default_config());
+    } catch (e) {
+        logger.error('Error writing default configuration:', e.message);
         process.exit(1);
     }
 }
 
-var config = {};
+let config = {};
 
 logger.debug('Reading config file');
 
-try{
+try {
     const cfg_content = fss.read_file_sync(argv.config);
     config = yaml.load(cfg_content);
-}catch(err){
+} catch(err) {
     logger.error('Error reading configuration file:', err.message);
     process.exit(1);
 }
 
 logger.debug('Validating config entries');
 
-var errored=false;
+let errored = false;
 
-options.forEach(option => {
+options.for_each(option => {
     logger.debug('Checking option', option.key);
 
-    var cfg_val = config[option.key];
+    let cfg_val = config[option.key];
 
-    if(cfg_val == undefined){
+    if (cfg_val === undefined) {
         errored = true;
         logger.error(`Config key ${option.key} does not exist on currently loaded configuration`);
         return;
     }
 
-    option.validators.forEach(validator => {
-        var response = validator(cfg_val);
-        if(response !== true){
+    option.validators.for_each(validator => {
+        let response = validator(cfg_val);
+
+        if (!response) {
             errored = true;
             logger.error(`Config option ${option.key} failed validation:`, response);
             return;
@@ -179,9 +182,10 @@ options.forEach(option => {
     });
 });
 
-if(errored) process.exit(1);
+if (errored) {
+    process.exit(1);
+}
 
 logger.info('Configuration successfully loaded');
 
 module.exports = config;
-

@@ -1,25 +1,20 @@
 {
-  "name": "piston-api",
-  "version": "3.0.0",
-  "description": "API for piston - a high performance code execution engine",
-  "main": "src/index.js",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1",
-    "express-validator": "^6.10.0",
-    "is-docker": "^2.1.1",
-    "js-yaml": "^4.0.0",
-    "logplease": "^1.2.15",
-    "nocamel": "HexF/nocamel#patch-1",
-    "node-fetch": "^2.6.1",
-    "semver": "^7.3.4",
-    "uuid": "^8.3.2",
-    "yargs": "^16.2.0"
-  },
-  "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.20.0",
-    "eslint-plugin-snakecasejs": "^2.2.0"
-  },
-  "license": "MIT"
+    "name": "piston-api",
+    "version": "3.0.0",
+    "description": "API for piston - a high performance code execution engine",
+    "main": "src/index.js",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "express-validator": "^6.10.0",
+        "is-docker": "^2.1.1",
+        "js-yaml": "^4.0.0",
+        "logplease": "^1.2.15",
+        "nocamel": "HexF/nocamel#patch-1",
+        "node-fetch": "^2.6.1",
+        "semver": "^7.3.4",
+        "uuid": "^8.3.2",
+        "yargs": "^16.2.0"
+    },
+    "license": "MIT"
 }
