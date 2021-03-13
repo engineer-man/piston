@@ -1,0 +1,6 @@
+{
+  "language": "gcc",
+  "version": "10.2.0",
+  "aliases": ["c","g++","c++","cpp","gdc","d"],
+  "author": "Thomas Hobson <git@hexf.me>"
+}
