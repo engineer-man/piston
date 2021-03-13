@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -59,14 +59,8 @@ exports.handler = async function(argv){
         run_timeout: argv.rt
     };
 
-    const response = await fetch(argv['piston-url'] + '/jobs', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(request)
-        })
-        .then(res=>res.json())
-        .then(res=>{if(res.data)return res.data; throw new Error(res.message)})
-        .catch(x=>x);
+    let response = await argv.axios.post('/jobs', request);
+    response = response.data
 
     function step(name, ctx){
         console.log(chalk.bold(`== ${name} ==`))

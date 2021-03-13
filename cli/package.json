@@ -6,8 +6,8 @@
   "author": "Thomas Hobson <thomas@hexf.me>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.21.1",
     "chalk": "^4.1.0",
-    "node-fetch": "^2.6.1",
     "yargs": "^16.2.0"
   }
 }

@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const chalk = require('chalk');
 
 exports.command = ['install <language> <language-version>']
@@ -13,15 +12,12 @@ const msg_format = {
 
 }
 
-exports.handler = async function(argv){
-    const install = await fetch(
-            `${argv['piston-url']}/packages/${argv['language']}/${argv['language-version']}`,
-            {method: 'post'}
-        )
-        .then(res=>res.json())
-        .then(res=>{if(res.data)return res.data; throw new Error(res.message)})
-        .catch(x=>x);
-
-    
-    console.log(msg_format.color(install));
+exports.handler = async function({axios, language, languageVersion}){
+    try{
+        const install = await axios.post(`/packages/${language}/${languageVersion}`)
+        
+        console.log(msg_format.color(install.data));
+    }catch({response}){
+        console.error(response.data.message)
+    }
 }

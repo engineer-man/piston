@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
 const chalk = require('chalk');
 
 exports.command = ['list']
@@ -13,19 +13,12 @@ const msg_format = {
 
 }
 
-exports.handler = async function(argv){
-    const api = new PistonEngine(argv['piston-url']);
+exports.handler = async function({axios}){
 
-    const packages = await api.list_packages();
+    const packages = await axios.get('/packages');
 
-    const packages = await fetch(argv['piston-url'] + '/packages')
-        .then(res=>res.json())
-        .then(res=>{if(res.data)return res.data; throw new Error(res.message)});
-        .then(res=>res.packages)
-        .catch(x=>x)
-
-   
-    const pkg_msg = packages
+    
+    const pkg_msg = packages.data.data.packages
         .map(msg_format.color)
         .join('\n');
 
