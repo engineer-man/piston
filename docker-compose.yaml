@@ -15,7 +15,7 @@ services:
 
   piston_fs_repo: #Temporary solution until CI works
     build: repo
-    command: ['deno-1.7.5'] # Only build deno
+    command: ['jelly-0.1.31'] # Only build jelly
     volumes:
-      - ./repo:/repo
-      - ./packages:/packages
+      - ./repo:/piston/repo
+      - ./packages:/piston/packages
