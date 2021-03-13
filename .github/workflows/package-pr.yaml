@@ -28,7 +28,7 @@ jobs:
           docker run -v $(pwd)'/repo:/repo' -v $(pwd)'/packages:/packages' piston_fs_repo $PACKAGES --no-server
 
       - name: Write test config file
-        uses: DamianReeves/write-file-action
+        uses: damianreeves/write-file-action
         with:
           path: data/config.yaml
           contents: |
