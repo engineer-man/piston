@@ -1,0 +1,21 @@
+name: Publish API image
+on:
+  push:
+    branches:
+      - master
+      - v3
+  
+jobs:
+  push_to_registry:
+    name: Build and Push Docker image to Github Packages
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Build and push API
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: engineer-man/piston/piston-api
+          tag_with_ref: true
