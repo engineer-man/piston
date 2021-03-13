@@ -1,0 +1,6 @@
+{
+    "language": "python",
+    "version": "3.9.1",
+    "author": "Thomas Hobson <thomas@hexf.me>",
+    "aliases": ["py", "python3"]
+}
