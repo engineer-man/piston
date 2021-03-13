@@ -103,7 +103,7 @@ class Package {
                 );
 
             proc.once('exit', (code, _) => {
-                code === 0 ? resolve() : reject();
+                code === 0 ? resolve(stdout) : reject();
             });
 
             proc.stdout.on('data', data => {

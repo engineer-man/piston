@@ -42,7 +42,7 @@ module.exports = {
     async package_list(req, res) {
         logger.debug('Request to list packages');
 
-        const packages = await get_package_list();
+        let packages = await get_package_list();
 
         packages = packages
             .map(pkg => {

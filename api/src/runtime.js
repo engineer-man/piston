@@ -35,30 +35,30 @@ class Runtime {
     }
 
     get compiled() {
-        if (this.compiled === undefined) {
-            this.compiled = fss.exists_sync(path.join(this.pkgdir, 'compile'));
+        if (this._compiled === undefined) {
+            this._compiled = fss.exists_sync(path.join(this.pkgdir, 'compile'));
         }
 
-        return this.compiled;
+        return this._compiled;
     }
 
     get env_vars() {
-        if (!this.env_vars) {
+        if (!this._env_vars) {
             const env_file = path.join(this.pkgdir, '.env');
             const env_content = fss.read_file_sync(env_file).toString();
 
-            this.env_vars = {};
+            this._env_vars = {};
 
             env_content
                 .trim()
                 .split('\n')
                 .map(line => line.split('=',2))
                 .forEach(([key,val]) => {
-                    this.env_vars[key.trim()] = val.trim();
+                    this._env_vars[key.trim()] = val.trim();
                 });
         }
 
-        return this.env_vars;
+        return this._env_vars;
     }
 
     toString() {
