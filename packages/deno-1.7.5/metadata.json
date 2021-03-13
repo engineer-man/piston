@@ -1,6 +1,0 @@
-{
-    "language": "deno",
-    "version": "1.7.5",
-    "author": "Thomas Hobson <thomas@hexf.me>",
-    "aliases": ["deno-ts", "deno-js"]
-}
