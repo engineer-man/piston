@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 require('yargs')(process.argv.slice(2))
     .option('piston-url', {
         alias: ['u'],
