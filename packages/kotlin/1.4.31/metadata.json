@@ -1,0 +1,6 @@
+{
+  "language": "kotlin",
+  "version": "1.4.31",
+  "aliases": ["kt"],
+  "author": "Thomas Hobson <git@hexf.me>"
+}
