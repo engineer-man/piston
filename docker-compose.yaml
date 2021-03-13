@@ -11,11 +11,11 @@ services:
       - ./data/piston:/piston
       - ./repo:/repo
     tmpfs:
-      - /piston/jobs
+      - /piston/jobs:exec
 
   piston_fs_repo: #Temporary solution until CI works
     build: repo
-    command: ['jelly-0.1.31'] # Only build jelly
+    command: ['typescript-4.2.3'] # Only build typescript
     volumes:
       - ./repo:/piston/repo
       - ./packages:/piston/packages
