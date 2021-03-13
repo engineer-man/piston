@@ -6,38 +6,45 @@ const { Job } = require('./job');
 const { body } = require('express-validator');
 
 module.exports = {
+
     run_job_validators: [
         body('language')
-            .isString(), // eslint-disable-line snakecasejs/snakecasejs
+            .isString(),
         body('version')
-            .isString(), // eslint-disable-line snakecasejs/snakecasejs
+            .isString(),
         // isSemVer requires it to be a version, not a selector
         body('files')
-            .isArray(), // eslint-disable-line snakecasejs/snakecasejs
+            .isArray(),
         body('files.*.name')
-            .isString() // eslint-disable-line snakecasejs/snakecasejs
+            .isString()
             .bail()
             .not()
             .contains('/'),
         body('files.*.content')
-            .isString(), // eslint-disable-line snakecasejs/snakecasejs
+            .isString(),
         body('compile_timeout')
-            .isNumeric(), // eslint-disable-line snakecasejs/snakecasejs
+            .isNumeric(),
         body('run_timeout')
-            .isNumeric(), // eslint-disable-line snakecasejs/snakecasejs
+            .isNumeric(),
         body('stdin')
-            .isString(), // eslint-disable-line snakecasejs/snakecasejs
+            .isString(),
         body('args')
             .isArray(),
         body('args.*')
-            .isString() // eslint-disable-line snakecasejs/snakecasejs
+            .isString()
     ],
-    async run_job(req, res){
-        // POST /jobs
 
-
+    // POST /jobs
+    async run_job(req, res) {
         const runtime = get_latest_runtime_matching_language_version(req.body.language, req.body.version);
-        if(runtime == undefined) return res.json_error(`${req.body.language}-${req.body.version} runtime is unknown`, 400);
+
+        if (runtime === undefined) {
+            return res
+                .status(400)
+                .send({
+                    message: `${req.body.language}-${req.body.version} runtime is unknown`
+                });
+        }
 
         const job = new Job({
             runtime,
@@ -54,8 +61,12 @@ module.exports = {
         await job.prime();
 
         const result = await job.execute();
-        res.json_success(result);
 
         await job.cleanup();
+
+        return res
+            .status(200)
+            .send(result);
     }
+
 };
