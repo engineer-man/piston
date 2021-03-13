@@ -24,6 +24,5 @@ jobs:
         with:
           context: api
           push: true
-          repository: 
           tags: |
             docker.pkg.github.com/engineer-man/piston/api
