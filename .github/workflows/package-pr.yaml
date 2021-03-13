@@ -15,59 +15,46 @@ jobs:
     name: Check that package builds
     runs-on: ubuntu-latest
     steps:
-      - name: Get PR Commits
-        id: 'get-pr-commits'
-        uses: tim-actions/get-pr-commits@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check subsystem
-        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
-        with:
-          commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '^[\s]*(pkg\([^:\s\n]+\))[\s]*:'
-          error: 'Your commit message must start with pkg([package])'
-      
-      - name: Get packages
-        id: 'get-packages'
-        shell: bash
-        run: |
-          COMMITS='${{ steps.get-pr-commits.outputs.commits }}'
-          PACKAGES=$(echo $COMMITS | jq .[].commit.message -r | grep -oP '^pkg\(\K[^:\h\n]+(?=\))' | sort -u)
-          echo "::set-output name=packages::$PACKAGES"
-
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Build docker containers
         run: |
           docker build -t piston_fs_repo repo
-          docker build -t piston_api api
           
       - name: Build Packages
         run: |
-          docker run -v $(pwd)'/repo:/repo' -v $(pwd)'/packages:/packages' piston_fs_repo ${{ steps.get-packages.outputs.packages }}
+          PACKAGES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+          docker run -v $(pwd)'/repo:/repo' -v $(pwd)'/packages:/packages' piston_fs_repo $PACKAGES --no-server
+
+      - name: Write test config file
+        uses: DamianReeves/write-file-action
+        with:
+          path: data/config.yaml
+          contents: |
+            log_level: DEBUG
+            bind_address: 0.0.0.0:6969
+            data_directory: /piston
+            runner_uid_min: 1100
+            runner_uid_max: 1500
+            runner_gid_min: 1100
+            runner_gid_max: 1500
+            enable_unshare: false
+            output_max_size: 1024
+            max_process_count: 64
+            max_open_files: 2048
+            repo_url: http://piston_fs_repo:8000/index
+
+          write-mode: overwrite
 
       - name: Run tests
         run: |
-          docker run -p 6969:6969 -v $(pwd)'/data:/piston' -v $(pwd)'/repo:/repo' --privileged --name api piston_api & 
+          docker run -v $(pwd)'/repo:/repo' -v $(pwd)'/packages:/packages' --name piston_fs_repo piston_fs_repo $PACKAGES
+          docker run -v $(pwd)'/data:/piston' -v $(pwd)'/repo:/repo' --privileged --name api piston_api & 
           echo Waiting for API to start..
-          while [[ "$(curl -s -w '%{http_code}' http://127.0.0.1:6969/runtimes)" != "200" ]]; do sleep 5; done
-          echo Adding local repo
-          curl -s http://127.0.0.1:6969/repos -XPOST -d "slug=local&url=file:///repo/index.yaml"
+          while [[ "$(curl -s -w '%{http_code}' http://api:6969/runtimes)" != "200" ]]; do sleep 5; done
+
           echo Testing packages
-          for pkg in "$(curl -s http://127.0.0.1:6969/repos/local/packages/ | jq '.data.packages[] | "\(.language)/\(.language_version)"' -r)"
-          do
-            PKG_SLUG=${pkg/\//-}
-            PKG_NAME=$(echo $pkg | cut -d'/' -f 1)
-            PKG_VERSION=$(echo $pkg | cut -d'/' -f 2)
-            echo Installing ${PKG_SLUG}
-            curl -sXPOST http://127.0.0.1:6969/repos/local/packages/${pkg} | jq '.language' -r || exit 1
-            echo Testing ${PKG_SLUG} (using ${PKG_SLUG}.tf)
-            TEST_FILE=$(cat ${PKG_SLUG}.tf)
-            TEST_JSON=`jq -C '.language = "${PKG_NAME}" | .version = "${PKG_VERSION}" | .files=[] | .files[0]={} | .files[0].name="test" | .files[0].name.content="${TEST_FILE}" | .main = "test" | .args = [] | .stdin = "" | .compile_timeout = 10000 | .run_timeout = 3000' <<< '{}'`
-            curl -sXPOST http://127.0.0.1:6969/jobs -H 'Content-Type: application/json' -d "$TEST_JSON" > ${PKG_SLUG}.tr
-            jq '.run.stdout' ${PKG_SLUG}.tr | grep "OK" || exit 1
-          done
 
 
 
