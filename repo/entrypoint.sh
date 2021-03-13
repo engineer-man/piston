@@ -1,11 +1,13 @@
 cd /piston/packages
 
+SERVER=1
+
 for pkg in "$@"
 do
-    make -j16 $pkg.pkg.tar.gz
+    [[ "$pkg" = "--no-server" ]] && SERVER=0 || make -j16 $pkg.pkg.tar.gz
 done
 
 cd /piston/repo
 ./mkindex.sh
 
-python3 -m http.server
+[[ $SERVER -eq 1 ]] && python3 -m http.server
