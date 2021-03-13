@@ -60,7 +60,7 @@ exports.handler = async function(argv){
     };
 
     let response = await argv.axios.post('/jobs', request);
-    response = response.data.data
+    response = response.data
 
     function step(name, ctx){
         console.log(chalk.bold(`== ${name} ==`))
