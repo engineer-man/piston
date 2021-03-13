@@ -1,1 +1,1 @@
-export PATH=$PWD/php-8.0.2/bin:$PATH
+export PATH=$PWD/bin:$PATH
