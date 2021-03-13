@@ -15,6 +15,7 @@ jobs:
       - name: Build and push API
         uses: docker/build-push-action@v1
         with:
+          context: api
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
