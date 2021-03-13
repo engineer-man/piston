@@ -1,4 +1,4 @@
-const {PistonEngine} = require('piston-api-client');
+const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -34,8 +34,6 @@ exports.builder = {
 
 exports.handler = async function(argv){
     
-    const api = new PistonEngine(argv['piston-url']);
-
     const files = [...(argv.files || []),argv.file]
         .map(file_path => ({
             name: path.basename(file_path),
@@ -50,7 +48,7 @@ exports.handler = async function(argv){
     })) || "";
 
 
-    const response = await api.run_job({
+    const request = {
         language: argv.language,
         version: argv['language-version'],
         files: files,
@@ -59,7 +57,16 @@ exports.handler = async function(argv){
         stdin,
         compile_timeout: argv.ct,
         run_timeout: argv.rt
-    })
+    };
+
+    const response = await fetch(argv['piston-url'] + '/jobs', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(request)
+        })
+        .then(res=>res.json())
+        .then(res=>{if(res.data)return res.data; throw new Error(res.message)})
+        .catch(x=>x);
 
     function step(name, ctx){
         console.log(chalk.bold(`== ${name} ==`))

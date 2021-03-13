@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.0",
-    "piston-api-client": "file:../api-client",
+    "node-fetch": "^2.6.1",
     "yargs": "^16.2.0"
   }
 }

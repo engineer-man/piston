@@ -1,4 +1,4 @@
-const {PistonEngine} = require('piston-api-client');
+const fetch = require('node-fetch');
 const chalk = require('chalk');
 
 exports.command = ['install <language> <language-version>']
@@ -14,14 +14,14 @@ const msg_format = {
 }
 
 exports.handler = async function(argv){
-    const api = new PistonEngine(argv['piston-url']);
+    const install = await fetch(
+            `${argv['piston-url']}/packages/${argv['language']}/${argv['language-version']}`,
+            {method: 'post'}
+        )
+        .then(res=>res.json())
+        .then(res=>{if(res.data)return res.data; throw new Error(res.message)})
+        .catch(x=>x);
 
-    const opts = {
-        language: argv['language'],
-        version: argv['language-version']
-    };
-
-    const install = await api.install_package(opts).catch(x=>x);
     
     console.log(msg_format.color(install));
 }
