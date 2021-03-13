@@ -1,5 +1,5 @@
 const logger = require('logplease').create('executor/job');
-const uuidv4 = require('uuid/v4');
+const {v4: uuidv4} = require('uuid');
 const cp = require('child_process');
 const path = require('path');
 const config = require('../config');
@@ -17,7 +17,7 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts, main }) {
+    constructor({ runtime, files, args, stdin, timeouts, main, alias }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files;
@@ -25,6 +25,7 @@ class Job {
         this.stdin = stdin;
         this.timeouts = timeouts;
         this.main = main;
+        this.alias = alias;
 
         let file_list = this.files.map(f => f.name);
 
@@ -87,7 +88,10 @@ class Job {
             var stderr = '';
 
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
-                env: this.runtime.env_vars,
+                env: { 
+                    ...this.runtime.env_vars,
+                    PISTON_ALIAS: this.alias
+                },
                 stdio: 'pipe',
                 cwd: this.dir,
                 uid: this.uid,
@@ -106,7 +110,7 @@ class Job {
                 } else {
                     stderr += data;
                 }
-            );
+            });
 
             proc.stdout.on('data', data => {
                 if (stdout.length > config.output_max_size) {
@@ -114,7 +118,7 @@ class Job {
                 } else {
                     stdout += data;
                 }
-            );
+            });
 
             const exit_cleanup = () => {
                 clear_timeout(kill_timeout);

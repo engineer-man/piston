@@ -23,7 +23,7 @@ const get_package_list = async () => {
     });
 };
 
-const get_package async (lang, version) => {
+const get_package = async (lang, version) => {
     const packages = await get_package_list();
 
     const candidates = packages

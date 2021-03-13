@@ -48,6 +48,7 @@ module.exports = {
 
         const job = new Job({
             runtime,
+            alias: req.body.language,
             files: req.body.files,
             args: req.body.args,
             stdin: req.body.stdin,
