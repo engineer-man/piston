@@ -39,6 +39,7 @@ jobs:
   test-pkg:
     name: Test package
     runs-on: ubuntu-latest
+    needs: build-pkg
     steps:
       - uses: actions/checkout@v2
 
