@@ -96,12 +96,15 @@ jobs:
           echo Waiting for Index to start..
           docker run --network container:piston_fs_repo appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8000/index
 
+          echo Adjusting index
+          sed -i 's/piston_fs_repo/localhost/g' repo/index
+
           echo Listing Packages
           PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:6969/packages)
           echo $PACKAGES_JSON
 
           echo Getting CLI ready
-          docker run  -v "$PWD/cli:/app" --entrypoint yarn node:15
+          docker run  -v "$PWD/cli:/app" --entrypoint /bin/bash node:15 -c 'cd /app; yarn'
 
           for package in $(jq -r '.[] | "\(.language)-\(.language_version)"' <<< "$PACKAGES_JSON")
           do
