@@ -36,10 +36,10 @@ jobs:
           path: packages/*.pkg.tar.gz
 
 
-    test-pkg:
-      name: Test package
-      runs-on: ubuntu-latest
-      steps:
+  test-pkg:
+    name: Test package
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2
 
       - uses: actions/download-artifact@v2
