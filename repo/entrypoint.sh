@@ -20,7 +20,9 @@ do
         echo "Running in CI mode, --no-build, --no-server"
         BUILD=0
         SERVER=0
-        for package in "$(git diff-tree --no-commit-id --name-only -r $1 | awk -F/ '{ print $2 "-" $3 }' | sort -u)"; do
+        PACKAGES=$(git diff-tree --no-commit-id --name-only -r $1 | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+        echo "Building packages: $PACKAGES"
+        for package in "$PACKAGES"; do
             make -j16 $package.pkg.tar.gz
         done
 
