@@ -27,8 +27,9 @@ jobs:
           
       - name: Build Packages
         run: |
-          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci HEAD
-          ls -la packages repo
+          git diff --name-only HEAD^1 HEAD
+          echo docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --no-server
+          ls -la packages
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
