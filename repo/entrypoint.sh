@@ -20,7 +20,8 @@ do
         echo "Running in CI mode, --no-build, --no-server"
         BUILD=0
         SERVER=0
-        SHA=$2
+        SHA=$1
+        shift
         echo "Commit Sha: $SHA"
         PACKAGES=$(git diff-tree --no-commit-id --name-only -r $SHA | awk -F/ '{ print $2 "-" $3 }' | sort -u)
         echo "Building packages: $PACKAGES"
