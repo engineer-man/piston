@@ -27,7 +27,7 @@ jobs:
           
       - name: Build Packages
         run: |
-          docker run -v "${{ github.workspace }}:/piston" piston_fs_repo --ci 05dc79d9f8884cdfe889536c95eec6a72e505706
+          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci 05dc79d9f8884cdfe889536c95eec6a72e505706
           ls -la /piston/*
 
       - name: Upload package as artifact
