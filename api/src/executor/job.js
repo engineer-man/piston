@@ -81,7 +81,7 @@ class Job {
             const proc_call = [
                 ...prlimit,
                 ...unshare,
-                'bash',file, ...args
+                'bash',file, ...args.map(x=>`"${x}"`)
             ];
 
             var stdout = '';
