@@ -27,10 +27,7 @@ jobs:
           
       - name: Build Packages
         run: |
-          SHALIST=$(git rev-parse HEAD)
-          echo "Commits: $SHALIST"
-          git log
-          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci $SHALIST
+          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci HEAD
           ls -la packages repo
 
       - name: Upload package as artifact
