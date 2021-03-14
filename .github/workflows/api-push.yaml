@@ -4,6 +4,9 @@ on:
     branches:
       - master
       - v3
+    paths:
+      - api/**
+
   
 jobs:
   push_to_registry:
