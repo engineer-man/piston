@@ -17,15 +17,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Build docker containers
-        run: |
-          docker build -t piston_fs_repo repo
           
       - name: Build Packages
         run: |
-          PACKAGES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | awk -F/ '{ print $2 "-" $3 }' | sort -u)
-          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' piston_fs_repo $PACKAGES --no-server
+          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' docker.pkg.github.com/engineer-man/piston/repo-builder $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | awk -F/ '{ print $2 "-" $3 }' | sort -u) --no-server
 
       - name: Write test config file
         uses: DamianReeves/write-file-action@v1.0
@@ -49,8 +44,8 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' --name piston_fs_repo piston_fs_repo $PACKAGES
-          docker run -v $(pwd)'/data:/piston' -v $(pwd)'/repo:/repo' --privileged --name docker.pkg.github.com/engineer-man/piston/api piston_api & 
+          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder $PACKAGES
+          docker run -v $(pwd)'/data:/piston' -v $(pwd)'/repo:/repo' --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api & 
           echo Waiting for API to start..
           while [[ "$(curl -s -w '%{http_code}' http://api:6969/runtimes)" != "200" ]]; do sleep 5; done
 
