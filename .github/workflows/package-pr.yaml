@@ -95,6 +95,9 @@ jobs:
           echo Listing Packages
           docker run --network container:api appropriate/curl http://localhost:6969/packages
 
+          docker logs api
+          docker logs piston_fs_repo
+
 
 
 
