@@ -89,6 +89,9 @@ jobs:
           echo Waiting for API to start..
           docker run --network container:api appropriate/curl --retry 10 --retry-connrefused http://localhost:6969/runtimes
 
+          echo Waiting for Index to start..
+          docker run --network container:api appropriate/curl --retry 10 --retry-connrefused http://piston_fs_repo:8000/index
+
           echo Listing Packages
           docker run --network container:api appropriate/curl http://localhost:6969/packages
 
