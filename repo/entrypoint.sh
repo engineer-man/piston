@@ -28,10 +28,12 @@ do
         elif [[ $CI -eq 1 ]]; then
             echo "Commit SHA: $pkg"
             
+            cd ..
             echo "Changed files:"
             git diff --name-only $pkg^1 $pkg
-            
             PACKAGES=$(git diff --name-only $pkg^1 $pkg | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+            cd packages
+
             echo "Building packages: $PACKAGES"
             for package in "$PACKAGES"; do
                 make -j16 $package.pkg.tar.gz
