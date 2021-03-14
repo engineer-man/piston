@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y unzip autoconf build-essential libssl-d
         ln -sf /bin/bash /bin/sh && \
         rm -rf /var/lib/apt/lists/*
 
-ADD *.sh /
+ADD entrypoint.sh mkindex.sh /
 
 ENTRYPOINT ["bash","/entrypoint.sh"]
 CMD ["--no-build"]
