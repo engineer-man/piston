@@ -100,6 +100,9 @@ jobs:
           PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:6969/packages)
           echo $PACKAGES_JSON
 
+          echo Getting CLI ready
+          docker run  -v "$PWD/cli:/app" --entrypoint yarn node:15
+
           for package in $(jq -r '.[] | "\(.language)-\(.language_version)"' <<< "$PACKAGES_JSON")
           do
             echo "Testing $package"
