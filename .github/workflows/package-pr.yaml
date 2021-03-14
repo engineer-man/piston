@@ -29,6 +29,7 @@ jobs:
         run: |
           SHALIST=$(curl "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$(jq -r '.pull_request.number' $GITHUB_EVENT_PATH)"/commits | jq '.[].commit.tree.sha' -r)
           echo "Commits: $SHALIST"
+          git log
           docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci $SHALIST
           ls -la packages repo
 
