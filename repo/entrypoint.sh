@@ -11,3 +11,4 @@ cd /piston/repo
 ./mkindex.sh
 
 [[ $SERVER -eq 1 ]] && python3 -m http.server
+exit 0
