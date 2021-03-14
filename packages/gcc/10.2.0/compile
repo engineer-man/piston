@@ -5,16 +5,16 @@
 
 case "${PISTON_ALIAS}" in
     gcc | c)
-        gcc -std=c11 $* -lm
+        gcc -std=c11 "$@" -lm
         ;;
     g++ | c++ | cpp)
-        g++ -std=c++17 $*
+        g++ -std=c++17 "$@"
         ;;
     gccgo | go)
-        gccgo $*
+        gccgo "$@"
         ;;
     gdc | d)
-        gdc $*
+        gdc "$@"
         ;;
     *)
         echo "How did you get here? (${PISTON_ALIAS})"

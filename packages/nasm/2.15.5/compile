@@ -5,11 +5,11 @@
 
 case "${PISTON_ALIAS}" in
     nasm)
-        nasm -f elf32 -o binary.o $*
+        nasm -f elf32 -o binary.o "$@"
         ld -m elf_i386 binary.o -o binary
         ;;
     nasm64)
-        nasm -f elf64 -o binary.o $*
+        nasm -f elf64 -o binary.o "$@"
         ld -m elf_x86_64 binary.o -o binary
         ;;
     *)

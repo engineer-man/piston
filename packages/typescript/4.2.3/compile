@@ -2,4 +2,4 @@
 
 # Put instructions to compile source code, remove this file if the language does not require this stage
 
-tsc $*
+tsc "$@"

@@ -1,1 +1,1 @@
-jelly fu $*
+jelly fu "$@"

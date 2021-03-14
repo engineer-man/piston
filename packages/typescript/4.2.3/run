@@ -5,4 +5,4 @@
 CODE=$(sed 's/ts$/js/' <<<"$1")
 shift
 
-node $CODE $*
+node $CODE "$@"

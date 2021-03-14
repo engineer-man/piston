@@ -2,4 +2,4 @@
 
 # Put instructions to run the runtime
 shift
-./binary $*
+./binary "$@"
