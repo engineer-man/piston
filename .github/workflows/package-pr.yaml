@@ -28,7 +28,7 @@ jobs:
       - name: Build Packages
         run: |
           docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci ${{ github.sha }}
-          ls -la piston/{packages,repo}
+          ls -la packages repo
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
