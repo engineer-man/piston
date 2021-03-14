@@ -127,8 +127,14 @@ jobs:
             done
           done
 
+
+      - name: Dump logs
+        if: ${{ always() }}
+        run: |
           docker logs api
           docker logs piston_fs_repo
+
+
 
 
 
