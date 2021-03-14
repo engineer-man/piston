@@ -29,9 +29,9 @@ do
             echo "Commit SHA: $pkg"
             
             echo "Changed files:"
-            git diff-tree --no-commit-id --name-only -r $pkg
+            git diff --name-only $pkg^1 $pkg
             
-            PACKAGES=$(git diff-tree --no-commit-id --name-only -r $pkg | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+            PACKAGES=$(git diff --name-only $pkg^1 $pkg | awk -F/ '{ print $2 "-" $3 }' | sort -u)
             echo "Building packages: $PACKAGES"
             for package in "$PACKAGES"; do
                 make -j16 $package.pkg.tar.gz
