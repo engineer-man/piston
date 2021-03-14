@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+export PATH=$PWD/julia-1.5.4/bin:$PATH
