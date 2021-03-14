@@ -75,6 +75,13 @@ jobs:
 
           write-mode: overwrite
 
+      - name: Login to GitHub registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          
       - name: Run tests
         run: |
           docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
