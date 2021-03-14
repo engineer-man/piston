@@ -77,7 +77,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder $PACKAGES &
+          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build &
           docker run -v $(pwd)'/data:/piston' --name api docker.pkg.github.com/engineer-man/piston/api & 
           echo Waiting for API to start..
           while [[ "$(curl -s -w '%{http_code}' http://api:6969/runtimes)" != "200" ]]; do sleep 5; done
