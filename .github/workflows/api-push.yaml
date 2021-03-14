@@ -21,13 +21,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-      - name: Pull existing
-        run: docker pull docker.pkg.github.com/engineer-man/piston/api
 
       - name: Build and push API
         uses: docker/build-push-action@v2
         with:
           context: api
           push: true
+          pull: true
           tags: |
             docker.pkg.github.com/engineer-man/piston/api
