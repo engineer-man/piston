@@ -2,6 +2,7 @@ name: "Package Index"
 
 on:
   release:
+  workflow_dispatch:
 
 jobs:
   create_index:
