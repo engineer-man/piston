@@ -44,3 +44,33 @@ jobs:
           tag: pkgs
           overwrite: true
           file_glob: true
+  create-index:
+    name: Create Index
+    runs-on: ubuntu-latest
+    needs: build-pkg
+    steps:
+      - name: "Download all release assets"
+        run: curl -s https://api.github.com/repos/engineer-man/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs curl -sLO
+      - name: "Generate index file"
+        run: |
+          echo "" > index
+          BASEURL=https://github.com/engineer-man/piston/releases/download/pkgs/
+          for pkg in *.pkg.tar.gz
+          do
+            PKGFILE=$(basename $pkg)
+            PKGFILENAME=$(echo $PKGFILE | sed 's/\.pkg\.tar\.gz//g')
+
+            PKGNAME=$(echo $PKGFILENAME | grep -oP '^\K.+(?=-)')
+            PKGVERSION=$(echo $PKGFILENAME | grep -oP '^.+-\K.+')
+            PKGCHECKSUM=$(sha256sum $PKGFILE | awk '{print $1}')
+            echo "$PKGNAME,$PKGVERSION,$PKGCHECKSUM,$BASEURL$PKGFILE" >> index
+            echo "Adding package $PKGNAME-$PKGVERSION"
+          done
+      - name: Upload index
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: index
+          tag: pkgs
+          overwrite: true
+          file_glob: true
