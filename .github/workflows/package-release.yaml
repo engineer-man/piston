@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Download all release assets"
-        run: curl -s https://api.github.com/repos/engineer-man/piston/releases/39776531 | jq '.assets[].browser_download_url' -r | xargs curl -sLO
+        run: curl -s https://api.github.com/repos/engineer-man/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs curl -sLO
       - name: "Generate index file"
         run: |
           echo "" > index
