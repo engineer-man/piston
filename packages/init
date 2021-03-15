@@ -54,7 +54,7 @@ echo "# Put 'export' statements here for environment variables" >> environment
 echo "export PATH=\$PWD/bin:\$PATH" >> environment
 
 echo "# Put instructions to run the runtime" >> run
-echo "$NAME-$VERSION \$*" >> run
+echo "$NAME-$VERSION \"\$@\"" >> run
 
 echo "# Put instructions to compile source code, remove this file if the language does not require this stage" >> compile
 
