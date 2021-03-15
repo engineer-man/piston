@@ -11,10 +11,11 @@ build build-all: $(addsuffix .pkg.tar.gz, ${PACKAGES})
 
 
 define PKG_RULE
-$(1).pkg.tar.gz: $(subst -,/,$(1))/ $(subst -,/,$(1))/pkg-info.json
+$(1).pkg.tar.gz: $(subst -,/,$(1)) $(subst -,/,$(1))/pkg-info.json
 	cd $$< && chmod +x ./build.sh && ./build.sh
 	rm -f $$@
-	tar czf $$@ $$< --transform='s|$$<||'
+
+	tar czf $$@ -C $$< .
 endef
 
 $(foreach pkg,$(PACKAGES),$(eval $(call PKG_RULE,$(pkg))))

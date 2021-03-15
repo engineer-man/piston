@@ -1,0 +1,6 @@
+{
+    "language": "go",
+    "version": "1.16.2",
+    "author": "Victor Frazao <luiz_victor_frazao@hotmail.com>",
+    "aliases": ["go", "golang"]
+}

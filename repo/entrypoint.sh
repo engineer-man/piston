@@ -2,8 +2,7 @@ cd /piston/packages
 
 SERVER=1
 BUILD=1
-
-ls -la /piston /piston/*
+CI=0
 
 echo "Running through arguments.."
 
@@ -20,22 +19,28 @@ do
         echo "Running in CI mode, --no-build, --no-server"
         BUILD=0
         SERVER=0
-        SHA=$1
-        shift
-        echo "Commit Sha: $SHA"
-        PACKAGES=$(git diff-tree --no-commit-id --name-only -r $SHA | awk -F/ '{ print $2 "-" $3 }' | sort -u)
-        echo "Building packages: $PACKAGES"
-        for package in "$PACKAGES"; do
-            make -j16 $package.pkg.tar.gz
-        done
-
+        CI=1
     else
         if [[ $BUILD -eq 1 ]]; then
             echo "Building package $pkg"
-            make -j16 $pkg.pkg.tar.gz
+            make -j16 $pkg.pkg.tar.gz PLATFORM=docker-debian
             echo "Done with package $pkg"
+        elif [[ $CI -eq 1 ]]; then
+            echo "Commit SHA: $pkg"
+            
+            cd ..
+            echo "Changed files:"
+            git diff --name-only $pkg^1 $pkg
+            PACKAGES=$(git diff --name-only $pkg^1 $pkg | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+            cd packages
+
+            echo "Building packages: $PACKAGES"
+            for package in "$PACKAGES"; do
+                make -j16 $package.pkg.tar.gz PLATFORM=docker-debian
+            done
+
         else
-            echo "Building was disabled, skipping $pkg"
+            echo "Building was disabled, skipping $pkg build=$BUILD ci=$CI"
         fi
     fi
 done

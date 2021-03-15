@@ -52,7 +52,7 @@ exports.handler = async function(argv){
         language: argv.language,
         version: argv['language-version'],
         files: files,
-        main: argv.file,
+        main: path.basename(argv.file),
         args: argv.args,
         stdin,
         compile_timeout: argv.ct,
@@ -84,6 +84,8 @@ exports.handler = async function(argv){
                 chalk.bold.yellow(ctx.signal)
                 )
     }
+
+    
     
     if(response.compile) step('Compile', response.compile)
     step('Run', response.run)

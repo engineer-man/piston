@@ -57,7 +57,7 @@ const options = [
     {
         key: 'runner_uid_min',
         desc: 'Minimum uid to use for runner',
-        default: 1000,
+        default: 1001,
         validators: []
     },
     {
@@ -69,7 +69,7 @@ const options = [
     {
         key: 'runner_gid_min',
         desc: 'Minimum gid to use for runner',
-        default: 1000,
+        default: 1001,
         validators: []
     },
     {
@@ -105,7 +105,7 @@ const options = [
     {
         key: 'repo_url',
         desc: 'URL of repo index',
-        default: 'https://github.com',
+        default: 'https://github.com/engineer-man/piston/releases/download/pkgs/index',
         validators: []
     }
 ];

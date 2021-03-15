@@ -24,14 +24,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          
+
+      - name: Get list of changed files
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+                
       - name: Build Packages
         run: |
-          SHALIST=$(curl "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$(jq -r '.pull_request.number' $GITHUB_EVENT_PATH)"/commits | jq '.[].commit.tree.sha' -r)
-          echo "Commits: $SHALIST"
-          git log
-          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --ci $SHALIST
-          ls -la packages repo
+          PACKAGES=$(jq '.[]' -r ${HOME}/files.json | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+          echo "Packages: $PACKAGES"
+          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --no-server $PACKAGES
+          ls -la packages
 
       - name: Upload package as artifact
         uses: actions/upload-artifact@v2
@@ -50,6 +54,9 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packages
+      
+      - name: Relocate downloaded packages
+        run: mv *.pkg.tar.gz packages/
 
       - name: Write test config file
         uses: DamianReeves/write-file-action@v1.0
@@ -67,18 +74,67 @@ jobs:
             output_max_size: 1024
             max_process_count: 64
             max_open_files: 2048
-            repo_url: http://piston_fs_repo:8000/index
+            repo_url: http://localhost:8000/index
 
           write-mode: overwrite
 
+      - name: Login to GitHub registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+
       - name: Run tests
         run: |
-          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder $PACKAGES &
-          docker run -v $(pwd)'/data:/piston' --name api docker.pkg.github.com/engineer-man/piston/api & 
+          ls -la
+          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
+          docker run --network container:piston_fs_repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
           echo Waiting for API to start..
-          while [[ "$(curl -s -w '%{http_code}' http://api:6969/runtimes)" != "200" ]]; do sleep 5; done
+          docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:6969/runtimes
 
-          echo Testing packages
+          echo Waiting for Index to start..
+          docker run --network container:piston_fs_repo appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8000/index
+
+          echo Adjusting index
+          sed -i 's/piston_fs_repo/localhost/g' repo/index
+
+          echo Listing Packages
+          PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:6969/packages)
+          echo $PACKAGES_JSON
+
+          echo Getting CLI ready
+          docker run  -v "$PWD/cli:/app" --entrypoint /bin/bash node:15 -c 'cd /app; yarn'
+
+          for package in $(jq -r '.[] | "\(.language)-\(.language_version)"' <<< "$PACKAGES_JSON")
+          do
+            echo "Testing $package"
+            PKG_PATH=$(sed 's|-|/|' <<< $package)
+            PKG_NAME=$(awk -F- '{ print $1 }' <<< $package)
+            PKG_VERSION=$(awk -F- '{ print $2 }' <<< $package)
+
+            echo "Installing..."
+            docker run --network container:api appropriate/curl -sXPOST http://localhost:6969/packages/$PKG_PATH
+
+            TEST_SCRIPTS=packages/$PKG_PATH/test.*
+            echo "Tests: $TEST_SCRIPTS"
+
+            for tscript in $TEST_SCRIPTS
+            do
+              TEST_RUNTIME=$(awk -F. '{print $2}' <<< $(basename $tscript))
+              echo Running $tscript with runtime=$TEST_RUNTIME
+              docker run --network container:api -v "$PWD/cli:/app" -v "$PWD/$(dirname $tscript):/pkg" node:15 /app/index.js run $TEST_RUNTIME $PKG_VERSION /pkg/$(basename $tscript) | grep OK
+            done
+          done
+
+
+      - name: Dump logs
+        if: ${{ always() }}
+        run: |
+          docker logs api
+          docker logs piston_fs_repo
+
+
 
 
 

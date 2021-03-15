@@ -17,6 +17,7 @@ do
     PKGCHECKSUM=$(sha256sum $PKGFILE | awk '{print $1}')
 
     echo "$PKGNAME,$PKGVERSION,$PKGCHECKSUM,$BASEURL$PKGFILE" >> index
+    echo "Adding package $PKGNAME-$PKGVERSION"
     
     ((i=i+1))
 done
