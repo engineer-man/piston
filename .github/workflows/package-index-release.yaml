@@ -5,6 +5,7 @@ on:
 
 jobs:
   create_index:
+    name: Create Index
     runs-on: ubuntu-latest
     steps:
       - name: "Download all release assets"
