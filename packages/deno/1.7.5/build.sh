@@ -3,4 +3,3 @@ unzip -o deno.zip
 rm deno.zip
 
 chmod +x deno
-
