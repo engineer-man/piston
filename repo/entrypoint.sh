@@ -23,7 +23,7 @@ do
     else
         if [[ $BUILD -eq 1 ]]; then
             echo "Building package $pkg"
-            make -j16 $pkg.pkg.tar.gz
+            make -j16 $pkg.pkg.tar.gz PLATFORM=docker-debian
             echo "Done with package $pkg"
         elif [[ $CI -eq 1 ]]; then
             echo "Commit SHA: $pkg"
@@ -36,7 +36,7 @@ do
 
             echo "Building packages: $PACKAGES"
             for package in "$PACKAGES"; do
-                make -j16 $package.pkg.tar.gz
+                make -j16 $package.pkg.tar.gz PLATFORM=docker-debian
             done
 
         else
