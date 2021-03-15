@@ -1,3 +1,5 @@
+name: "Package Index"
+
 on:
   release:
     type: [edited]
