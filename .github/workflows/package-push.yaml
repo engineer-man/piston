@@ -50,7 +50,7 @@ jobs:
     needs: build-pkg
     steps:
       - name: "Download all release assets"
-        run: curl -s https://api.github.com/repos/engineer-man/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs curl -sLO
+        run: curl -s https://api.github.com/repos/engineer-man/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs -L 1 curl -sLO
       - name: "Generate index file"
         run: |
           echo "" > index
