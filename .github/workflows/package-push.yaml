@@ -1,0 +1,46 @@
+name: 'Package Pushed'
+
+on:
+  push:
+    branches:
+      - master
+      - v3
+    paths:
+      - packages/**
+
+
+jobs:
+  build-pkg:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Login to GitHub registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+
+      - name: Get list of changed files
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+                
+      - name: Build Packages
+        run: |
+          PACKAGES=$(jq '.[]' -r ${HOME}/files.json | awk -F/ '{ print $2 "-" $3 }' | sort -u)
+          echo "Packages: $PACKAGES"
+          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --no-server $PACKAGES
+          ls -la packages
+
+      - name: Upload Packages
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: packages/*.pkg.tar.gz
+          tag: pkgs
+          overwrite: true
+          file_glob: true
