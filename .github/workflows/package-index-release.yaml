@@ -2,12 +2,9 @@ name: "Package Index"
 
 on:
   release:
-    types:
-      - edited
 
 jobs:
   create_index:
-    if: github.ref == 'pkgs'
     runs-on: ubuntu-latest
     steps:
       - name: "Download all release assets"
