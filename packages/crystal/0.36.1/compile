@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Compile crystal files into out file
+crystal build "$@" -o out --no-color && \
+chmod +x out

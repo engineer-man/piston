@@ -1,0 +1,6 @@
+{
+    "language": "crystal",
+    "version": "0.36.1",
+    "author": "Dan Vargas <danvargas46@gmail.com>",
+    "aliases": ["crystal", "cr"]
+}

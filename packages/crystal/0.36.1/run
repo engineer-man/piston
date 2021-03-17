@@ -1,0 +1,4 @@
+#!/bin/bash
+
+shift # Filename is only used to compile
+./out "$@"
