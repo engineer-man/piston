@@ -1,0 +1,6 @@
+{
+  "language": "brainfuck",
+  "version": "1.0.0",
+  "aliases": ["bf"],
+  "author": "Thomas Hobson <git@hexf.me>"
+}
