@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Paradoc only takes filename and stdin
+python3 -m paradoc "$1"
