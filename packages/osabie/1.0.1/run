@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# Put instructions to run the runtime
-osabie "$@"
+# osabie only takes filename and stdin
+osabie "$1"
