@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Compile nim file(s)
+nim --hints:off --out:out --nimcache:./ c "$@"
+chmod +x out
