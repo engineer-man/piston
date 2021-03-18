@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Put instructions to run the runtime
+swipl -g true -t halt "$@"
