@@ -9,15 +9,10 @@ git clone https://github.com/fabianishere/brainfuck.git
 
 cd build
 
-cmake ../brainfuck
+cmake ../brainfuck -DCMAKE_INSTALL_PREFIX=$PREFIX
 
 make -j$(nproc)
 make install -j$(nproc)
-
-
-# === autoconf based ===
-./configure --prefix "$PREFIX"
-
 
 cd ../
 rm -rf build brainfuck
