@@ -6,11 +6,11 @@ PREFIX=$(realpath $(dirname $0))
 git clone https://github.com/fabianishere/brainfuck.git
 
 cd brainfuck
-
 mkdir -p build
+
 cd build
 
-cmake -DCMAKE_INSTALL_PREFIX=$PREFIX/ -DENABLE_EDITLINE=OFF ..
+cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX/ -DENABLE_EDITLINE=OFF
 
 make -j$(nproc)
 make install -j$(nproc)
