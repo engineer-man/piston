@@ -1,0 +1,2 @@
+export PYTHONPATH=$PYTHONPATH:$PWD/paradoc
+export PATH=$PWD/bin:$PATH

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# optimizing for small programs
+zig build-exe -O ReleaseSmall --color off --cache-dir . --global-cache-dir . --name out "$@"

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Compile haskell file(s)
+ghc -dynamic -v0 -o out "$@"
+chmod +x out
