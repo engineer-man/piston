@@ -6,6 +6,9 @@ PREFIX=$(realpath $(dirname $0))
 git clone https://github.com/fabianishere/brainfuck.git
 
 cd brainfuck
+git checkout 6ea0f173989df4d5ce698e1f3c95f2cd0535ebd1
+
+
 mkdir -p build
 
 cd build
