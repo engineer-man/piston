@@ -9,7 +9,7 @@ git clone https://github.com/fabianishere/brainfuck.git
 
 cd build
 
-cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EDITLINE=OFF ../brainfuck
+cmake -DCMAKE_INSTALL_PREFIX=$PREFIX/ -DENABLE_EDITLINE=OFF ../brainfuck
 
 make -j$(nproc)
 make install -j$(nproc)
