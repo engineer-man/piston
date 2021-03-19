@@ -18,4 +18,4 @@ cd ..
 
 rm -rf build 
 
-
+bin/pip2 install numpy scipy pandas pycrypto numba whoosh bcrypt passlib
