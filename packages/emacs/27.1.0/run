@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Put instructions to run the runtime
+emacs -Q --script "$@"
