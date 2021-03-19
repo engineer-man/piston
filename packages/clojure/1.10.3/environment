@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Clojure requires JAVA_HOME to be set and java binary to be in the path
+export JAVA_HOME=$PWD/java
+export CLOJURE_PATH=$PWD/bin
+export PATH=$PWD/java/bin:$PATH
