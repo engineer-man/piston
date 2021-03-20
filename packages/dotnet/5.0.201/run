@@ -4,4 +4,4 @@
 export DOTNET_CLI_HOME=$PWD
 
 shift
-dotnet $(basename $(realpath .)).dll "$@"
+dotnet bin/Debug/net5.0/$(basename $(realpath .)).dll "$@"
