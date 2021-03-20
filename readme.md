@@ -98,6 +98,10 @@ so we can discuss potentially getting you an unlimited key.
 git clone https://github.com/engineer-man/piston
 ```
 
+### Installation
+
+- docker-compose up -d piston_api
+
 ## Just Piston (no CLI)
 
 ### Host System Package Dependencies
@@ -112,10 +116,6 @@ echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u "$GITHUB_US
 
 docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 6969:6969 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
 ```
-
-### Installation
-
-- docker-compose up -d piston_api
 
 <br>
 
