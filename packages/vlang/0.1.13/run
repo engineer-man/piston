@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
+# Export environment variables
+export VMODULES="$PWD"
+export TMPDIR="$PWD"
+
 # Put instructions to run the runtime
 v run "$@"
