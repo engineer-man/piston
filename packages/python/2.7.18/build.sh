@@ -20,4 +20,4 @@ rm -rf build
 bin/pip2 install -U pip==20.3.*
 # Upgrade pip to latest supported version
 
-bin/pip2 install numpy scipy pandas pycrypto whoosh bcrypt passlib
+bin/pip2 install numpy scipy pandas==0.23.* pycrypto whoosh bcrypt passlib
