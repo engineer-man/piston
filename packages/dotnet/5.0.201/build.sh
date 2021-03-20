@@ -6,7 +6,7 @@ rm dotnet.tar.gz
 
 # Cache nuget packages
 export DOTNET_CLI_HOME=$PWD
-dotnet new console -o cache_application
+./dotnet new console -o cache_application
 # This calls a restore on the global-packages index ($DOTNET_CLI_HOME/.nuget/packages)
 # If we want to allow more packages, we could add them to this cache_application
 
