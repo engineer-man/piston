@@ -1,0 +1,6 @@
+{
+  "language": "dotnet",
+  "version": "5.0.201",
+  "aliases": ["cs", "csharp"],
+  "author": "Thomas Hobson <git@hexf.me>"
+}

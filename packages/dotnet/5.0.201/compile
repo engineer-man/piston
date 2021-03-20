@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+dotnet new console
+rm Program.cs
+dotnet build -o .
