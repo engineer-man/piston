@@ -17,5 +17,7 @@ make install -j$(nproc)
 cd ..
 
 rm -rf build 
+bin/pip2 install -U pip==20.3.*
+# Upgrade pip to latest supported version
 
-bin/pip2 install numpy==1.16.* scipy==1.2.* pandas==0.23.* pycrypto whoosh bcrypt==3.1.* passlib
+bin/pip2 install numpy scipy pandas pycrypto whoosh bcrypt passlib
