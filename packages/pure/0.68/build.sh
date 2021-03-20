@@ -5,8 +5,8 @@ PREFIX=$(realpath $(dirname $0))
 # Installing LLVM and clang (the latter is optional but recommended)
 curl -OL "http://llvm.org/releases/3.4/llvm-3.4.src.tar.gz"
 curl -OL "http://llvm.org/releases/3.4/clang-3.4.src.tar.gz"
-tar xfvz llvm-3.4.src.tar.gz
-tar xfvz clang-3.4.src.tar.gz
+tar xfz llvm-3.4.src.tar.gz
+tar xfz clang-3.4.src.tar.gz
 
 mv clang-3.4 llvm-3.4/tools/clang
 # Cleaning up gzip files.
@@ -20,7 +20,7 @@ make install -j$(nproc)
 
 # Installing Pure
 curl -sSLO "https://github.com/agraef/pure-lang/releases/download/pure-0.68/pure-0.68.tar.gz"
-tar xfvz pure-0.68.tar.gz
+tar xfz pure-0.68.tar.gz
 rm pure-0.68.tar.gz
 cd pure-0.68
 
