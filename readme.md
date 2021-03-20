@@ -83,111 +83,155 @@ so we can discuss potentially getting you an unlimited key.
 
 # Getting Started
 
+## All In One
+
 ### Host System Package Dependencies
 
 - Docker
 - Docker Compose
 - Node JS
 
-#### After system dependencies are installed, clone this repository:
+### After system dependencies are installed, clone this repository:
 
 ```sh
 # clone and enter repo
 git clone https://github.com/engineer-man/piston
 ```
 
-#### Installation
+## Just Piston (no CLI)
 
-- docker-compose up
+### Host System Package Dependencies
 
-#### CLI Usage
-- `cli/execute [language] [file path] [args]`
+- Docker
+
+### Installation
+
+```sh
+echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u "$GITHUB_USERNAME" --password-stdin
+# Change out the $GITHUB_TOKEN and $GITHUB_USERNAME with appropritate values
+
+docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 6969:6969 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
+```
+
+### Installation
+
+- docker-compose up -d piston_api
+
 <br>
 
 # Usage
 
 ### CLI
 
+The CLI is the main tool used for installing packages within piston, but also supports running code.
+
+You can execute the cli with `cli/index.js`.
+
 ```sh
-lxc/execute [language] [file path] [args]
+# List all available packages
+cli/index.js ppman list
+
+# Install python 3.9.1
+cli/index.js ppman install python 3.9.1
+
+# Run a python script
+echo 'print("Hello world!")' > test.py
+cli/index.js run python 3.9.1 test.py
+```
+
+If you are operating on a remote machine, add the `-u` flag like so:
+
+```sh
+cli/index.js -u http://piston.server:6969 ppman list
 ```
 
 ### API
-To use the API, it must first be started. Please note that if root is required to access
-LXC then the API must also be running as root. To start the API, run the following:
 
-```
-cd api
-./start
-```
+The container exposes an API on port 6969 by default.
+This is used by the CLI to carry out running jobs and package managment.
 
-For your own local installation, the API is available at:
-
-```
-http://127.0.0.1:2000
-```
-
-#### Versions Endpoint
-`GET /versions`
-This endpoint will return the supported languages along with the current version and aliases. To execute
-code for a particular language using the `/execute` endpoint, either the name or one of the aliases must
-be provided.
+#### Runtimes Endpoint
+`GET /runtimes`
+This endpoint will return the supported languages along with the current version, author and aliases. To execute
+code for a particular language using the `/jobs` endpoint, either the name or one of the aliases must
+be provided, along with the version.
+Multiple versions of the same language may be present at the same time, and may be selected when running a job.
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
 
 [
-    {
-        "name": "awk",
-        "aliases": ["awk"],
-        "version": "1.3.3"
-    },
-    {
-        "name": "bash",
-        "aliases": ["bash"],
-        "version": "4.4.20"
-    },
-    {
-        "name": "c",
-        "aliases": ["c"],
-        "version": "7.5.0"
-    }
+  {
+    "language": "bash",
+    "version": "5.1.0",
+    "author": "Thomas Hobson <git@hexf.me>",
+    "aliases": [
+      "sh"
+    ]
+  },
+  {
+    "language": "brainfuck",
+    "version": "2.7.3",
+    "author": "Thomas Hobson <git@hexf.me>",
+    "aliases": [
+      "bf"
+    ]
+  },
+  ...
 ]
 ```
 
 #### Execute Endpoint
-`POST /execute`
+`POST /jobs`
 This endpoint requests execution of some arbitrary code.
-- `language` (**required**) The language to use for execution, must be a string and supported by Piston (see list below).
-- `source` (**required**) The source code to execute, must be a string.
-- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string or left out of the request.
-- `args` (*optional*) The arguments to pass to the program. Must be an array or left out of the request.
+- `language` (**required**) The language to use for execution, must be a string and must be installed.
+- `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
+- `files` (**required**) An array of files containing code or other data that should be used for execution.
+- `files[].name` (**required**) The name of the file to upload, must be a string containing no path.
+- `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
+- `main` (**required**) The name of one of the files provided that should be considered the main source file which will be used as the entrypoint, must be a string and be the name of a file in `files`.
+- `stdin` (**required**) The text to pass as stdin to the program. Must be a string, can be left blank.
+- `args` (**required**) The arguments to pass to the program. Must be an array.
+- `compile_timeout` (**required**) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
+- `run_timeout` (**required**) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
+
 ```json
 {
     "language": "js",
-    "source": "console.log(process.argv)",
+    "version": "15.10.0",
+    "files":[
+        {
+            "name": "my_cool_code.js",
+            "content": "console.log(process.argv)"
+        }
+    ],
+    "main": "my_cool_code.js",
     "stdin": "",
     "args": [
         "1",
         "2",
         "3"
-    ]
+    ],
+    "compile_timeout": 10000,
+    "run_timeout": 3000
 }
 ```
-A typical response upon successful execution will contain the `language`, `version`, `output` which
-is a combination of both `stdout` and `stderr` but in chronological order according to program output,
-as well as separate `stdout` and `stderr`.
+A typical response upon successful execution will contain 1 or 2 keys `run` and `compile`.
+`compile` will only be present if the language requested requires a compile stage.
+
+Each of these keys has an identical structure, containing both a `stdout` and `stderr` key, which is a string containing the text outputted during the stage into each buffer.
+It also contains the `code` and `signal` which was returned from each process.
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-    "ran": true,
-    "language": "js",
-    "version": "12.13.0",
-    "output": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]",
-    "stdout": "[ '/usr/bin/node',\n  '/tmp/code.code',\n  '1',\n  '2',\n  '3' ]",
-    "stderr": ""
+  "run": {
+    "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
+    "stderr": "",
+    "code": 0,
+    "signal": null
+  }
 }
 ```
 If a problem exists with the request, a `400` status code is returned and the reason in the `message` key.
@@ -196,43 +240,35 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-    "message": "Supplied language is not supported by Piston"
+    "message": "html-5.0.0 runtime is unknown"
 }
 ```
 
 <br>
 
-# Supported Languages
-
-`python`,`php`,`node`
-
-
-<br>
-<!--
 # Principle of Operation
-Piston utilizes LXC as the primary mechanism for sandboxing. There is a small API written in Node which takes
-in execution requests and executes them in the container. High level, the API writes
-a temporary source and args file to `/tmp` and that gets mounted read-only along with the execution scripts into the container.
+
+Piston uses Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
+which takes in execution requests and executees them within the container safely.
+High level, the API writes any source code to a temporary directory in `/piston/jobs`.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
 <br>
-<!--
+
 # Security
-LXC provides a great deal of security out of the box in that it's separate from the system.
+Docker provides a great deal of security out of the box in that it's separate from the system.
 Piston takes additional steps to make it resistant to
 various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
 - Disabling outgoing network interaction
-- Capping max processes at 64 (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
+- Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
 - Capping max files at 2048 (resists various file based attacks)
-- Mounting all resources read-only (resists `sudo rm -rf --no-preserve-root /`)
 - Cleaning up all temp space after each execution (resists out of drive space attacks)
 - Running as a variety of unprivileged users
 - Capping runtime execution at 3 seconds
 - Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
 - SIGKILLing misbehaving code
--->
+
 <br>
-<!--  Someone please do this -->
 
 # License
 Piston is licensed under the MIT license.
