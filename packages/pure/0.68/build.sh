@@ -2,6 +2,9 @@
 
 PREFIX=$(realpath $(dirname $0))
 
+# Python is available in the container as 'python3' and 'python2', not as 'python'
+alias python=python3
+
 # Installing LLVM and clang (the latter is optional but recommended)
 curl -OL "http://llvm.org/releases/3.4/llvm-3.4.src.tar.gz"
 curl -OL "http://llvm.org/releases/3.4/clang-3.4.src.tar.gz"
