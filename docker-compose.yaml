@@ -9,13 +9,11 @@ services:
       - 6969:6969
     volumes: 
       - ./data/piston:/piston
-      - ./repo:/repo
     tmpfs:
       - /piston/jobs:exec
 
-  piston_fs_repo: #Temporary solution until CI works
+  piston_fs_repo: # Local testing of packages
     build: repo
-    command: ['typescript-4.2.3'] # Only build typescript
+    command: ['dart-2.12.1'] # Only build dart
     volumes:
-      - ./repo:/piston/repo
-      - ./packages:/piston/packages
+      - .:/piston
