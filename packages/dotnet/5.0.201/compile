@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
-dotnet new console
+export DOTNET_CLI_HOME=$PWD
+
+dotnet build > /dev/null # Shut the thing up
+
+dotnet new console -o . --no-restore
 rm Program.cs
-dotnet build -o .
+
+dotnet restore --source $DOTNET_ROOT/.nuget/packages
+
+dotnet build -o . --no-restore
