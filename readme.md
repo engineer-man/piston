@@ -253,6 +253,49 @@ Content-Type: application/json
 
 <br>
 
+# Supported Languages
+`awk`,
+`bash`,
+`brainfuck`,
+`c`,
+`cpp`,
+`clojure`,
+`crystal`,
+`csharp`,
+`d`,
+`dash`,
+`deno`,
+`elixir`,
+`emacs`,
+`elisp`,
+`go`,
+`haskell`,
+`java`,
+`jelly`,
+`julia`,
+`kotlin`,
+`lisp`,
+`lolcode`,
+`lua`,
+`nasm`,
+`nasm64`,
+`nim`,
+`node`,
+`osabie`,
+`paradoc`,
+`perl`,
+`php`,
+`python2`,
+`python3`,
+`ruby`,
+`rust`,
+`scala`,
+`swift`,
+`typescript`,
+`zig`,
+
+<br>
+
 # Principle of Operation
 
 Piston uses Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
