@@ -3,8 +3,8 @@
 PREFIX=$(realpath $(dirname $0))
 
 # Installing LLVM and clang (the latter is optional but recommended)
-curl -O "http://llvm.org/releases/3.4/llvm-3.4.src.tar.gz"
-curl -O "http://llvm.org/releases/3.4/clang-3.4.src.tar.gz"
+curl -OL "http://llvm.org/releases/3.4/llvm-3.4.src.tar.gz"
+curl -OL "http://llvm.org/releases/3.4/clang-3.4.src.tar.gz"
 tar xfvz llvm-3.4.src.tar.gz
 tar xfvz clang-3.4.src.tar.gz
 
