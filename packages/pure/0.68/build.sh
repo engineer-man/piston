@@ -17,7 +17,7 @@ rm llvm-3.4.src.tar.gz && rm clang-3.4.src.tar.gz
 cd llvm-3.4
 
 # Building and installing - LLVM and clang
-./configure --enable-shared --enable-optimized --enable-targets=host-only --prefix "$PREFIX" --enable-docs=NO
+./configure --enable-shared --enable-optimized --enable-targets=host-only --prefix "$PREFIX" --enable-docs="no"
 make -j$(nproc)
 make install -j$(nproc)
 
