@@ -46,7 +46,7 @@ It's used in numerous places including:
 * [EMKC Challenges](https://emkc.org/challenges),
 * [EMKC Weekly Contests](https://emkc.org/contests),
 * [Engineer Man Discord Server](https://discord.gg/engineerman),
-* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers
+* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 3100+ other servers
 and 100+ direct integrations.
 
 To get it in your own server, go here: https://emkc.org/run.
