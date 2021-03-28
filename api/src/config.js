@@ -45,7 +45,7 @@ const options = [
     {
         key: 'bind_address',
         desc: 'Address to bind REST API on\nThank @Bones for the number',
-        default: '0.0.0.0:6969',
+        default: '0.0.0.0:2000',
         validators: []
     },
     {

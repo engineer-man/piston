@@ -121,7 +121,7 @@ cd cli && yarn && cd -
 echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u "$GITHUB_USERNAME" --password-stdin
 # Change out the $GITHUB_TOKEN and $GITHUB_USERNAME with appropritate values
 
-docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 6969:6969 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
+docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 2000:2000 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
 ```
 
 <br>
@@ -149,12 +149,12 @@ cli/index.js run python 3.9.1 test.py
 If you are operating on a remote machine, add the `-u` flag like so:
 
 ```sh
-cli/index.js -u http://piston.server:6969 ppman list
+cli/index.js -u http://piston.server:2000 ppman list
 ```
 
 ### API
 
-The container exposes an API on port 6969 by default.
+The container exposes an API on port 2000 by default.
 This is used by the CLI to carry out running jobs and package managment.
 
 #### Runtimes Endpoint
