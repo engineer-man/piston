@@ -8,7 +8,7 @@ tar xfz 0.39.0.tar.gz
 rm 0.39.0.tar.gz
 
 # cd into pony dir that was created from tar extraction.
-cd 0.39.0
+cd ponyc-0.39.0
 
 # Build the vendored LLVM libraries that are included in the `lib/llvm/src`.
 make libs build_flags="-j$(nproc)"
