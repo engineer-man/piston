@@ -1,5 +1,7 @@
 FROM node:15.8.0-buster-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN dpkg-reconfigure -p critical dash
 RUN for i in $(seq 1001 1500); do \
         groupadd -g $i runner$i && \
@@ -14,7 +16,7 @@ RUN apt-get update && \
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
 ENV NODE_ENV=production
-ENV DEBIAN_FRONTEND noninteractive
+
 WORKDIR /piston_api
 COPY ["package.json", "yarn.lock", "./"]
 RUN yarn
