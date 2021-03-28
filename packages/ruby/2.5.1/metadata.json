@@ -1,6 +1,5 @@
 {
     "language": "ruby",
     "version": "2.5.1",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["ruby", "rb"]
 }

@@ -1,6 +1,5 @@
 {
     "language": "elixir",
     "version": "1.11.3",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["elixir", "exs"]
 }

@@ -159,7 +159,7 @@ This is used by the CLI to carry out running jobs and package managment.
 
 #### Runtimes Endpoint
 `GET /runtimes`
-This endpoint will return the supported languages along with the current version, author and aliases. To execute
+This endpoint will return the supported languages along with the current version and aliases. To execute
 code for a particular language using the `/jobs` endpoint, either the name or one of the aliases must
 be provided, along with the version.
 Multiple versions of the same language may be present at the same time, and may be selected when running a job.
@@ -171,7 +171,6 @@ Content-Type: application/json
   {
     "language": "bash",
     "version": "5.1.0",
-    "author": "Thomas Hobson <git@hexf.me>",
     "aliases": [
       "sh"
     ]
@@ -179,7 +178,6 @@ Content-Type: application/json
   {
     "language": "brainfuck",
     "version": "2.7.3",
-    "author": "Thomas Hobson <git@hexf.me>",
     "aliases": [
       "bf"
     ]

@@ -16,7 +16,7 @@ See [deno/1.7.5/](deno/1.7.5/) or any other directory for examples.
 
 3. Create a file named `build.sh`, adding a shebang for bash `#!/bin/bash` on the first line.
 In this file put any steps to compile the specified langauge.
-This script should download sources, compile sources and output binaries. They should be dumped into the current working directory, removing any files which aren't required in the process. 
+This script should download sources, compile sources and output binaries. They should be dumped into the current working directory, removing any files which aren't required in the process.
 
 4. Create a file named `run`, containing bash script to run the interpreter.
 The first argument given to this script (`$1`) is the name of the main file, with the remaining ones as program arguments.
@@ -27,7 +27,7 @@ The first argument is always the main file, followed the names of the other file
 
 6. Create a file named `environment`, containing `export` statements which edit the environment variables accordingly. The `$PWD` variable should be used, and is set inside the package directory when running on the target system.
 
-7. Create a test script starting with test, with the file extension of the language. This script should simply output the phrase `OK`. For example, for mono we would create `test.cs` with the content: 
+7. Create a test script starting with test, with the file extension of the language. This script should simply output the phrase `OK`. For example, for mono we would create `test.cs` with the content:
 ```cs
 using System;
 
@@ -40,13 +40,12 @@ public class Test
 }
 ```
 
-8. Create a `metadata.json` file which contains metadata about the language and interpreter. This simply contains the language name, as in the folder name, the version as in the folder name, the author's name and email address, aliases that can be used to call this package, and finally a dependencies map.
+8. Create a `metadata.json` file which contains metadata about the language and interpreter. This simply contains the language name, as in the folder name, the version as in the folder name, aliases that can be used to call this package, and finally a dependencies map.
 The dependencies map contains the keys as language names, and the values as semver selectors for packages.
 ```json
 {
     "language": "deno",
     "version": "1.7.5",
-    "author": "Thomas Hobson <thomas@hexf.me>",
     "dependencies": {},
     "aliases": ["deno-ts", "deno-js"]
 }

@@ -1,6 +1,5 @@
 {
-  "language": "nasm",
-  "version": "2.15.5",
-  "aliases": ["nasm64"],
-  "author": "Thomas Hobson <git@hexf.me>"
+    "language": "nasm",
+    "version": "2.15.5",
+    "aliases": ["nasm64"]
 }

@@ -1,6 +1,5 @@
 {
     "language": "erlang",
     "version": "23.0.0",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["erlang", "erl", "escript"]
 }
