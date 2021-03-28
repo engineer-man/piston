@@ -3,9 +3,12 @@
 PREFIX=$(realpath $(dirname $0))
 
 # Installing LLVM
+mkdir -p llvm
+cd llvm
 curl -OL "http://llvm.org/releases/3.4/llvm-3.4.src.tar.gz"
 tar xfz llvm-3.4.src.tar.gz
 rm llvm-3.4.src.tar.gz
+cd ..
 
 # get sources
 curl -OL "https://github.com/ponylang/ponyc/archive/refs/tags/0.39.0.tar.gz"

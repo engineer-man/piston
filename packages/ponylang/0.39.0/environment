@@ -2,4 +2,4 @@
 
 # Put 'export' statements here for environment variables
 export PATH=$PWD/bin:$PATH
-export LLVM_DIR=$PWD/llvm-3.4
+export LLVM_DIR=$PWD/llvm
