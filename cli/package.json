@@ -1,13 +1,12 @@
 {
-  "name": "piston-cli",
-  "version": "1.0.0",
-  "description": "Piston Execution Engine CLI tools",
-  "main": "index.js",
-  "author": "Thomas Hobson <thomas@hexf.me>",
-  "license": "MIT",
-  "dependencies": {
-    "axios": "^0.21.1",
-    "chalk": "^4.1.0",
-    "yargs": "^16.2.0"
-  }
+    "name": "piston-cli",
+    "version": "1.0.0",
+    "description": "Piston Execution Engine CLI tools",
+    "main": "index.js",
+    "license": "MIT",
+    "dependencies": {
+        "axios": "^0.21.1",
+        "chalk": "^4.1.0",
+        "yargs": "^16.2.0"
+    }
 }

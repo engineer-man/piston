@@ -1,6 +1,5 @@
 {
     "language": "node",
     "version": "15.10.0",
-    "author": "Martin Kos <martinkos007@gmail.com>",
     "aliases": ["node-javascript", "node-js", "javascript", "js"]
 }

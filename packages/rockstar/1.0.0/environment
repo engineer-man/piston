@@ -1,0 +1,2 @@
+export ROCKSTAR_PATH=$PWD/rockstar/satriani
+export PATH=$PWD/bin:$PATH

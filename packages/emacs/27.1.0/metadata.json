@@ -1,6 +1,5 @@
 {
     "language": "emacs",
     "version": "27.1.0",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["emacs", "el", "elisp"]
 }

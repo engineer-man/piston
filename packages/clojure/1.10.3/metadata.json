@@ -1,6 +1,5 @@
 {
-  "language": "clojure",
-  "version": "1.10.3",
-  "aliases": ["clojure","clj"],
-  "author": "Dan Vargas <danvargas46@gmail.com>"
+    "language": "clojure",
+    "version": "1.10.3",
+    "aliases": ["clojure", "clj"]
 }

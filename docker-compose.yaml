@@ -1,19 +1,19 @@
 version: '3.8'
 
 services:
-  piston_api:
-    build: api
-    privileged: true
-    restart: always
-    ports:
-      - 6969:6969
-    volumes: 
-      - ./data/piston:/piston
-    tmpfs:
-      - /piston/jobs:exec
+    piston_api:
+        build: api
+        privileged: true
+        restart: always
+        ports:
+            - 2000:2000
+        volumes:
+            - ./data/piston:/piston
+        tmpfs:
+            - /piston/jobs:exec
 
-  piston_fs_repo: # Local testing of packages
-    build: repo
-    command: ['dart-2.12.1'] # Only build dart
-    volumes:
-      - .:/piston
+    piston_fs_repo: # Local testing of packages
+        build: repo
+        command: ['dart-2.12.1'] # Only build dart
+        volumes:
+            - .:/piston

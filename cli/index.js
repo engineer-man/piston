@@ -13,7 +13,7 @@ const axios_instance = function(argv){
 require('yargs')(process.argv.slice(2))
     .option('piston-url', {
         alias: ['u'],
-        default: 'http://127.0.0.1:6969',
+        default: 'http://127.0.0.1:2000',
         desc: 'Piston API URL',
         string: true
     })
