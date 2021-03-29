@@ -104,7 +104,7 @@ jobs:
           echo $PACKAGES_JSON
 
           echo Getting CLI ready
-          docker run  -v "$PWD/cli:/app" --entrypoint /bin/bash node:15 -c 'cd /app; yarn'
+          docker run  -v "$PWD/cli:/app" --entrypoint /bin/bash node:15 -c 'cd /app; npm i'
 
           for package in $(jq -r '.[] | "\(.language)-\(.language_version)"' <<< "$PACKAGES_JSON")
           do

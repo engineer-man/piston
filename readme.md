@@ -104,8 +104,7 @@ git clone https://github.com/engineer-man/piston
 docker-compose up -d piston_api
 # Start the API container
 
-npm install -g yarn
-cd cli && yarn && cd -
+cd cli && npm i && cd -
 # Install all the dependencies for the cli
 ```
 
