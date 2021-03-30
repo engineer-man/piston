@@ -3,7 +3,6 @@ version: '3.8'
 services:
   piston_api:
     build: api
-    privileged: true
     restart: always
     ports:
       - 6969:6969

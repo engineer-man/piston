@@ -70,7 +70,7 @@ jobs:
             runner_uid_max: 1500
             runner_gid_min: 1100
             runner_gid_max: 1500
-            enable_unshare: false
+            disable_networking: false
             output_max_size: 1024
             max_process_count: 64
             max_open_files: 2048
