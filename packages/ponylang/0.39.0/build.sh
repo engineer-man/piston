@@ -13,8 +13,12 @@ git submodule update --recursive --init
 
 cd ponyc
 
-# build
-make -j$(nproc)
+# Build the vendored LLVM libraries that are included in the `lib/llvm/src`.
+make libs build_flags="-j$(nproc)"
+# Configure the CMake build directory.
+make configure
+# Will build pony and put it in `build/release`.
+make build
 # Install pony into `$PREFIX`.
 make prefix="$PREFIX" install
 
