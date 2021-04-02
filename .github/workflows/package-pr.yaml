@@ -94,7 +94,7 @@ jobs:
           docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/runtimes
 
           echo Waiting for Index to start..
-          docker run --network container:piston_fs_repo appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8000/index
+          docker run --network container:piston_fs_repo appropriate/curl -s --retry 30 --retry-connrefused http://localhost:8000/index
 
           echo Adjusting index
           sed -i 's/piston_fs_repo/localhost/g' repo/index
