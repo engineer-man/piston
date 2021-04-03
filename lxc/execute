@@ -40,9 +40,9 @@ timeout -s KILL 20 \
 # process janitor
 lxc-attach --clear-env -n piston -- \
     /bin/bash -c "
-        while pgrep -u runner$runner > /dev/null
+        while pgrep -U runner$runner > /dev/null
         do
-            pkill -u runner$runner --signal SIGKILL
+            pkill -U runner$runner --signal SIGKILL
         done
 
         find /tmp -user runner$runner -delete
