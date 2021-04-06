@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Groovy requires JAVA_HOME to be set
+export JAVA_HOME=$PWD/java
+export PATH=$PWD/groovy-3.0.7/bin:$PATH
