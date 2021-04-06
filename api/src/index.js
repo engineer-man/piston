@@ -92,7 +92,6 @@ const app = express();
                 return {
                     language: rt.language,
                     version: rt.version.raw,
-                    author: rt.author,
                     aliases: rt.aliases
                 };
             });

@@ -1,6 +1,5 @@
 {
-  "language": "gawk",
-  "version": "5.1.0",
-  "aliases": ["awk"],
-  "author": "Thomas Hobson <git@hexf.me>"
+    "language": "gawk",
+    "version": "5.1.0",
+    "aliases": ["awk"]
 }

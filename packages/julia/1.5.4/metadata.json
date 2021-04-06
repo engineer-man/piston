@@ -1,6 +1,5 @@
 {
-  "language": "julia",
-  "version": "1.5.4",
-  "aliases": ["jl"],
-  "author": "Victor Frazao <luiz_victor_frazao@hotmail.com>"
+    "language": "julia",
+    "version": "1.5.4",
+    "aliases": ["jl"]
 }

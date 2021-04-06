@@ -1,6 +1,5 @@
 {
     "language": "cow",
     "version": "1.0.0",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["cow"]
-}  
+}

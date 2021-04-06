@@ -1,6 +1,5 @@
 {
-  "language": "dash",
-  "version": "0.5.11",
-  "aliases": ["dash"],
-  "author": "Dan Vargas <danvargas46@gmail.com>"
+    "language": "dash",
+    "version": "0.5.11",
+    "aliases": ["dash"]
 }

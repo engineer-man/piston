@@ -1,6 +1,5 @@
 {
-  "language": "bash",
-  "version": "5.1.0",
-  "aliases": ["sh"],
-  "author": "Thomas Hobson <git@hexf.me>"
+    "language": "bash",
+    "version": "5.1.0",
+    "aliases": ["sh"]
 }

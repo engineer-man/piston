@@ -9,7 +9,6 @@ fi
 
 NAME=$1
 VERSION=$2
-AUTHOR="$(git config user.name) <$(git config user.email)>"
 SOURCE=$3
 
 DIR=$NAME/$VERSION
@@ -26,7 +25,7 @@ build_instructions(){
     echo "curl \"$SOURCE\" -o $NAME.tar.gz"
     echo
     echo "tar xzf $NAME.tar.gz --strip-components=1"
-    echo 
+    echo
 
     echo "# === autoconf based ==="
     echo './configure --prefix "$PREFIX"'
@@ -58,7 +57,7 @@ echo "$NAME-$VERSION \"\$@\"" >> run
 
 echo "# Put instructions to compile source code, remove this file if the language does not require this stage" >> compile
 
-jq '.language = "'$NAME'" | .version = "'$VERSION'" | .aliases = [] | .author = "'"$AUTHOR"'"' <<< "{}" > metadata.json
+jq '.language = "'$NAME'" | .version = "'$VERSION'" | .aliases = []' <<< "{}" > metadata.json
 
 cd - > /dev/null
 

@@ -1,6 +1,5 @@
 {
     "language": "pascal",
     "version": "3.2.0",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["pascal", "freepascal", "pp", "pas"]
 }

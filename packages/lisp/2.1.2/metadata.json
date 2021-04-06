@@ -1,6 +1,5 @@
 {
-  "language": "lisp",
-  "version": "2.1.2",
-  "aliases": ["lisp","cl","sbcl","commonlisp"],
-  "author": "Dan Vargas <danvargas46@gmail.com>"
+    "language": "lisp",
+    "version": "2.1.2",
+    "aliases": ["lisp", "cl", "sbcl", "commonlisp"]
 }

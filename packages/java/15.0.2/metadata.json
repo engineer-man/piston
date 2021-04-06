@@ -1,6 +1,5 @@
 {
-  "language": "java",
-  "version": "15.0.2",
-  "aliases": [],
-  "author": "Thomas Hobson <git@hexf.me>"
+    "language": "java",
+    "version": "15.0.2",
+    "aliases": []
 }

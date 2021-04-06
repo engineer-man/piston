@@ -14,12 +14,11 @@ class Runtime {
             fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
         );
 
-        const { language, version, author, build_platform, aliases } = info;
+        const { language, version, build_platform, aliases } = info;
 
         this.pkgdir = package_dir;
         this.language = language;
         this.version = semver.parse(version);
-        this.author = author;
         this.aliases = aliases;
 
         if (build_platform !== globals.platform) {

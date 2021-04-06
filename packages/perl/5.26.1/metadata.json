@@ -1,6 +1,5 @@
 {
     "language": "perl",
     "version": "5.26.1",
-    "author": "Dan Vargas <danvargas46@gmail.com>",
     "aliases": ["perl", "pl"]
 }

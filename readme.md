@@ -104,8 +104,7 @@ git clone https://github.com/engineer-man/piston
 docker-compose up -d piston_api
 # Start the API container
 
-npm install -g yarn
-cd cli && yarn && cd -
+cd cli && npm i && cd -
 # Install all the dependencies for the cli
 ```
 
@@ -121,7 +120,7 @@ cd cli && yarn && cd -
 echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u "$GITHUB_USERNAME" --password-stdin
 # Change out the $GITHUB_TOKEN and $GITHUB_USERNAME with appropritate values
 
-docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 6969:6969 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
+docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 2000:2000 --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
 ```
 
 <br>
@@ -144,22 +143,29 @@ cli/index.js ppman install python 3.9.1
 # Run a python script
 echo 'print("Hello world!")' > test.py
 cli/index.js run python 3.9.1 test.py
+
+# Run the script using the latest version
+cli/index.js run python '*' test.py
+
+# Run using python 3.x
+cli/index.js run python 3.x test.py
+
 ```
 
 If you are operating on a remote machine, add the `-u` flag like so:
 
 ```sh
-cli/index.js -u http://piston.server:6969 ppman list
+cli/index.js -u http://piston.server:2000 ppman list
 ```
 
 ### API
 
-The container exposes an API on port 6969 by default.
+The container exposes an API on port 2000 by default.
 This is used by the CLI to carry out running jobs and package managment.
 
 #### Runtimes Endpoint
 `GET /runtimes`
-This endpoint will return the supported languages along with the current version, author and aliases. To execute
+This endpoint will return the supported languages along with the current version and aliases. To execute
 code for a particular language using the `/jobs` endpoint, either the name or one of the aliases must
 be provided, along with the version.
 Multiple versions of the same language may be present at the same time, and may be selected when running a job.
@@ -171,7 +177,6 @@ Content-Type: application/json
   {
     "language": "bash",
     "version": "5.1.0",
-    "author": "Thomas Hobson <git@hexf.me>",
     "aliases": [
       "sh"
     ]
@@ -179,7 +184,6 @@ Content-Type: application/json
   {
     "language": "brainfuck",
     "version": "2.7.3",
-    "author": "Thomas Hobson <git@hexf.me>",
     "aliases": [
       "bf"
     ]
@@ -254,21 +258,23 @@ Content-Type: application/json
 <br>
 
 # Supported Languages
-`awk`,
 `bash`,
 `brainfuck`,
-`c`,
-`cpp`,
 `clojure`,
+`coffeescript`,
+`cow`,
 `crystal`,
-`csharp`,
-`d`,
+`dart`,
 `dash`,
 `deno`,
+`dotnet`,
 `elixir`,
 `emacs`,
-`elisp`,
+`erlang`,
+`gawk`,
+`gcc`,
 `go`,
+`groovy`,
 `haskell`,
 `java`,
 `jelly`,
@@ -277,21 +283,26 @@ Content-Type: application/json
 `lisp`,
 `lolcode`,
 `lua`,
+`mono`,
 `nasm`,
-`nasm64`,
 `nim`,
 `node`,
+`ocaml`,
 `osabie`,
 `paradoc`,
+`pascal`,
 `perl`,
 `php`,
-`python2`,
-`python3`,
+`prolog`,
+`pure`,
+`python`,
+`rockstar`,
 `ruby`,
 `rust`,
 `scala`,
 `swift`,
 `typescript`,
+`vlang`,
 `zig`,
 
 <br>
