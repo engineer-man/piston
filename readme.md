@@ -143,6 +143,13 @@ cli/index.js ppman install python 3.9.1
 # Run a python script
 echo 'print("Hello world!")' > test.py
 cli/index.js run python 3.9.1 test.py
+
+# Run the script using the latest version
+cli/index.js run python '*' test.py
+
+# Run using python 3.x
+cli/index.js run python 3.x test.py
+
 ```
 
 If you are operating on a remote machine, add the `-u` flag like so:
