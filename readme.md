@@ -120,7 +120,7 @@ cd cli && npm i && cd -
 echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u "$GITHUB_USERNAME" --password-stdin
 # Change out the $GITHUB_TOKEN and $GITHUB_USERNAME with appropritate values
 
-docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 2000:2000 --privileged --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
+docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 2000:2000 --name piston_api docker.pkg.github.com/engineer-man/piston/api:latest
 ```
 
 <br>
