@@ -22,4 +22,5 @@ make build
 # Install pony into `$PREFIX`.
 make prefix="$PREFIX" install
 
+cd ..
 rm -rf ponyc
