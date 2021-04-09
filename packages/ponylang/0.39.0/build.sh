@@ -2,10 +2,11 @@
 
 PREFIX=$(realpath $(dirname $0))
 
-cd ponyc
-
 # get sources - only get the latest copy of the relevant files
 git clone -q https://github.com/ponylang/ponyc.git ponyc
+
+cd ponyc
+
 # release commit for 0.39.0
 git reset --hard 85d897b978c5082a1f3264a3a9ad479446d73984
 
