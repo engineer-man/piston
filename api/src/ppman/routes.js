@@ -91,7 +91,7 @@ module.exports = {
 
     // DELETE /packages/:language/:version
     async package_uninstall(req, res) {
-        logger.debug('Request to install package');
+        logger.debug('Request to uninstall package');
 
         const pkg = await get_package(req.params.language, req.params.version);
 
