@@ -63,6 +63,11 @@ class Runtime {
     toString() {
         return `${this.language}-${this.version.raw}`;
     }
+
+    unregister() {
+        const index = runtimes.indexOf(this);
+        runtimes.splice(index, 1); //Remove from runtimes list
+    }
 }
 
 module.exports = runtimes;

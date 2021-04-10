@@ -91,11 +91,33 @@ module.exports = {
 
     // DELETE /packages/:language/:version
     async package_uninstall(req, res) {
-        return res
-            .status(500)
-            .send({
-                message: 'Not implemented'
-            });
+        logger.debug('Request to install package');
+
+        const pkg = await get_package(req.params.language, req.params.version);
+
+        if (pkg == null) {
+            return res
+                .status(404)
+                .send({
+                    message: `Requested package ${req.params.language}-${req.params.version} does not exist`
+                });
+        }
+
+        try {
+            const response = await pkg.uninstall();
+
+            return res
+                .status(200)
+                .send(response);
+        } catch(e) {
+            logger.error(`Error while uninstalling package ${pkg.language}-${pkg.version}:`, e.message);
+
+            return res
+                .status(500)
+                .send({
+                    message: e.message
+                });
+        }
     }
 
 };
