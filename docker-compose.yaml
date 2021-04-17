@@ -2,7 +2,7 @@ version: '2.7'
 
 services:
     piston_api:
-        build: api
+        image: ghcr.io/engineer-man/piston
         restart: always
         ports:
             - 2000:2000
