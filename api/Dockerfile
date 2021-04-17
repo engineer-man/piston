@@ -26,3 +26,4 @@ RUN make -C ./src/nosocket/ all && make -C ./src/nosocket/ install
 
 CMD [ "node", "src", "-m", "-c", "/piston/config.yaml"]
 EXPOSE 2000/tcp
+
