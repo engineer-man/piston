@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# CJam jar executable
+cjam "$@"
