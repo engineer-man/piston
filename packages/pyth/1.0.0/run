@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# pyth only takes filename and stdin
+python3 "$PYTH_PATH"/pyth.py "$1"
