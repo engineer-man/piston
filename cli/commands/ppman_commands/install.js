@@ -14,8 +14,8 @@ const msg_format = {
 
 exports.handler = async function({axios, language, languageVersion}){
     try{
-        const install = await axios.post(`/packages/${language}/${languageVersion}`)
-        
+        const install = await axios.post(`/api/v1/packages/${language}/${languageVersion}`)
+
         console.log(msg_format.color(install.data));
     }catch({response}){
         console.error(response.data.message)

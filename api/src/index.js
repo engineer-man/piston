@@ -78,15 +78,15 @@ const app = express();
     const ppman_routes = require('./ppman/routes');
     const executor_routes = require('./executor/routes');
 
-    app.get('/packages', ppman_routes.package_list);
-    app.post('/packages/:language/:version', ppman_routes.package_install);
-    app.delete('/packages/:language/:version', ppman_routes.package_uninstall);
-    app.post('/jobs',
+    app.get('/api/v1/packages', ppman_routes.package_list);
+    app.post('/api/v1/packages/:language/:version', ppman_routes.package_install);
+    app.delete('/api/v1/packages/:language/:version', ppman_routes.package_uninstall);
+    app.post('/api/v1/execute',
         executor_routes.run_job_validators,
         validate,
         executor_routes.run_job
     );
-    app.get('/runtimes', (req, res) => {
+    app.get('/api/v1/runtimes', (req, res) => {
         const runtimes = runtime
             .map(rt => {
                 return {

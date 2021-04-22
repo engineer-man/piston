@@ -101,11 +101,11 @@ git clone https://github.com/engineer-man/piston
 ### Installation
 
 ```sh
-docker-compose up -d piston_api
 # Start the API container
+docker-compose up -d api
 
-cd cli && npm i && cd -
 # Install all the dependencies for the cli
+cd cli && npm i && cd -
 ```
 
 ## Just Piston (no CLI)
@@ -158,10 +158,10 @@ cli/index.js -u http://piston.server:2000 ppman list
 ### API
 
 The container exposes an API on port 2000 by default.
-This is used by the CLI to carry out running jobs and package managment.
+This is used by the CLI to carry out running jobs and package management.
 
 #### Runtimes Endpoint
-`GET /runtimes`
+`GET /api/v1/runtimes`
 This endpoint will return the supported languages along with the current version and aliases. To execute
 code for a particular language using the `/jobs` endpoint, either the name or one of the aliases must
 be provided, along with the version.
@@ -190,7 +190,7 @@ Content-Type: application/json
 ```
 
 #### Execute Endpoint
-`POST /jobs`
+`POST /api/v1/execute`
 This endpoint requests execution of some arbitrary code.
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
 - `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.

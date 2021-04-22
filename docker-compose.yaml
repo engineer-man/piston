@@ -1,8 +1,9 @@
-version: '2.7'
+version: '3.2'
 
 services:
-    piston_api:
+    api:
         image: ghcr.io/engineer-man/piston
+        container_name: piston_api
         restart: always
         ports:
             - 2000:2000

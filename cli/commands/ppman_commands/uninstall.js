@@ -14,8 +14,8 @@ const msg_format = {
 
 exports.handler = async function({axios, language, languageVersion}){
     try{
-        const uninstall = await axios.delete(`/packages/${language}/${languageVersion}`)
-        
+        const uninstall = await axios.delete(`/api/v1/packages/${language}/${languageVersion}`)
+
         console.log(msg_format.color(uninstall.data));
     }catch({response}){
         console.error(response.data.message)
