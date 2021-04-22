@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# dragon binary & java runtime path
+export PATH=$PWD/bin:$PATH
+export JAVA_RUNTIME=$PWD/bin/runtime/bin/java
