@@ -17,21 +17,14 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts, main, alias }) {
+    constructor({ runtime, files, args, stdin, timeouts, alias }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files;
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
-        this.main = main;
         this.alias = alias;
-
-        let file_list = this.files.map(f => f.name);
-
-        if (!file_list.includes(this.main)) {
-            throw new Error(`Main file "${this.main}" will not be written to disk`);
-        }
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -171,7 +164,7 @@ class Job {
 
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
-            [this.main, ...this.args],
+            [this.files[0].name, ...this.args],
             this.timeouts.run
         );
 

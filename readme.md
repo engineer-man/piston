@@ -194,10 +194,9 @@ Content-Type: application/json
 This endpoint requests execution of some arbitrary code.
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
 - `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
-- `files` (**required**) An array of files containing code or other data that should be used for execution.
+- `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
 - `files[].name` (**required**) The name of the file to upload, must be a string containing no path.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `main` (**required**) The name of one of the files provided that should be considered the main source file which will be used as the entrypoint, must be a string and be the name of a file in `files`.
 - `stdin` (**required**) The text to pass as stdin to the program. Must be a string, can be left blank.
 - `args` (**required**) The arguments to pass to the program. Must be an array.
 - `compile_timeout` (**required**) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
@@ -213,7 +212,6 @@ This endpoint requests execution of some arbitrary code.
             "content": "console.log(process.argv)"
         }
     ],
-    "main": "my_cool_code.js",
     "stdin": "",
     "args": [
         "1",

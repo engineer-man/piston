@@ -52,7 +52,6 @@ exports.handler = async function(argv){
         language: argv.language,
         version: argv['language-version'],
         files: files,
-        main: path.basename(argv.file),
         args: argv.args,
         stdin,
         compile_timeout: argv.ct,

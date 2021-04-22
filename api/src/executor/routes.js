@@ -1,4 +1,4 @@
-// {"language":"python","version":"3.9.1","files":{"code.py":"print('hello world')"},"args":[],"stdin":"","compile_timeout":10, "run_timeout":3, "main": "code.py"}
+// {"language":"python","version":"3.9.1","files":{"code.py":"print('hello world')"},"args":[],"stdin":"","compile_timeout":10, "run_timeout":3}
 // {"success":true, "run":{"stdout":"hello world", "stderr":"", "error_code":0},"compile":{"stdout":"","stderr":"","error_code":0}}
 
 const { get_latest_runtime_matching_language_version } = require('../runtime');
@@ -55,8 +55,7 @@ module.exports = {
             timeouts: {
                 run: req.body.run_timeout,
                 compile: req.body.compile_timeout
-            },
-            main: req.body.main
+            }
         });
 
         await job.prime();
