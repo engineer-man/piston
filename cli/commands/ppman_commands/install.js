@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 
-exports.command = ['install <language> <language-version>']
+exports.command = ['install <language> [language-version]']
 exports.aliases = ['i']
 exports.describe = 'Installs the named package'
 
@@ -14,7 +14,7 @@ const msg_format = {
 
 exports.handler = async function({axios, language, languageVersion}){
     try{
-        const install = await axios.post(`/api/v1/packages/${language}/${languageVersion}`)
+        const install = await axios.post(`/api/v1/packages/${language}/${languageVersion || '*'}`)
 
         console.log(msg_format.color(install.data));
     }catch({response}){

@@ -3,11 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 
-exports.command = ['execute <language> <language-version> <file> [args..]']
+exports.command = ['execute <language> <file> [args..]']
 exports.aliases = ['run']
 exports.describe = 'Executes file with the specified runner'
 
 exports.builder = {
+    languageVersion: {
+        string: true,
+        desc: 'Set the version of the language to use',
+        alias: ['l'],
+        default: '*'
+    },
     stdin: {
         boolean: true,
         desc: 'Read input from stdin and pass to executor',
