@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# golfscript only takes code file and stdin
+golfscript.rb "$1"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Path to Ruby and golfscript.rb
+export PATH=$PWD/bin:$PATH
