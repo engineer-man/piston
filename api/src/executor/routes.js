@@ -22,16 +22,6 @@ module.exports = {
             .contains('/'),
         body('files.*.content')
             .isString(),
-        body('compile_timeout')
-            .isNumeric(),
-        body('run_timeout')
-            .isNumeric(),
-        body('stdin')
-            .isString(),
-        body('args')
-            .isArray(),
-        body('args.*')
-            .isString()
     ],
 
     // POST /jobs
@@ -50,11 +40,11 @@ module.exports = {
             runtime,
             alias: req.body.language,
             files: req.body.files,
-            args: req.body.args,
-            stdin: req.body.stdin,
+            args: req.body.args || [],
+            stdin: req.body.stdin || "",
             timeouts: {
-                run: req.body.run_timeout,
-                compile: req.body.compile_timeout
+                run: req.body.run_timeout || 3000,
+                compile: req.body.compile_timeout || 10000
             }
         });
 

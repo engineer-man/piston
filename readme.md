@@ -197,10 +197,10 @@ This endpoint requests execution of some arbitrary code.
 - `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
 - `files[].name` (**required**) The name of the file to upload, must be a string containing no path.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (**required**) The text to pass as stdin to the program. Must be a string, can be left blank.
-- `args` (**required**) The arguments to pass to the program. Must be an array.
-- `compile_timeout` (**required**) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
-- `run_timeout` (**required**) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
+- `stdin` (**optional**) The text to pass as stdin to the program. Must be a string, can be left blank.
+- `args` (**optional**) The arguments to pass to the program. Must be an array.
+- `compile_timeout` (**optional**) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
+- `run_timeout` (**optional**) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
 
 ```json
 {
