@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-# CJam jar executable
-cjam "$@"
+# run cjam jar
+java -jar "$CJAM_PATH"/cjam.jar "$@"

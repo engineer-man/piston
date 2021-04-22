@@ -2,3 +2,4 @@
 
 # CJam and Java Path
 export PATH=$PWD/bin:$PATH
+export CJAM_PATH=$PWD/bin
