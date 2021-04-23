@@ -85,6 +85,7 @@ class Job {
 
             var stdout = '';
             var stderr = '';
+            var output = '';
 
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
                 env: { 
@@ -108,6 +109,7 @@ class Job {
                     proc.kill('SIGKILL');
                 } else {
                     stderr += data;
+                    output += data;
                 }
             });
 
@@ -116,6 +118,7 @@ class Job {
                     proc.kill('SIGKILL');
                 } else {
                     stdout += data;
+                    output += data;
                 }
             });
 
@@ -135,13 +138,13 @@ class Job {
             proc.on('exit', (code, signal)=>{
                 exit_cleanup();
 
-                resolve({ stdout, stderr, code, signal });
+                resolve({ stdout, stderr, code, signal, output });
             });
 
             proc.on('error', (err) => {
                 exit_cleanup();
 
-                reject({ error: err, stdout, stderr });
+                reject({ error: err, stdout, stderr, output });
             });
         });
     }
@@ -177,7 +180,9 @@ class Job {
 
         return {
             compile,
-            run
+            run,
+            language: this.runtime.language,
+            version: this.runtime.version.raw
         };
     }
 
