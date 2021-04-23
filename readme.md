@@ -149,15 +149,18 @@ cli/index.js ppman list
 # Install python 3.9.1
 cli/index.js ppman install python 3.9.1
 
+# Install latest python
+cli/index.js ppman install python
+
 # Run a python script
 echo 'print("Hello world!")' > test.py
-cli/index.js run python 3.9.1 test.py
+cli/index.js run python test.py -l 3.9.1
 
 # Run the script using the latest version
-cli/index.js run python '*' test.py
+cli/index.js run python test.py
 
 # Run using python 3.x
-cli/index.js run python 3.x test.py
+cli/index.js run python test.py -l 3.x
 
 ```
 
