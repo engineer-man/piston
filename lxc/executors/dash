@@ -1,4 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-xargs -a args.args -d '\n' timeout -s KILL 3 dash code.code < stdin.stdin

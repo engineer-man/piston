@@ -1,0 +1,5 @@
+{
+    "language": "lisp",
+    "version": "2.1.2",
+    "aliases": ["lisp", "cl", "sbcl", "commonlisp"]
+}

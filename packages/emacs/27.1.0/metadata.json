@@ -1,0 +1,5 @@
+{
+    "language": "emacs",
+    "version": "27.1.0",
+    "aliases": ["emacs", "el", "elisp"]
+}

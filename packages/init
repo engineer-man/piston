@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 3 ]]; then
+    echo "Usage: $0 [name] [version] [source]"
+    echo ""
+    echo "Initializes an empty package"
+    exit 1
+fi
+
+NAME=$1
+VERSION=$2
+SOURCE=$3
+
+DIR=$NAME/$VERSION
+
+mkdir -p $DIR
+
+build_instructions(){
+    echo 'PREFIX=$(realpath $(dirname $0))'
+    echo
+    echo 'mkdir -p build'
+    echo
+    echo 'cd build'
+    echo
+    echo "curl \"$SOURCE\" -o $NAME.tar.gz"
+    echo
+    echo "tar xzf $NAME.tar.gz --strip-components=1"
+    echo
+
+    echo "# === autoconf based ==="
+    echo './configure --prefix "$PREFIX"'
+    echo
+    echo 'make -j$(nproc)'
+    echo 'make install -j$(nproc)'
+
+    echo 'cd ../'
+    echo 'rm -rf build'
+
+}
+
+cd $DIR
+
+for name in build.sh environment run compile; do
+    echo "#!/usr/bin/env bash" > "$name"
+    echo "" >> "$name"
+done
+
+echo "# Put instructions to build your package in here" >> build.sh
+echo ""
+build_instructions >> build.sh
+
+echo "# Put 'export' statements here for environment variables" >> environment
+echo "export PATH=\$PWD/bin:\$PATH" >> environment
+
+echo "# Put instructions to run the runtime" >> run
+echo "$NAME-$VERSION \"\$@\"" >> run
+
+echo "# Put instructions to compile source code, remove this file if the language does not require this stage" >> compile
+
+jq '.language = "'$NAME'" | .version = "'$VERSION'" | .aliases = []' <<< "{}" > metadata.json
+
+cd - > /dev/null
+
+echo $DIR

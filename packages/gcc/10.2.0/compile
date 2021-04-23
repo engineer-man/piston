@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Put instructions to compile source code, remove this file if the language does not require this stage
+
+
+case "${PISTON_ALIAS}" in
+    gcc | c)
+        gcc -std=c11 "$@" -lm
+        ;;
+    g++ | c++ | cpp)
+        g++ -std=c++17 "$@"
+        ;;
+    gccgo | go)
+        gccgo "$@"
+        ;;
+    gdc | d)
+        gdc "$@"
+        ;;
+    *)
+        echo "How did you get here? (${PISTON_ALIAS})"
+        exit 1
+        ;;
+esac
+
+chmod +x a.out

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run clojure with Java referencing the clojure jar location
+java -jar $CLOJURE_PATH/clojure.jar "$@"

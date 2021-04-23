@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Compile pony file(s)
+ponyc -b out

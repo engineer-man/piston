@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-cp code.code code.d
-timeout -s KILL 10 dmd code.d
-timeout -s KILL 3 xargs -a args.args -d '\n' ./code

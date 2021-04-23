@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# osabie only takes filename and stdin
+osabie "$1"

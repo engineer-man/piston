@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+    api:
+        build: api
+        container_name: piston_api
+        cap_add:
+            - CAP_SYS_ADMIN
+        restart: always
+        ports:
+            - 2000:2000
+        volumes:
+            - ./data/piston:/piston
+        tmpfs:
+            - /piston/jobs:exec
+
+    repo: # Local testing of packages
+        build: repo
+        container_name: piston_repo
+        command: ['dart-2.12.1'] # Only build dart
+        volumes:
+            - .:/piston

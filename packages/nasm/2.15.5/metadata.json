@@ -1,0 +1,5 @@
+{
+    "language": "nasm",
+    "version": "2.15.5",
+    "aliases": ["nasm64"]
+}

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd /tmp/$1
-mv code.code interim.ts
-tsc interim.ts
-rm -f interim.ts
-mv interim.js code.code
-timeout -s KILL 3 xargs -a args.args -d '\n' node code.code < stdin.stdin

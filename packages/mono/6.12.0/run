@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CODE=${1/cs/exe}
+shift
+mono $CODE "$@"
