@@ -1,9 +1,14 @@
 <h1 align="center">
-    <a href="https://github.com/engineer-man/piston"><img src="var/docs/images/icon_circle.svg" width="25" height="25" alt="engineer-man piston"></a>
-  Piston
+    <a href="https://github.com/engineer-man/piston">
+        <img src="var/docs/images/piston.svg" width="32" height="32" style="vertical-align: middle;" alt="engineer-man piston" />
+    </a>
+    <span>
+        Piston
+    </span>
 </h1>
 
 <h3 align="center">A high performance general purpose code execution engine.</h3>
+
 <br>
 
 <p align="center">
@@ -37,19 +42,26 @@
 # About
 
 <h4>
-Piston is a high performance general purpose code execution engine. It excels at running untrusted and
-possibly malicious code without fear from any harmful effects.
+    Piston is a high performance general purpose code execution engine. It excels at running untrusted and
+    possibly malicious code without fear from any harmful effects.
 </h4>
+
 <br>
 
 It's used in numerous places including:
-* [EMKC Challenges](https://emkc.org/challenges),
-* [EMKC Weekly Contests](https://emkc.org/contests),
-* [Engineer Man Discord Server](https://discord.gg/engineerman),
-* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 1300+ other servers
-and 100+ direct integrations.
+* [EMKC Challenges](https://emkc.org/challenges)
+* [EMKC Weekly Contests](https://emkc.org/contests)
+* [Engineer Man Discord Server](https://discord.gg/engineerman)
+* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 4000+ other servers
+and 200+ direct integrations.
 
 To get it in your own server, go here: https://emkc.org/run.
+
+<br>
+
+### Official Extensions
+The following are approved and endorsed extensions/utilities to the core Piston offering.
+- [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 
 <br>
 
@@ -171,21 +183,21 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 [
-  {
-    "language": "bash",
-    "version": "5.1.0",
-    "aliases": [
-      "sh"
-    ]
-  },
-  {
-    "language": "brainfuck",
-    "version": "2.7.3",
-    "aliases": [
-      "bf"
-    ]
-  },
-  ...
+    {
+        "language": "bash",
+        "version": "5.1.0",
+        "aliases": [
+            "sh"
+        ]
+    },
+    {
+        "language": "brainfuck",
+        "version": "2.7.3",
+        "aliases": [
+            "bf"
+        ]
+    },
+    ...
 ]
 ```
 
@@ -197,17 +209,18 @@ This endpoint requests execution of some arbitrary code.
 - `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
 - `files[].name` (**optinal**) The name of the file to upload, must be a string containing no path.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (**optional**) The text to pass as stdin to the program. Must be a string, can be left blank.
-- `args` (**optional**) The arguments to pass to the program. Must be an array.
-- `compile_timeout` (**optional**) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
-- `run_timeout` (**optional**) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
+- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string, can be left blank.
+- `args` (*optional*) The arguments to pass to the program. Must be an array.
+- `compile_timeout` (*optional*) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
+- `run_timeout` (*optional*) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
 
 ```json
 {
     "language": "js",
     "version": "15.10.0",
-    "files":[
+    "files": [
         {
+            "main": true,
             "name": "my_cool_code.js",
             "content": "console.log(process.argv)"
         }
@@ -232,14 +245,15 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "run": {
-    "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
-    "stderr": "",
-    "code": 0,
-    "signal": null
-  }
+    "run": {
+        "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
+        "stderr": "",
+        "code": 0,
+        "signal": null
+    }
 }
 ```
+
 If a problem exists with the request, a `400` status code is returned and the reason in the `message` key.
 ```json
 HTTP/1.1 400 Bad Request
