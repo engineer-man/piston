@@ -138,6 +138,11 @@ class Package {
         logger.debug("Finding runtime")
         const found_runtime = runtime.get_latest_runtime_matching_language_version(this.language, this.version.raw);
 
+        if(!found_runtime){
+            logger.error(`Uninstalling ${this.language}-${this.version.raw} failed: Not installed`)
+            return
+        }
+
         logger.debug("Unregistering runtime")
         found_runtime.unregister();
 
