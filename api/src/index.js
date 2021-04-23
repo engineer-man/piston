@@ -64,7 +64,7 @@ const app = express();
 
         if (!errors.isEmpty()) {
             return res
-                .status(422)
+                .status(400)
                 .send({
                     message: errors.array()
                 });
