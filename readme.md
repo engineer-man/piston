@@ -2,7 +2,7 @@
     <a href="https://github.com/engineer-man/piston">
         <img src="var/docs/images/piston.svg" valign="middle" width="58" height="58" alt="engineer-man piston" />
     </a>
-    <span>
+    <span valign="middle">
         Piston
     </span>
 </h1>
