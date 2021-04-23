@@ -140,7 +140,7 @@ class Package {
 
         if(!found_runtime){
             logger.error(`Uninstalling ${this.language}-${this.version.raw} failed: Not installed`)
-            return
+            throw new Error(`${this.language}-${this.version.raw} is not installed`)
         }
 
         logger.debug("Unregistering runtime")
