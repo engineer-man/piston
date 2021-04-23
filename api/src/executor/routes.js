@@ -15,11 +15,6 @@ module.exports = {
         // isSemVer requires it to be a version, not a selector
         body('files')
             .isArray(),
-        body('files.*.name')
-            .isString()
-            .bail()
-            .not()
-            .contains('/'),
         body('files.*.content')
             .isString(),
     ],

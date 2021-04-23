@@ -20,7 +20,11 @@ class Job {
     constructor({ runtime, files, args, stdin, timeouts, alias }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
-        this.files = files;
+        this.files = files.map((file,i) => ({
+            name: file.name || `file${i}`,
+            content: file.content
+        }));
+        
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
@@ -34,6 +38,7 @@ class Job {
 
         uid %= (config.runner_uid_max - config.runner_uid_min) + 1;
         gid %= (config.runner_gid_max - config.runner_gid_min) + 1;
+
 
         this.state = job_states.READY;
         this.dir = path.join(config.data_directory, globals.data_directories.jobs, this.uuid);
