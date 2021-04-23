@@ -109,6 +109,10 @@ const app = express();
             .send(runtimes);
     });
 
+    app.use(function (req,res,next){
+        return res.status(404).send({message: 'Not Found'});
+    });
+
     logger.debug('Calling app.listen');
     const [ address, port ] = config.bind_address.split(':');
 
