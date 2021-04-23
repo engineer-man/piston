@@ -68,13 +68,14 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 # Public API
 
 - Requires no installation and you can use it immediately.
-- Reference the Versions/Execute sections below to learn about the request and response formats.
+- Reference the Runtimes/Execute sections below to learn about the request and response formats.
 
 <br>
 
-When using the public Piston API, use the base URL:
+When using the public Piston API, use the following two URLs:
 ```
-https://emkc.org/api/v1/piston
+GET  https://emkc.org/api/v2/piston/runtimes
+POST https://emkc.org/api/v2/piston/execute
 ```
 > Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
 and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
@@ -241,9 +242,12 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
+    "language": "js",
+    "version": "15.10.0",
     "run": {
         "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "stderr": "",
+        "output": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "code": 0,
         "signal": null
     }
