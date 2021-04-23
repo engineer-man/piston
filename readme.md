@@ -1,6 +1,6 @@
 <h1 align="center">
     <a href="https://github.com/engineer-man/piston">
-        <img src="var/docs/images/piston.svg" width="32" height="32" style="vertical-align: middle;" alt="engineer-man piston" />
+        <img src="var/docs/images/piston.svg" valign="middle" width="58" height="58" alt="engineer-man piston" />
     </a>
     <span>
         Piston
