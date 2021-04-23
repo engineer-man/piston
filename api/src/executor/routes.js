@@ -19,7 +19,7 @@ module.exports = {
             .isString(),
     ],
 
-    // POST /jobs
+    // POST /execute
     async run_job(req, res) {
         const runtime = get_latest_runtime_matching_language_version(req.body.language, req.body.version);
 

@@ -73,20 +73,9 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 <br>
 
 When using the public Piston API, use the base URL:
-
 ```
 https://emkc.org/api/v1/piston
 ```
-
-#### GET
-```
-https://emkc.org/api/v1/piston/versions
-```
-#### POST
-```
-https://emkc.org/api/v1/piston/execute
-```
-
 > Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
 and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
 so we can discuss potentially getting you an unlimited key.
@@ -129,7 +118,13 @@ cd cli && npm i && cd -
 ### Installation
 
 ```sh
-docker run -v $PWD:'/piston' --tmpfs /piston/jobs -dit -p 2000:2000 --name piston_api ghcr.io/engineer-man/piston
+docker run \
+    -v $PWD:'/piston' \
+    --tmpfs /piston/jobs \
+    -dit \
+    -p 2000:2000 \
+    --name piston_api \
+    ghcr.io/engineer-man/piston
 ```
 
 <br>
@@ -146,22 +141,21 @@ You can execute the cli with `cli/index.js`.
 # List all available packages
 cli/index.js ppman list
 
-# Install python 3.9.1
-cli/index.js ppman install python 3.9.1
-
 # Install latest python
 cli/index.js ppman install python
 
-# Run a python script
-echo 'print("Hello world!")' > test.py
-cli/index.js run python test.py -l 3.9.1
+# Install specific version of python
+cli/index.js ppman install python 3.9.4
 
-# Run the script using the latest version
+# Run a python script using the latest version
+echo 'print("Hello world!")' > test.py
 cli/index.js run python test.py
 
-# Run using python 3.x
+# Run a python script using a specific version
+echo 'print("Hello world!")' > test.py
+cli/index.js run python test.py -l 3.9.4
 cli/index.js run python test.py -l 3.x
-
+cli/index.js run python test.py -l 3
 ```
 
 If you are operating on a remote machine, add the `-u` flag like so:
@@ -178,7 +172,7 @@ This is used by the CLI to carry out running jobs and package management.
 #### Runtimes Endpoint
 `GET /api/v1/runtimes`
 This endpoint will return the supported languages along with the current version and aliases. To execute
-code for a particular language using the `/jobs` endpoint, either the name or one of the aliases must
+code for a particular language using the `/api/v1/execute` endpoint, either the name or one of the aliases must
 be provided, along with the version.
 Multiple versions of the same language may be present at the same time, and may be selected when running a job.
 ```json
