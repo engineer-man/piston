@@ -59,6 +59,14 @@ const app = express();
     app.use(body_parser.urlencoded({ extended: true }));
     app.use(body_parser.json());
 
+    app.use(function (err, req, res, next) {
+        return res
+            .status(400)
+            .send({
+                stack: err.stack
+            })
+      })
+
     const validate = (req, res, next) => {
         const errors = validationResult(req);
 
