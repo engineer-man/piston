@@ -3,9 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 
-exports.command = ['execute <language> <file> [args..]']
-exports.aliases = ['run']
-exports.describe = 'Executes file with the specified runner'
+exports.command = ['execute <language> <file> [args..]'];
+exports.aliases = ['run'];
+exports.describe = 'Executes file with the specified runner';
 
 exports.builder = {
     languageVersion: {
@@ -36,23 +36,22 @@ exports.builder = {
         array: true,
         desc: 'Additional files to add',
     }
-}
+};
 
-exports.handler = async function(argv){
-    
+exports.handler = async function(argv) {
     const files = [...(argv.files || []),argv.file]
-        .map(file_path => ({
-            name: path.basename(file_path),
-            content: fs.readFileSync(file_path).toString()
-        }));
+        .map(file_path => {
+            return {
+                name: path.basename(file_path),
+                content: fs.readFileSync(file_path).toString()
+            };
+        });
 
-
-    const stdin = (argv.stdin && await new Promise((resolve, _)=>{
-        var data = "";
-        process.stdin.on('data', d=> data += d)
-        process.stdin.on('end', _ => resolve(data))
-    })) || "";
-
+    const stdin = (argv.stdin && await new Promise((resolve, _) => {
+        let data = '';
+        process.stdin.on('data', d => data += d);
+        process.stdin.on('end', _ => resolve(data));
+    })) || '';
 
     const request = {
         language: argv.language,
@@ -64,35 +63,39 @@ exports.handler = async function(argv){
         run_timeout: argv.rt
     };
 
-    let response = await argv.axios.post('/jobs', request);
-    response = response.data
+    let { data: response } = await argv.axios.post('/api/v1/execute', request);
 
-    function step(name, ctx){
-        console.log(chalk.bold(`== ${name} ==`))
-        if(ctx.stdout){
-            console.log(" ",chalk.bold(`STDOUT`))
-            console.log("   ",ctx.stdout.replace(/\n/g,'\n    '))
+    const step = (name, ctx) => {
+        console.log(chalk.bold(`== ${name} ==`));
+
+        if (ctx.stdout) {
+            console.log(chalk.bold(`STDOUT`))
+            console.log(ctx.stdout.replace(/\n/g,'\n    '))
         }
-        if(ctx.stderr){
+
+        if (ctx.stderr) {
             console.log(chalk.bold(`STDERR`))
-            console.log("   ",ctx.stderr.replace(/\n/g,'\n    '))
+            console.log(ctx.stderr.replace(/\n/g,'\n    '))
         }
 
-        if(ctx.code)
+        if (ctx.code) {
             console.log(
                 chalk.bold(`Exit Code:`),
                 chalk.bold[ctx.code > 0 ? 'red' : 'green'](ctx.code)
-                )
-        if(ctx.signal)
+            );
+        }
+
+        if (ctx.signal) {
             console.log(
                 chalk.bold(`Signal:`),
                 chalk.bold.yellow(ctx.signal)
-                )
+            );
+        }
     }
 
-    
-    
-    if(response.compile) step('Compile', response.compile)
-    step('Run', response.run)
-    
+    if (response.compile) {
+        step('Compile', response.compile);
+    }
+
+    step('Run', response.run);
 }
