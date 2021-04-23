@@ -1,8 +1,8 @@
 <h1 align="center">
     <a href="https://github.com/engineer-man/piston">
-        <img src="var/docs/images/piston.svg" width="32" height="32" style="vertical-align: middle;" alt="engineer-man piston" />
+        <img src="var/docs/images/piston.svg" valign="middle" width="58" height="58" alt="engineer-man piston" />
     </a>
-    <span>
+    <span valign="middle">
         Piston
     </span>
 </h1>
@@ -207,12 +207,12 @@ This endpoint requests execution of some arbitrary code.
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
 - `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
 - `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
-- `files[].name` (**optinal**) The name of the file to upload, must be a string containing no path.
+- `files[].name` (*optional*) The name of the file to upload, must be a string containing no path or left out.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string, can be left blank.
-- `args` (*optional*) The arguments to pass to the program. Must be an array.
-- `compile_timeout` (*optional*) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number.
-- `run_timeout` (*optional*) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number.
+- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
+- `args` (*optional*) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
+- `compile_timeout` (*optional*) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+- `run_timeout` (*optional*) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
 
 ```json
 {
@@ -220,7 +220,6 @@ This endpoint requests execution of some arbitrary code.
     "version": "15.10.0",
     "files": [
         {
-            "main": true,
             "name": "my_cool_code.js",
             "content": "console.log(process.argv)"
         }
