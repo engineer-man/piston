@@ -3,10 +3,13 @@
 export DOTNET_CLI_HOME=$PWD
 export HOME=$PWD
 
+rename 's/$/\.cs/' "$@" # Add .cs extension
+
 dotnet build --help > /dev/null # Shut the thing up
 
 dotnet new console -o . --no-restore
 rm Program.cs
+
 
 dotnet restore --source $DOTNET_ROOT/.nuget/packages
 dotnet build --no-restore
