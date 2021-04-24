@@ -5,4 +5,9 @@ export VMODULES="$PWD"
 export TMPDIR="$PWD"
 
 # Put instructions to run the runtime
-v run "$@"
+
+rename 's/$/\.v/' "$@" # Add .v extension
+
+filename=$1.v
+shift
+v run $filename "$@"
