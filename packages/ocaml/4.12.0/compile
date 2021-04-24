@@ -1,3 +1,5 @@
 #!/bin/bash
 
-ocamlc -o out "$@"
+rename 's/$/\.ml/' "$@" # Add .ml extension
+
+ocamlc -o out *.ml
