@@ -5,16 +5,16 @@
 
 case "${PISTON_ALIAS}" in
     gcc | c)
-        gcc -std=c11 "$@" -lm
+        rename 's/$/\.c/' "$@" # Add .c extension
+        gcc -std=c11 *.c -lm
         ;;
     g++ | c++ | cpp)
-        g++ -std=c++17 "$@"
-        ;;
-    gccgo | go)
-        gccgo "$@"
+        rename 's/$/\.cpp/' "$@" # Add .cpp extension
+        g++ -std=c++17 *.cpp
         ;;
     gdc | d)
-        gdc "$@"
+        rename 's/$/\.d/' "$@" # Add .d extension
+        gdc *.d
         ;;
     *)
         echo "How did you get here? (${PISTON_ALIAS})"
