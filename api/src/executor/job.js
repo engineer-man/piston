@@ -21,7 +21,7 @@ class Job {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files.map((file,i) => ({
-            name: file.name || `file${i}`,
+            name: file.name || `file${i}.code`,
             content: file.content
         }));
         
