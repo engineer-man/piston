@@ -52,8 +52,8 @@ It's used in numerous places including:
 * [EMKC Challenges](https://emkc.org/challenges)
 * [EMKC Weekly Contests](https://emkc.org/contests)
 * [Engineer Man Discord Server](https://discord.gg/engineerman)
-* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot) bot as well as 4000+ other servers
-and 200+ direct integrations.
+* [I Run Code (Discord Bot)](https://github.com/engineer-man/piston-bot)
+* 200+ direct integrations
 
 To get it in your own server, go here: https://emkc.org/run.
 
@@ -61,6 +61,7 @@ To get it in your own server, go here: https://emkc.org/run.
 
 ### Official Extensions
 The following are approved and endorsed extensions/utilities to the core Piston offering.
+- [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord.
 - [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 
 <br>
