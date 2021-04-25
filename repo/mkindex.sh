@@ -1,4 +1,4 @@
-BASEURL=http://piston_fs_repo:8000/
+BASEURL=http://repo:8000/
 
 i=0
 
