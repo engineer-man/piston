@@ -88,7 +88,7 @@ jobs:
       - name: Run tests
         run: |
           ls -la
-          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name piston_fs_repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
+          docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
           docker run --network container:piston_fs_repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
           echo Waiting for API to start..
           docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/runtimes
