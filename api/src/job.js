@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('./config');
 const globals = require('./globals');
 const fs = require('fs/promises');
+const ps_list = require('ps-list');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -183,6 +184,17 @@ class Job {
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
         await fs.rm(this.dir, { recursive: true, force: true });
+
+        let processes = await ps_list();
+        processes.filter(proc => proc.uid == this.uid);
+
+        await Promise.all(
+            processes.map(
+                proc => process.kill(proc.pid, 'SIGKILL')
+            )
+        );
+        
+
     }
 
 }
