@@ -1,5 +1,18 @@
 {
     "language": "gcc",
     "version": "10.2.0",
-    "aliases": ["c", "g++", "c++", "cpp", "gdc", "d"]
+    "provides": [
+        {
+            "language":"c",
+            "aliases": ["gcc"]
+        },
+        {
+            "language": "c++",
+            "aliases": ["cpp", "g++"]
+        },
+        {
+            "language": "d",
+            "aliases": ["gdc"]
+        }
+    ]
 }

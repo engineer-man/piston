@@ -3,21 +3,21 @@
 # Put instructions to compile source code, remove this file if the language does not require this stage
 
 
-case "${PISTON_ALIAS}" in
-    gcc | c)
+case "${PISTON_LANGUAGE}" in
+    c)
         rename 's/$/\.c/' "$@" # Add .c extension
         gcc -std=c11 *.c -lm
         ;;
-    g++ | c++ | cpp)
+    c++)
         rename 's/$/\.cpp/' "$@" # Add .cpp extension
         g++ -std=c++17 *.cpp
         ;;
-    gdc | d)
+    d)
         rename 's/$/\.d/' "$@" # Add .d extension
         gdc *.d
         ;;
     *)
-        echo "How did you get here? (${PISTON_ALIAS})"
+        echo "How did you get here? (${PISTON_LANGUAGE})"
         exit 1
         ;;
 esac

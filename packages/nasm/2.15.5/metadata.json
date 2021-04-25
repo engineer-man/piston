@@ -1,5 +1,14 @@
 {
     "language": "nasm",
     "version": "2.15.5",
-    "aliases": ["nasm64"]
+    "provides": [
+        {
+            "language": "nasm",
+            "aliases": ["asm", "nasm32"]
+        },
+        {
+            "language": "nasm64",
+            "aliases": ["asm64"]
+        }
+    ]
 }

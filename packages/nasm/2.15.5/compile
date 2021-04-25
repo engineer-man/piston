@@ -3,7 +3,7 @@
 # Put instructions to compile source code, remove this file if the language does not require this stage
 
 
-case "${PISTON_ALIAS}" in
+case "${PISTON_LANGUAGE}" in
     nasm)
         nasm -f elf32 -o binary.o "$@"
         ld -m elf_i386 binary.o -o binary
@@ -13,7 +13,7 @@ case "${PISTON_ALIAS}" in
         ld -m elf_x86_64 binary.o -o binary
         ;;
     *)
-        echo "How did you get here? (${PISTON_ALIAS})"
+        echo "How did you get here? (${PISTON_LANGUAGE})"
         exit 1
         ;;
 esac
