@@ -105,7 +105,7 @@ module.exports.get_latest_runtime_matching_language_version = function(lang, ver
 };
 
 module.exports.get_runtime_by_name_and_version = function(runtime, ver){
-    return runtimes.find(rt => (rt.runtime == runtime || (rt.runtime === undefined && rt.language == lang)) && semver.satisfies(rt.version, ver));
+    return runtimes.find(rt => (rt.runtime == runtime || (rt.runtime === undefined && rt.language == runtime)) && semver.satisfies(rt.version, ver));
 }
 
 module.exports.load_package = Runtime.load_package;
