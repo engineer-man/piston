@@ -17,5 +17,5 @@ do
 
 	echo "==$test_file: $language-$lang_ver=="
 	#jq '.'  <<<"$result"
-	jq -r '.compile.output + .run.output' <<<$result
+	jq -r 'if (.run.stdout | contains("OK") ) then (.run.stdout) else (.compile.output + .run.output) end' <<<$result
 done
