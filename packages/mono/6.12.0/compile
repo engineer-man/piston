@@ -1,3 +1,4 @@
 #!/bin/bash
 
-csc "$@"
+rename 's/$/\.cs/' "$@" # Add .cs extension
+csc -out:out "$@"
