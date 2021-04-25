@@ -24,6 +24,22 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // Add 32 bit and 64 bit architectures to seccomp filter
+    int rc;
+    uint32_t arch[] = {SCMP_ARCH_X86_64, SCMP_ARCH_X86, SCMP_ARCH_X32};
+    // We first remove the existing arch, otherwise our subsequent call to add
+    // it will fail
+    seccomp_arch_remove(ctx, seccomp_arch_native());
+    for (int i = 0; i < sizeof(arch) / sizeof(arch[0]); i++)
+    {
+        rc = seccomp_arch_add(ctx, arch[i]);
+        if (rc != 0)
+        {
+            fprintf(stderr, "Unable to add arch: %d\n", arch[i]);
+            return 1;
+        }
+    }
+
     // Add a seccomp rule to the syscall blacklist - blacklist the socket syscall
     if (seccomp_rule_add(ctx, SCMP_ACT_ERRNO(EACCES), SCMP_SYS(socket), 0) < 0)
     {
