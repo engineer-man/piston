@@ -6,6 +6,7 @@ const config = require('./config');
 const globals = require('./globals');
 const fs = require('fs/promises');
 const ps_list = require('ps-list');
+const wait_pid = require('waitpid');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -190,7 +191,10 @@ class Job {
 
         await Promise.all(
             processes.map(
-                proc => process.kill(proc.pid, 'SIGKILL')
+                async proc => {
+                    process.kill(proc.pid, 'SIGKILL');
+                    wait_pid(proc.pid); //Free zombie state process
+                }
             )
         );
         
