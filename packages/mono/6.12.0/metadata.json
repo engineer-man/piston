@@ -1,5 +1,10 @@
 {
     "language": "mono",
     "version": "6.12.0",
-    "aliases": ["csharp", "cs"]
+    "provides": [
+        {
+            "language": "csharp",
+            "aliases": ["mono", "mono-csharp", "mono-c#", "mono-cs", "c#", "cs"]
+        }
+    ]
 }
