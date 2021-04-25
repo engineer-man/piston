@@ -5,7 +5,8 @@ AUTH_HEADER="Authorization: $API_KEY"
 for test_file in */*/test.*
 do
 	IFS='/' read -ra test_parts <<< "$test_file"
-	language=${test_parts[0]}
+	IFS='.' read -ra file_parts <<< "$(basename $test_file)"
+	language=${file_parts[1]}
 	lang_ver=${test_parts[1]}
 
 	test_src=$(python3 -c "import json; print(json.dumps(open('$test_file').read()))")
