@@ -1,5 +1,14 @@
 {
     "language": "deno",
     "version": "1.7.5",
-    "aliases": ["deno-ts", "deno-js"]
+    "provides": [
+        {
+            "language": "typescript",
+            "aliases": ["deno-ts","deno"]
+        },
+        {
+            "language": "javascript",
+            "aliases": ["deno-js"]
+        }
+    ]
 }
