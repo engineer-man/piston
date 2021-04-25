@@ -14,6 +14,7 @@
         "ps-list": "^7.2.0",
         "semver": "^7.3.4",
         "uuid": "^8.3.2",
+        "waitpid2": "^2.0.5",
         "yargs": "^16.2.0"
     },
     "license": "MIT"
