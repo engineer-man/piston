@@ -4,7 +4,7 @@
     "provides": [
         {
             "language": "awk",
-            "alias": ["gawk"]
+            "aliases": ["gawk"]
         }
     ]
 }
