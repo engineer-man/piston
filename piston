@@ -1,2 +1,23 @@
 #!/usr/bin/env bash
-node cli/index.js "$@"
+
+case $1 in
+    dev)
+        shift
+        docker-compose -f docker-compose.dev.yaml "$@"
+        ;;
+    prod)
+        shift
+        docker-compose -f docker-compose.yaml "$@"
+        ;;
+    update)
+        git pull
+        docker-compose build api
+        docker-compose up api -d
+        ;;
+    clean-pkgs)
+        git clean -fqXd packages
+        ;;
+    *)
+        node cli/index.js "$@"
+        ;;
+esac
