@@ -89,15 +89,15 @@ jobs:
         run: |
           ls -la
           docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
-          docker run --network container:piston_fs_repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
+          docker run --network container:repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
           echo Waiting for API to start..
           docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/runtimes
 
           echo Waiting for Index to start..
-          docker run --network container:piston_fs_repo appropriate/curl -s --retry 999 --retry-max-time 0 --retry-connrefused http://localhost:8000/index
+          docker run --network container:repo appropriate/curl -s --retry 999 --retry-max-time 0 --retry-connrefused http://localhost:8000/index
 
           echo Adjusting index
-          sed -i 's/piston_fs_repo/localhost/g' repo/index
+          sed -i 's/repo/localhost/g' repo/index
 
           echo Listing Packages
           PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:2000/packages)
