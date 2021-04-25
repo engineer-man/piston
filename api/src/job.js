@@ -129,7 +129,8 @@ class Job {
 
                 try {
                     process.kill(-proc.pid, 'SIGKILL');
-                } catch {
+                } catch(e) {
+                    logger.warn(e)
                     // Process will be dead already, so nothing to kill.
                 }
             };
