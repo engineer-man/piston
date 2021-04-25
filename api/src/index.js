@@ -68,8 +68,9 @@ const app = express();
 
     logger.debug('Registering Routes');
 
-    const api_v1 = require('./api/v1')
-    app.use('/api/v1', api_v1); 
+    const api_v2 = require('./api/v2')
+    app.use('/api/v1', api_v2); 
+    app.use('/api/v2', api_v2); 
 
     app.use(function (req,res,next){
         return res.status(404).send({message: 'Not Found'});
