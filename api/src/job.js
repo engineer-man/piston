@@ -100,6 +100,7 @@ class Job {
 
             proc.stdin.write(this.stdin);
             proc.stdin.end();
+            proc.stdin.destroy();
 
             const kill_timeout = set_timeout(_ => proc.kill('SIGKILL'), timeout);
 
@@ -126,13 +127,6 @@ class Job {
 
                 proc.stderr.destroy();
                 proc.stdout.destroy();
-
-                try {
-                    process.kill(-proc.pid, 'SIGKILL');
-                } catch(e) {
-                    logger.warn(e)
-                    // Process will be dead already, so nothing to kill.
-                }
             };
 
             proc.on('exit', (code, signal)=>{
