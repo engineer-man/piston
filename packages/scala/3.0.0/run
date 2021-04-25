@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
 # Put instructions to run the runtime
-scala "$@"
+mv $1 $1.scala
+filename=$1.scala
+shift
+scala $filename "$@"
