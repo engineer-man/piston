@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-GOCACHE=$PWD go run "$@"
+mv $1 $1.go
+filename=$1.go
+shift
+GOCACHE=$PWD go run $filename "$@"
