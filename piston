@@ -12,7 +12,7 @@ case $1 in
     update)
         git pull
         docker-compose build api
-        docker-compose up api -d
+        docker-compose up -d api
         ;;
     clean-pkgs)
         git clean -fqXd packages
