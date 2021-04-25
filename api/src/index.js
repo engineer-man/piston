@@ -9,7 +9,6 @@ const fs = require('fs/promises');
 const fss = require('fs');
 const body_parser = require('body-parser');
 const runtime = require('./runtime');
-const { validationResult } = require('express-validator');
 
 const logger = Logger.create('index');
 const app = express();
@@ -67,48 +66,10 @@ const app = express();
             })
       })
 
-    const validate = (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res
-                .status(400)
-                .send({
-                    message: errors.array()
-                });
-        }
-
-        next();
-    };
-
     logger.debug('Registering Routes');
 
-    const ppman_routes = require('./ppman/routes');
-    const executor_routes = require('./executor/routes');
-
-    app.get('/api/v1/packages', ppman_routes.package_list);
-    app.post('/api/v1/packages/:language/:version', ppman_routes.package_install);
-    app.delete('/api/v1/packages/:language/:version', ppman_routes.package_uninstall);
-    app.post('/api/v1/execute',
-        executor_routes.run_job_validators,
-        validate,
-        executor_routes.run_job
-    );
-    app.get('/api/v1/runtimes', (req, res) => {
-        const runtimes = runtime
-            .map(rt => {
-                return {
-                    language: rt.language,
-                    version: rt.version.raw,
-                    aliases: rt.aliases,
-                    runtime: rt.runtime
-                };
-            });
-
-        return res
-            .status(200)
-            .send(runtimes);
-    });
+    const api_v1 = require('./api/v1')
+    app.use('/api/v1', api_v1); 
 
     app.use(function (req,res,next){
         return res.status(404).send({message: 'Not Found'});

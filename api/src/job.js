@@ -2,8 +2,8 @@ const logger = require('logplease').create('executor/job');
 const {v4: uuidv4} = require('uuid');
 const cp = require('child_process');
 const path = require('path');
-const config = require('../config');
-const globals = require('../globals');
+const config = require('./config');
+const globals = require('./globals');
 const fs = require('fs/promises');
 
 const job_states = {
