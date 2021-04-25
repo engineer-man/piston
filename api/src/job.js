@@ -1,4 +1,4 @@
-const logger = require('logplease').create('executor/job');
+const logger = require('logplease').create('job');
 const {v4: uuidv4} = require('uuid');
 const cp = require('child_process');
 const path = require('path');

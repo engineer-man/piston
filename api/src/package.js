@@ -1,4 +1,4 @@
-const logger = require('logplease').create('ppman/package');
+const logger = require('logplease').create('package');
 const semver = require('semver');
 const config = require('./config');
 const globals = require('./globals');
