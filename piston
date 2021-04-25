@@ -11,7 +11,7 @@ case $1 in
         ;;
     update)
         git pull
-        docker-compose build api
+        docker-compose pull api
         docker-compose up -d api
         ;;
     clean-pkgs)
