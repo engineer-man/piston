@@ -50,7 +50,7 @@ const app = express();
         .flat()
         .filter(pkg => fss.exists_sync(path.join(pkg, globals.pkg_installed_file)));
 
-    installed_languages.forEach(pkg => new runtime.Runtime(pkg));
+    installed_languages.forEach(pkg => runtime.load_package(pkg));
 
     logger.info('Starting API Server');
     logger.debug('Constructing Express App');
@@ -100,7 +100,8 @@ const app = express();
                 return {
                     language: rt.language,
                     version: rt.version.raw,
-                    aliases: rt.aliases
+                    aliases: rt.aliases,
+                    runtime: rt.runtime
                 };
             });
 

@@ -17,7 +17,7 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts, alias }) {
+    constructor({ runtime, files, args, stdin, timeouts }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files.map((file,i) => ({
@@ -28,7 +28,6 @@ class Job {
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
-        this.alias = alias;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -90,7 +89,7 @@ class Job {
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
                 env: { 
                     ...this.runtime.env_vars,
-                    PISTON_ALIAS: this.alias
+                    PISTON_LANGUAGE: this.runtime.language
                 },
                 stdio: 'pipe',
                 cwd: this.dir,

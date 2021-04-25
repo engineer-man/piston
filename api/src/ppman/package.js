@@ -85,7 +85,7 @@ class Package {
         });
 
         logger.debug('Registering runtime');
-        new runtime.Runtime(this.install_path);
+        runtime.load_package(this.install_path);
 
         logger.debug('Caching environment');
         const get_env_command = `cd ${this.install_path}; source environment; env`;
@@ -136,7 +136,7 @@ class Package {
         logger.info(`Uninstalling ${this.language}-${this.version.raw}`);
 
         logger.debug("Finding runtime")
-        const found_runtime = runtime.get_latest_runtime_matching_language_version(this.language, this.version.raw);
+        const found_runtime = runtime.get_runtime_by_name_and_version(this.language, this.version.raw);
 
         if(!found_runtime){
             logger.error(`Uninstalling ${this.language}-${this.version.raw} failed: Not installed`)

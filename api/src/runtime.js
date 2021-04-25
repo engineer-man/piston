@@ -9,17 +9,21 @@ const runtimes = [];
 
 class Runtime {
 
-    constructor(package_dir){
+    constructor({language, version, aliases, pkgdir, runtime}){
+        this.language = language;
+        this.version = version;
+        this.aliases = aliases;
+        this.pkgdir = pkgdir;
+        this.runtime = runtime;
+    }
+
+    static load_package(package_dir){
         let info = JSON.parse(
             fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
         );
 
-        const { language, version, build_platform, aliases } = info;
-
-        this.pkgdir = package_dir;
-        this.language = language;
-        this.version = semver.parse(version);
-        this.aliases = aliases;
+        let { language, version, build_platform, aliases, provides } = info;
+        version = semver.parse(version);
 
         if (build_platform !== globals.platform) {
             logger.warn(
@@ -28,9 +32,29 @@ class Runtime {
             );
         }
 
+        if(provides){
+            // Multiple languages in 1 package
+            provides.forEach(lang => {
+                runtimes.push(new Runtime({
+                    language: lang.language,
+                    aliases: lang.aliases,
+                    version,
+                    pkgdir: package_dir,
+                    runtime: language
+                }));
+            });
+        }else{
+            runtimes.push(new Runtime({
+                language,
+                version,
+                aliases,
+                pkgdir: package_dir
+            }))
+        }
+
         logger.debug(`Package ${language}-${version} was loaded`);
 
-        runtimes.push(this);
+        
     }
 
     get compiled() {
@@ -79,3 +103,9 @@ module.exports.get_latest_runtime_matching_language_version = function(lang, ver
     return module.exports.get_runtimes_matching_language_version(lang, ver)
         .sort((a,b) => semver.rcompare(a.version, b.version))[0];
 };
+
+module.exports.get_runtime_by_name_and_version = function(runtime, ver){
+    return runtimes.find(rt => (rt.runtime == runtime || (rt.runtime === undefined && rt.language == lang)) && semver.satisfies(rt.version, ver));
+}
+
+module.exports.load_package = Runtime.load_package;
