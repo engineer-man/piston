@@ -13,7 +13,7 @@ case "${PISTON_LANGUAGE}" in
         g++ -std=c++17 *.cpp
         ;;
     d)
-        rename 's/$/\.d/' "$@" # Add .d extension
+        rename 's/.code$/\.d/' "$@" # Add .d extension
         gdc *.d
         ;;
     *)
