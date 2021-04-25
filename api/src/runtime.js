@@ -12,7 +12,7 @@ class Runtime {
     constructor({language, version, aliases, pkgdir, runtime}){
         this.language = language;
         this.version = version;
-        this.aliases = aliases;
+        this.aliases = aliases || [];
         this.pkgdir = pkgdir;
         this.runtime = runtime;
     }
