@@ -8,6 +8,7 @@ tar xzf java.tar.gz --strip-components=1
 rm java.tar.gz
 cd ..
 
-curl -L "https://dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.7.zip" -o groovy.zip
+# Download Groovy binaries
+curl -L "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-3.0.7.zip" -o groovy.zip
 unzip -q groovy.zip
 rm groovy.zip
