@@ -192,6 +192,17 @@ class Job {
             processes = processes.filter(proc => proc.uid == this.uid);
 
             for(const proc of processes){
+                // First stop the processes, but keep their resources allocated so they cant re-fork
+                try{
+                    process.kill(proc.pid, 'SIGSTOP');
+                }catch{
+                    // Could already be dead
+                }
+            }
+
+
+            for(const proc of processes){
+                // Then clear them out of the process tree
                 try{
                     process.kill(proc.pid, 'SIGKILL');
                 }catch{
