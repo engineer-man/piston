@@ -192,7 +192,11 @@ class Job {
             processes = processes.filter(proc => proc.uid == this.uid);
 
             for(const proc of processes){
-                process.kill(proc.pid, 'SIGKILL');
+                try{
+                    process.kill(proc.pid, 'SIGKILL');
+                }catch{
+                    // Could already be dead and just needs to be waited on
+                }
                 wait_pid(proc.pid);
             }
         }
