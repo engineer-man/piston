@@ -91,7 +91,7 @@ jobs:
           docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
           docker run --network container:repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
           echo Waiting for API to start..
-          docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/runtimes
+          docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v1/runtimes
 
           echo Waiting for Index to start..
           docker run --network container:repo appropriate/curl -s --retry 999 --retry-max-time 0 --retry-connrefused http://localhost:8000/index
@@ -100,7 +100,7 @@ jobs:
           sed -i 's/repo/localhost/g' repo/index
 
           echo Listing Packages
-          PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:2000/packages)
+          PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:2000/api/v1/packages)
           echo $PACKAGES_JSON
 
           echo Getting CLI ready
@@ -114,7 +114,7 @@ jobs:
             PKG_VERSION=$(awk -F- '{ print $2 }' <<< $package)
 
             echo "Installing..."
-            docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/packages/$PKG_PATH
+            docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/api/v1/packages/$PKG_PATH
 
             TEST_SCRIPTS=packages/$PKG_PATH/test.*
             echo "Tests: $TEST_SCRIPTS"
@@ -134,7 +134,7 @@ jobs:
         if: ${{ always() }}
         run: |
           docker logs api
-          docker logs piston_fs_repo
+          docker logs repo
 
 
 
