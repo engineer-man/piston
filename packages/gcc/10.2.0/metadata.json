@@ -13,6 +13,10 @@
         {
             "language": "d",
             "aliases": ["gdc"]
+        },
+        {
+            "language": "fortran",
+            "aliases": ["fortran", "f90"]
         }
     ]
 }
