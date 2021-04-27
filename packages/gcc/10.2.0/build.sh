@@ -17,7 +17,7 @@ tar xzf gcc.tar.gz --strip-components=1
 cd ../obj
 
 # === autoconf based === 
-../build/configure --prefix "$PREFIX" --enable-languages=c,c++,d --disable-multilib --disable-bootstrap
+../build/configure --prefix "$PREFIX" --enable-languages=c,c++,d,fortran --disable-multilib --disable-bootstrap
 
 make -j$(nproc)
 make install -j$(nproc)
