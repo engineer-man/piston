@@ -183,12 +183,10 @@ class Job {
         };
     }
 
-    async cleanup() {
-        logger.info(`Cleaning up job uuid=${this.uuid}`);
-        await fs.rm(this.dir, { recursive: true, force: true });
+
+    async cleanup_processes(){
         let processes = [1];
         while(processes.length > 0){
-
             processes = await ps_list();
             processes = processes.filter(proc => proc.uid == this.uid);
 
@@ -212,8 +210,32 @@ class Job {
                 wait_pid(proc.pid);
             }
         }
-        
+    }
 
+    async cleanup_filesystem(){
+        /*
+        for (const clean_path of globals.clean_directories) {
+            const contents = await fs.readdir(clean_path);
+
+            for (const file of contents) {
+                const file_path = path.join(clean_path, file);
+                const stat = await fs.stat(file_path);
+                if(stat.uid == this.uid)
+                    await fs.rm(file_path,  { recursive: true, force: true });
+            }
+
+        }*/
+
+        await fs.rm(this.dir, { recursive: true, force: true });
+    }
+
+    async cleanup() {
+        logger.info(`Cleaning up job uuid=${this.uuid}`);
+        
+        await Promise.all([
+            this.cleanup_processes(),
+            this.cleanup_filesystem()
+        ]);
     }
 
 }
