@@ -74,6 +74,7 @@ jobs:
             output_max_size: 1024
             max_process_count: 64
             max_open_files: 2048
+            max_file_size: 1000000
             repo_url: http://localhost:8000/index
 
           write-mode: overwrite
