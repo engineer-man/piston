@@ -16,6 +16,10 @@ case "${PISTON_LANGUAGE}" in
         rename 's/.code$/\.d/' "$@" # Add .d extension
         gdc *.d
         ;;
+    fortran)
+        rename 's/.code$/\.f90/' "$@" # Add .f90 extension
+        gfortran *.f90
+        ;;
     *)
         echo "How did you get here? (${PISTON_LANGUAGE})"
         exit 1

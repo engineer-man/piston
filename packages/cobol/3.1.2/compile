@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+cobc -o binary --free -x -L lib "$@"
+chmod +x binary
+

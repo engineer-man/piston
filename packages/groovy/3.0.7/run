@@ -1,3 +1,5 @@
 #!/bin/bash
 
-groovy "$@"
+# Run the jar created during compile
+shift
+java -jar out.jar "$@"
