@@ -213,7 +213,7 @@ class Job {
     }
 
     async cleanup_filesystem(){
-        /*
+        
         for (const clean_path of globals.clean_directories) {
             const contents = await fs.readdir(clean_path);
 
@@ -224,7 +224,7 @@ class Job {
                     await fs.rm(file_path,  { recursive: true, force: true });
             }
 
-        }*/
+        }
 
         await fs.rm(this.dir, { recursive: true, force: true });
     }
