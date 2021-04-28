@@ -103,6 +103,12 @@ const options = [
         validators: []
     },
     {
+        key: 'max_file_size',
+        desc: 'Max file size in bytes for a file',
+        default: 1000000, //1MB
+        validators: []
+    },
+    {
         key: 'repo_url',
         desc: 'URL of repo index',
         default: 'https://github.com/engineer-man/piston/releases/download/pkgs/index',

@@ -74,7 +74,8 @@ class Job {
             const prlimit = [
                 'prlimit',
                 '--nproc=' + config.max_process_count,
-                '--nofile=' + config.max_open_files
+                '--nofile=' + config.max_open_files,
+                '--fsize=' + config.max_file_size
             ];
 
             const proc_call = [
@@ -185,7 +186,7 @@ class Job {
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
         await fs.rm(this.dir, { recursive: true, force: true });
-        let processes = [1]
+        let processes = [1];
         while(processes.length > 0){
 
             processes = await ps_list();
