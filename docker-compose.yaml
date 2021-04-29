@@ -11,4 +11,4 @@ services:
             - ./data/piston:/piston
         tmpfs:
             - /piston/jobs:exec
-            - /tmp
+            - /tmp:exec
