@@ -170,9 +170,9 @@ The container exposes an API on port 2000 by default.
 This is used by the CLI to carry out running jobs and package management.
 
 #### Runtimes Endpoint
-`GET /api/v1/runtimes`
+`GET /api/v2/runtimes`
 This endpoint will return the supported languages along with the current version and aliases. To execute
-code for a particular language using the `/api/v1/execute` endpoint, either the name or one of the aliases must
+code for a particular language using the `/api/v2/execute` endpoint, either the name or one of the aliases must
 be provided, along with the version.
 Multiple versions of the same language may be present at the same time, and may be selected when running a job.
 ```json
@@ -199,7 +199,7 @@ Content-Type: application/json
 ```
 
 #### Execute Endpoint
-`POST /api/v1/execute`
+`POST /api/v2/execute`
 This endpoint requests execution of some arbitrary code.
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
 - `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
