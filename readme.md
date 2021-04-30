@@ -315,6 +315,7 @@ Content-Type: application/json
 `swift`,
 `typescript`,
 `vlang`,
+`yeethon`,
 `zig`,
 
 <br>
