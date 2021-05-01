@@ -210,6 +210,7 @@ This endpoint requests execution of some arbitrary code.
 - `args` (*optional*) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
 - `compile_timeout` (*optional*) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
 - `run_timeout` (*optional*) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+- `max_memory_usage` (*optional*) The maximum amount of memory the run stage is allowed to use. Must be a number or left out. Defaults to `256000000` (256 MB)
 
 ```json
 {
@@ -228,7 +229,8 @@ This endpoint requests execution of some arbitrary code.
         "3"
     ],
     "compile_timeout": 10000,
-    "run_timeout": 3000
+    "run_timeout": 3000,
+    "max_memory_usage": 256000000
 }
 ```
 A typical response upon successful execution will contain 1 or 2 keys `run` and `compile`.

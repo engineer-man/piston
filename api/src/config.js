@@ -109,6 +109,12 @@ const options = [
         validators: []
     },
     {
+        key: 'max_memory_usage',
+        desc: 'Max memory usage in bytes',
+        default: 256000000, //256MB
+        validators: []
+    },
+    {
         key: 'repo_url',
         desc: 'URL of repo index',
         default: 'https://github.com/engineer-man/piston/releases/download/pkgs/index',

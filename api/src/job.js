@@ -19,7 +19,7 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts }) {
+    constructor({ runtime, files, args, stdin, timeouts, max_memory_usage }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files.map((file,i) => ({
@@ -30,6 +30,7 @@ class Job {
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
+        this.max_memory_usage = max_memory_usage;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -75,7 +76,8 @@ class Job {
                 'prlimit',
                 '--nproc=' + config.max_process_count,
                 '--nofile=' + config.max_open_files,
-                '--fsize=' + config.max_file_size
+                '--fsize=' + config.max_file_size,
+                '--as=' + this.max_memory_usage
             ];
 
             const proc_call = [
@@ -161,7 +163,8 @@ class Job {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.timeouts.compile
+                this.timeouts.compile,
+                config.max_memory_usage
             );
         }
 
@@ -170,7 +173,8 @@ class Job {
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.timeouts.run
+            this.timeouts.run,
+            this.max_memory_usage
         );
 
         this.state = job_states.EXECUTED;
