@@ -6,8 +6,9 @@ RUN apt-get update && apt-get install -y unzip autoconf build-essential libssl-d
         linux-headers-amd64 perl xz-utils python3 python3-pip gnupg jq zlib1g-dev \
         cmake cmake-doc extra-cmake-modules build-essential gcc binutils bash coreutils \
         util-linux pciutils usbutils coreutils binutils findutils grep libncurses5-dev \
-        libncursesw5-dev python3-pip libgmp-dev libmpfr-dev python2 libffi-dev \
-        libreadline-dev && \
+        libncursesw5-dev python3-pip libgmp-dev libmpfr-dev python2 libffi-dev gfortran\
+        libreadline-dev libblas-dev liblapack-dev libpcre3-dev libarpack2-dev libfftw3-dev \
+        libglpk-dev libqhull-dev libqrupdate-dev libsuitesparse-dev libsundials-dev && \
         ln -sf /bin/bash /bin/sh && \
         rm -rf /var/lib/apt/lists/* && \
         update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2
