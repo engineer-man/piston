@@ -1,14 +1,13 @@
 const express = require('express');
 const router  = express.Router();
 
-const config = require('../config');
 const runtime = require('../runtime');
 const {Job} = require("../job");
 const package = require('../package')
 const logger = require('logplease').create('api/v1');
 
 router.post('/execute', async function(req, res){
-        const {language, version, files, stdin, args, run_timeout, compile_timeout, max_memory_usage} = req.body;
+        const {language, version, files, stdin, args, run_timeout, compile_timeout} = req.body;
 
         if(!language || typeof language !== "string")
         {
@@ -47,21 +46,6 @@ router.post('/execute', async function(req, res){
             }
         }
 
-        if (max_memory_usage) {
-            if (typeof max_memory_usage !== "number" || max_memory_usage < 0) {
-                return res
-                    .status(400)
-                    .send({
-                        message: "if specified, max_memory_usage must be a non-negative number"
-                    })
-            } else if (max_memory_usage > config.max_memory_usage) {
-                return res
-                    .status(400)
-                    .send({
-                        message: "max_memory_usage cannot exceed the configured limit of " + config.max_memory_usage
-                    })
-            }
-        }
 
 
     
@@ -84,8 +68,7 @@ router.post('/execute', async function(req, res){
             timeouts: {
                 run: run_timeout || 3000,
                 compile: compile_timeout || 10000
-            },
-            max_memory_usage: max_memory_usage || config.max_memory_usage
+            }
         });
 
         await job.prime();
