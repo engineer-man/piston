@@ -9,6 +9,8 @@ const fss = require('fs');
 const cp = require('child_process');
 const crypto = require('crypto');
 const runtime = require('./runtime');
+const chownr = require('chownr');
+const util = require('util');
 
 class Package {
 
@@ -119,6 +121,9 @@ class Package {
             .join('\n');
 
         await fs.write_file(path.join(this.install_path, '.env'), filtered_env);
+
+        logger.debug('Changing Ownership of package directory');
+        await util.promisify(chownr)(this.install_path,0,0);
 
         logger.debug('Writing installed state to disk');
         await fs.write_file(path.join(this.install_path, globals.pkg_installed_file), Date.now().toString());
