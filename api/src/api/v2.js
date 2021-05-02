@@ -37,7 +37,7 @@ router.post('/execute', async function(req, res){
         }
 
         for (const [i,file] of files.entries()) {
-            if(!file.content || typeof file.content !== "string"){
+            if(typeof file.content !== "string"){
                 return res
                     .status(400)
                     .send({
