@@ -19,7 +19,7 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts }) {
+    constructor({ runtime, files, args, stdin, timeouts, compile_memory_limit, run_memory_limit }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files.map((file,i) => ({
@@ -30,6 +30,8 @@ class Job {
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
+        this.compile_memory_limit = compile_memory_limit;
+        this.run_memory_limit = run_memory_limit;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -67,7 +69,7 @@ class Job {
         logger.debug('Primed job');
     }
 
-    async safe_call(file, args, timeout) {
+    async safe_call(file, args, timeout, memory_limit) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
@@ -77,6 +79,10 @@ class Job {
                 '--nofile=' + config.max_open_files,
                 '--fsize=' + config.max_file_size
             ];
+
+            if (memory_limit >= 0) {
+                prlimit.push('--as=' + memory_limit);
+            }
 
             const proc_call = [
                 ...prlimit,
@@ -161,7 +167,8 @@ class Job {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.timeouts.compile
+                this.timeouts.compile,
+                this.compile_memory_limit
             );
         }
 
@@ -170,7 +177,8 @@ class Job {
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.timeouts.run
+            this.timeouts.run,
+            this.run_memory_limit
         );
 
         this.state = job_states.EXECUTED;
