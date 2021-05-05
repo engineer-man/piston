@@ -1,20 +1,11 @@
 #!/bin/bash
 
-# Download and install NodeJS
-curl "https://nodejs.org/dist/v15.10.0/node-v15.10.0-linux-x64.tar.xz" -o node.tar.xz
-tar xf node.tar.xz --strip-components=1
-rm node.tar.xz
-export PATH=$PWD/bin:$PATH
+# Using the Rocky implementation of the Rockstar spec
 
-# Pull Rockstar reference implementation project
-git clone -q "https://github.com/RockstarLang/rockstar.git" rockstar
-cd rockstar
-git reset --hard bc9eedc6acb7c0f31a425cc204dcd93cb3e68936
+# Download Java
+source ../../java/15.0.2/build.sh
 
-# Install Satriani dependencies
-cd satriani
-npm install
-cd ../..
-
-# Suppress "(program returned no output)" output at the end of each program
-sed -i 's/console.log(result ? result : "(program returned no output)");/if (result) console.log(result);/g' rockstar/satriani/rockstar.js
+# Download Rocky and the wrapper
+curl -LO "https://github.com/gaborsch/rocky/raw/master/rocky.jar"
+curl -LO "https://github.com/gaborsch/rocky/raw/master/rockstar"
+chmod +x rockstar

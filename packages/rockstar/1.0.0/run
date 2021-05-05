@@ -1,3 +1,4 @@
 #!/bin/bash
 
-node $ROCKSTAR_PATH/rockstar "$@"
+# Run Rockstar file (no args or multifile execution, only stdin)
+$ROCKSTAR_PATH/rockstar "$1"
