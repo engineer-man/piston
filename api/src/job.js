@@ -219,9 +219,14 @@ class Job {
 
             for (const file of contents) {
                 const file_path = path.join(clean_path, file);
-                const stat = await fs.stat(file_path);
-                if(stat.uid == this.uid)
-                    await fs.rm(file_path,  { recursive: true, force: true });
+                try{
+                    const stat = await fs.stat(file_path);
+                    if(stat.uid == this.uid)
+                        await fs.rm(file_path,  { recursive: true, force: true });
+                }catch(e){
+                    // File was somehow deleted in the time that we read the dir to when we checked the file
+                    logger.warn(`Error removing file ${file_path}: ${e}`)
+                }
             }
 
         }
