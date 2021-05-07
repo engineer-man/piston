@@ -7,7 +7,7 @@ const package = require('../package')
 const logger = require('logplease').create('api/v1');
 
 router.use(function(req, res, next){
-    if(req.method == "POST" && req.headers['content-type'] !== "application/json")
+    if(req.method == "POST" && !req.headers['content-type'].startsWith("application/json"))
         return res
             .status(415)
             .send({
