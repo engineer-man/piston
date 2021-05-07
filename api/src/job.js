@@ -5,7 +5,6 @@ const path = require('path');
 const config = require('./config');
 const globals = require('./globals');
 const fs = require('fs/promises');
-const ps_list = require('ps-list');
 const wait_pid = require('waitpid');
 
 const job_states = {
@@ -194,8 +193,25 @@ class Job {
     async cleanup_processes(){
         let processes = [1];
         while(processes.length > 0){
-            processes = await ps_list();
-            processes = processes.filter(proc => proc.uid == this.uid);
+            processes = await new Promise((resolve, reject) => cp.execFile('ps', ['awwxo', 'pid,ruid'], function(err, stdout) {
+                if(err === null){
+                    const lines = stdout.split('\n').slice(1); //Remove header with slice
+                    const procs = lines.map(line => {
+                        const [pid, ruid] = line
+                            .trim()
+                            .split(/\s+/)
+                            .map(n => parseInt(n));
+
+                        return { pid, ruid }
+                    })
+                    resolve(procs)
+                }
+                else{
+                    reject(error)
+                }
+            }));
+
+            processes = processes.filter(proc => proc.ruid == this.uid);
 
             for(const proc of processes){
                 // First stop the processes, but keep their resources allocated so they cant re-fork
