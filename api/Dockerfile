@@ -20,11 +20,10 @@ RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
 WORKDIR /piston_api
 COPY ["package.json", "package-lock.json", "./"]
-RUN npm install 
+RUN npm install
 COPY ./src ./src
 
 RUN make -C ./src/nosocket/ all && make -C ./src/nosocket/ install
 
 CMD [ "node", "src"]
 EXPOSE 2000/tcp
-

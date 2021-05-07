@@ -1,8 +1,8 @@
 // Globals are things the user shouldn't change in config, but is good to not use inline constants for
 const is_docker = require('is-docker');
-const fss = require('fs');
+const fs = require('fs');
 const platform = `${is_docker() ? 'docker' : 'baremetal'}-${
-    fss.read_file_sync('/etc/os-release')
+    fs.read_file_sync('/etc/os-release')
         .toString()
         .split('\n')
         .find(x => x.startsWith('ID'))
@@ -18,9 +18,9 @@ module.exports = {
     platform,
     pkg_installed_file: '.ppman-installed', //Used as indication for if a package was installed
     clean_directories: [
-        "/dev/shm",
-        "/run/lock",
-        "/tmp",
-        "/var/tmp"
+        '/dev/shm',
+        '/run/lock',
+        '/tmp',
+        '/var/tmp'
     ]
 };

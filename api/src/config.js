@@ -2,7 +2,6 @@ const fss = require('fs');
 const Logger = require('logplease');
 const logger = Logger.create('config');
 
-
 const options = [
     {
         key: 'log_level',
@@ -31,7 +30,7 @@ const options = [
         default: 1001,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -40,7 +39,7 @@ const options = [
         default: 1500,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -49,7 +48,7 @@ const options = [
         default: 1001,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -58,7 +57,7 @@ const options = [
         default: 1500,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -76,7 +75,7 @@ const options = [
         default: 1024,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -85,7 +84,7 @@ const options = [
         default: 64,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -94,7 +93,7 @@ const options = [
         default: 2048,
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -103,7 +102,7 @@ const options = [
         default: 1000000, //1MB
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -112,7 +111,7 @@ const options = [
         default: -1, // no limit
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -121,7 +120,7 @@ const options = [
         default: -1, // no limit
         parser: parse_int,
         validators: [
-            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+            (x, raw) => !is_nan(x) || `${raw} is not a number`,
         ]
     },
     {
@@ -141,15 +140,13 @@ let config = {};
 options.forEach(option => {
     const env_key = "PISTON_" + option.key.to_upper_case();
 
-    const parser = option.parser || (x=>x);
+    const parser = option.parser || (x => x);
 
     const env_val = process.env[env_key];
 
     const parsed_val = parser(env_val);
 
-    
     const value = env_val || option.default;
-
 
     option.validators.for_each(validator => {
         let response = null;
@@ -173,6 +170,5 @@ if (errored) {
 }
 
 logger.info('Configuration successfully loaded');
-
 
 module.exports = config;

@@ -8,7 +8,7 @@ exports.aliases = ['run'];
 exports.describe = 'Executes file with the specified runner';
 
 exports.builder = {
-    languageVersion: {
+    version: {
         string: true,
         desc: 'Set the version of the language to use',
         alias: ['l'],
@@ -38,7 +38,7 @@ exports.builder = {
     }
 };
 
-exports.handler = async function(argv) {
+exports.handler = async (argv) => {
     const files = [...(argv.files || []),argv.file]
         .map(file_path => {
             return {
@@ -63,7 +63,7 @@ exports.handler = async function(argv) {
         run_timeout: argv.rt
     };
 
-    let { data: response } = await argv.axios.post('/api/v1/execute', request);
+    let { data: response } = await argv.axios.post('/api/v2/execute', request);
 
     const step = (name, ctx) => {
         console.log(chalk.bold(`== ${name} ==`));

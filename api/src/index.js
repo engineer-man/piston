@@ -40,16 +40,20 @@ const app = express();
     const pkglist = await fs.readdir(pkgdir);
 
     const languages = await Promise.all(
-        pkglist.map(lang=>
-            fs.readdir(path.join(pkgdir,lang))
-                .then(x=>x.map(y=>path.join(pkgdir, lang, y)))
-        ));
+        pkglist.map(lang => {
+            return fs
+                .readdir(path.join(pkgdir,lang))
+                .then(x => {
+                    return x.map(y => path.join(pkgdir, lang, y))
+                });
+        })
+    );
 
     const installed_languages = languages
         .flat()
         .filter(pkg => fss.exists_sync(path.join(pkg, globals.pkg_installed_file)));
 
-    installed_languages.forEach(pkg => runtime.load_package(pkg));
+    installed_languages.for_each(pkg => runtime.load_package(pkg));
 
     logger.info('Starting API Server');
     logger.debug('Constructing Express App');
@@ -58,22 +62,24 @@ const app = express();
     app.use(body_parser.urlencoded({ extended: true }));
     app.use(body_parser.json());
 
-    app.use(function (err, req, res, next) {
+    app.use((err, req, res, next) => {
         return res
             .status(400)
             .send({
                 stack: err.stack
-            })
-      })
+            });
+    });
 
     logger.debug('Registering Routes');
 
     const api_v2 = require('./api/v2')
-    app.use('/api/v1', api_v2); 
-    app.use('/api/v2', api_v2); 
+    app.use('/api/v2', api_v2);
+    app.use('/api/v2', api_v2);
 
-    app.use(function (req,res,next){
-        return res.status(404).send({message: 'Not Found'});
+    app.use((req, res, next) => {
+        return res
+            .status(404)
+            .send({message: 'Not Found'});
     });
 
     logger.debug('Calling app.listen');
