@@ -8,13 +8,11 @@ const package = require('../package')
 const logger = require('logplease').create('api/v2');
 
 router.use((req, res, next) => {
-    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || !req.body) {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
         return next();
     }
 
-    try {
-        JSON.parse(req.body);
-    } catch (e) {
+    if (req.headers['content-type'] !== 'application/json') {
         return res
             .status(415)
             .send({
