@@ -4,7 +4,10 @@ const axios = require('axios').default;
 
 const axios_instance = argv => {
     argv.axios = axios.create({
-        baseURL: argv['piston-url']
+        baseURL: argv['piston-url'],
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
 
     return argv;
