@@ -6,6 +6,16 @@ const {Job} = require("../job");
 const package = require('../package')
 const logger = require('logplease').create('api/v1');
 
+router.use(function(req, res, next){
+    if(req.method == "POST" && req.headers['content-type'] !== "application/json")
+        return res
+            .status(415)
+            .send({
+                message: "requests must be of type application/json"
+            })
+    next();
+})
+
 router.post('/execute', async function(req, res){
         const {language, version, files, stdin, args, run_timeout, compile_timeout} = req.body;
 
