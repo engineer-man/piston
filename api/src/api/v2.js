@@ -8,7 +8,7 @@ const package = require('../package')
 const logger = require('logplease').create('api/v2');
 
 router.use((req, res, next) => {
-    if (!req.body || req.body === '') {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || !req.body) {
         return next();
     }
 
