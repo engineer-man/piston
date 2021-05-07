@@ -19,7 +19,7 @@ let gid = 0;
 
 class Job {
 
-    constructor({ runtime, files, args, stdin, timeouts, compile_memory_limit, run_memory_limit }) {
+    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid =  uuidv4();
         this.runtime = runtime;
         this.files = files.map((file,i) => ({
@@ -30,8 +30,7 @@ class Job {
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
-        this.compile_memory_limit = compile_memory_limit;
-        this.run_memory_limit = run_memory_limit;
+        this.memory_limits = memory_limits;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -168,7 +167,7 @@ class Job {
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
                 this.timeouts.compile,
-                this.compile_memory_limit
+                this.memory_limits.compile
             );
         }
 
@@ -178,7 +177,7 @@ class Job {
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
             this.timeouts.run,
-            this.run_memory_limit
+            this.memory_limits.run
         );
 
         this.state = job_states.EXECUTED;

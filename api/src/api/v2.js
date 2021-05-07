@@ -101,8 +101,10 @@ router.post('/execute', async function(req, res){
                 run: run_timeout || 3000,
                 compile: compile_timeout || 10000
             },
-            compile_memory_limit: compile_memory_limit || config.compile_memory_limit,
-            run_memory_limit: run_memory_limit || config.run_memory_limit
+            memory_limits: {
+                run: run_memory_limit || config.run_memory_limit,
+                compile: compile_memory_limit || config.compile_memory_limit
+            }
         });
 
         await job.prime();
