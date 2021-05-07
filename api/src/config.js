@@ -1,36 +1,7 @@
 const fss = require('fs');
-const yargs = require('yargs');
-const hide_bin = require('yargs/helpers').hideBin;
 const Logger = require('logplease');
 const logger = Logger.create('config');
-const yaml = require('js-yaml');
 
-const header = `#
-#      ____  _     _
-#     |  _ \\(_)___| |_ ___  _ __
-#     | |_) | / __| __/ _ \\| '_ \\
-#     |  __/| \\__ \\ || (_) | | | |
-#     |_|   |_|___/\\__\\___/|_| |_|
-#
-# A High performance code execution engine
-#     github.com/engineer-man/piston
-#
-
-`;
-const argv = yargs(hide_bin(process.argv))
-    .usage('Usage: $0 -c [config]')
-    .demandOption('c')
-    .option('config', {
-        alias: 'c',
-        describe: 'config file to load from',
-        default: '/piston/config.yaml'
-    })
-    .option('make-config', {
-        alias: 'm',
-        type: 'boolean',
-        describe: 'create config file and populate defaults if it does not already exist'
-    })
-    .argv;
 
 const options = [
     {
@@ -58,67 +29,100 @@ const options = [
         key: 'runner_uid_min',
         desc: 'Minimum uid to use for runner',
         default: 1001,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'runner_uid_max',
         desc: 'Maximum uid to use for runner',
         default: 1500,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'runner_gid_min',
         desc: 'Minimum gid to use for runner',
         default: 1001,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'runner_gid_max',
         desc: 'Maximum gid to use for runner',
         default: 1500,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'disable_networking',
         desc: 'Set to true to disable networking',
         default: true,
-        validators: []
+        parser: x => x === "true",
+        validators: [
+            x => typeof x === "boolean" || `${x} is not a boolean`
+        ]
     },
     {
         key: 'output_max_size',
         desc: 'Max size of each stdio buffer',
         default: 1024,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'max_process_count',
         desc: 'Max number of processes per job',
         default: 64,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'max_open_files',
         desc: 'Max number of open files per job',
         default: 2048,
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'max_file_size',
         desc: 'Max file size in bytes for a file',
         default: 1000000, //1MB
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'compile_memory_limit',
         desc: 'Max memory usage for compile stage in bytes (set to -1 for no limit)',
         default: -1, // no limit
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'run_memory_limit',
         desc: 'Max memory usage for run stage in bytes (set to -1 for no limit)',
         default: -1, // no limit
-        validators: []
+        parser: parse_int,
+        validators: [
+            (x,raw) => !isNaN(x) || `${raw} is not a number`,
+        ]
     },
     {
         key: 'repo_url',
@@ -128,76 +132,40 @@ const options = [
     }
 ];
 
-const make_default_config = () => {
-    let content = header.split('\n');
-
-    options.forEach(option => {
-        content = content.concat(option.desc.split('\n').map(x=>`# ${x}`));
-
-        if (option.options) {
-            content.push('# Options: ' + option.options.join(', '));
-        }
-
-        content.push(`${option.key}: ${option.default}`);
-
-        content.push(''); // New line between
-    });
-
-    return content.join('\n');
-};
-
-logger.info(`Loading Configuration from ${argv.config}`);
-
-if (argv['make-config']) {
-    logger.debug('Make configuration flag is set');
-}
-
-if (!!argv['make-config'] && !fss.exists_sync(argv.config)) {
-    logger.info('Writing default configuration...');
-    try {
-        fss.write_file_sync(argv.config, make_default_config());
-    } catch (e) {
-        logger.error('Error writing default configuration:', e.message);
-        process.exit(1);
-    }
-}
-
-let config = {};
-
-logger.debug('Reading config file');
-
-try {
-    const cfg_content = fss.read_file_sync(argv.config);
-    config = yaml.load(cfg_content);
-} catch(err) {
-    logger.error('Error reading configuration file:', err.message);
-    process.exit(1);
-}
-
-logger.debug('Validating config entries');
+logger.info(`Loading Configuration from environment`);
 
 let errored = false;
 
-options.for_each(option => {
-    logger.debug('Checking option', option.key);
+let config = {};
 
-    let cfg_val = config[option.key];
+options.forEach(option => {
+    const env_key = "PISTON_" + option.key.to_upper_case();
 
-    if (cfg_val === undefined) {
-        errored = true;
-        logger.error(`Config key ${option.key} does not exist on currently loaded configuration`);
-        return;
-    }
+    const parser = option.parser || (x=>x);
+
+    const env_val = process.env[env_key];
+
+    const parsed_val = parser(env_val);
+
+    
+    const value = env_val || option.default;
+
 
     option.validators.for_each(validator => {
-        let response = validator(cfg_val);
+        let response = null;
+        if(env_val)
+            response = validator(parsed_val, env_val);
+        else
+            response = validator(value, value);
 
-        if (!response) {
+        if (response !== true) {
             errored = true;
             logger.error(`Config option ${option.key} failed validation:`, response);
             return;
         }
     });
+
+    config[option.key] = value;
 });
 
 if (errored) {
@@ -205,5 +173,6 @@ if (errored) {
 }
 
 logger.info('Configuration successfully loaded');
+
 
 module.exports = config;

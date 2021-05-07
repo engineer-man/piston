@@ -25,6 +25,6 @@ COPY ./src ./src
 
 RUN make -C ./src/nosocket/ all && make -C ./src/nosocket/ install
 
-CMD [ "node", "src", "-m", "-c", "/piston/config.yaml"]
+CMD [ "node", "src"]
 EXPOSE 2000/tcp
 

@@ -58,27 +58,6 @@ jobs:
       - name: Relocate downloaded packages
         run: mv *.pkg.tar.gz packages/
 
-      - name: Write test config file
-        uses: DamianReeves/write-file-action@v1.0
-        with:
-          path: data/config.yaml
-          contents: |
-            log_level: DEBUG
-            bind_address: 0.0.0.0:2000
-            data_directory: /piston
-            runner_uid_min: 1100
-            runner_uid_max: 1500
-            runner_gid_min: 1100
-            runner_gid_max: 1500
-            disable_networking: false
-            output_max_size: 1024
-            max_process_count: 64
-            max_open_files: 2048
-            max_file_size: 1000000
-            repo_url: http://localhost:8000/index
-
-          write-mode: overwrite
-
       - name: Login to GitHub registry
         uses: docker/login-action@v1
         with:
@@ -90,7 +69,7 @@ jobs:
         run: |
           ls -la
           docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
-          docker run --network container:repo -v $(pwd)'/data:/piston' -d --name api docker.pkg.github.com/engineer-man/piston/api
+          docker run --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api docker.pkg.github.com/engineer-man/piston/api
           echo Waiting for API to start..
           docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v1/runtimes
 
