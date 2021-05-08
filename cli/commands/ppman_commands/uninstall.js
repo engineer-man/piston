@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 
-exports.command = ['uninstall <language> [language-version]'];
+exports.command = ['uninstall <language> [language_version]'];
 exports.aliases = ['u'];
 exports.describe = 'Uninstalls the named package';
 
@@ -10,12 +10,13 @@ const msg_format = {
     json: JSON.stringify
 };
 
-exports.handler = async ({ axios, language, version }) => {
+exports.handler = async ({ axios, language, language_version }) => {
     try {
-        const install = await axios.delete(`/api/v2/packages`, {
+        const request = {
             language,
-            version: version || '*'
-        });
+            version: language_version || '*'
+        };
+        const uninstall = await axios.delete(`/api/v2/packages`, {data: request});
 
         console.log(msg_format.color(uninstall.data));
     } catch ({ response }) {

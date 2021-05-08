@@ -8,7 +8,7 @@ exports.aliases = ['run'];
 exports.describe = 'Executes file with the specified runner';
 
 exports.builder = {
-    version: {
+    language_version: {
         string: true,
         desc: 'Set the version of the language to use',
         alias: ['l'],
@@ -55,7 +55,7 @@ exports.handler = async (argv) => {
 
     const request = {
         language: argv.language,
-        version: argv['language-version'],
+        version: argv['language_version'],
         files: files,
         args: argv.args,
         stdin,
