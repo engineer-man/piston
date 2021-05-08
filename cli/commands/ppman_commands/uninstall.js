@@ -12,7 +12,10 @@ const msg_format = {
 
 exports.handler = async ({ axios, language, version }) => {
     try {
-        const uninstall = await axios.delete(`/api/v2/packages/${language}/${version || '*'}`)
+        const install = await axios.delete(`/api/v2/packages`, {
+            language,
+            version: version || '*'
+        });
 
         console.log(msg_format.color(uninstall.data));
     } catch ({ response }) {

@@ -163,10 +163,10 @@ router.get('/packages', async (req, res) => {
     return res.status(200).send(packages);
 });
 
-router.post('/packages/:language/:version', async (req, res) => {
+router.post('/packages', async (req, res) => {
     logger.debug('Request to install package');
 
-    const { language, version } = req.params;
+    const { language, version } = req.body;
 
     const pkg = await package.get_package(language, version);
 
@@ -192,10 +192,10 @@ router.post('/packages/:language/:version', async (req, res) => {
     }
 });
 
-router.delete('/packages/:language/:version', async (req, res) => {
+router.delete('/packages', async (req, res) => {
     logger.debug('Request to uninstall package');
 
-    const { language, version } = req.params;
+    const { language, version } = req.body;
 
     const pkg = await package.get_package(language, version);
 

@@ -12,7 +12,10 @@ const msg_format = {
 
 exports.handler = async ({ axios, language, version }) => {
     try {
-        const install = await axios.post(`/api/v2/packages/${language}/${version || '*'}`);
+        const install = await axios.post(`/api/v2/packages`, {
+            language,
+            version: version || '*'
+        });
 
         console.log(msg_format.color(install.data));
     } catch ({ response }) {
