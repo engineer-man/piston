@@ -100,7 +100,7 @@ const options = [
     {
         key: 'max_file_size',
         desc: 'Max file size in bytes for a file',
-        default: 1000000, //1MB
+        default: 10000000, //10MB
         parser: parse_int,
         validators: [
             (x,raw) => !isNaN(x) || `${raw} is not a number`,
