@@ -13,188 +13,197 @@ const chownr = require('chownr');
 const util = require('util');
 
 class Package {
+  constructor({ language, version, download, checksum }) {
+    this.language = language;
+    this.version = semver.parse(version);
+    this.checksum = checksum;
+    this.download = download;
+  }
 
-    constructor({ language, version, download, checksum }){
-        this.language = language;
-        this.version = semver.parse(version);
-        this.checksum = checksum;
-        this.download = download;
+  get installed() {
+    return fss.exists_sync(
+      path.join(this.install_path, globals.pkg_installed_file)
+    );
+  }
+
+  get install_path() {
+    return path.join(
+      config.data_directory,
+      globals.data_directories.packages,
+      this.language,
+      this.version.raw
+    );
+  }
+
+  async install() {
+    if (this.installed) {
+      throw new Error('Already installed');
     }
 
-    get installed() {
-        return fss.exists_sync(path.join(this.install_path, globals.pkg_installed_file));
+    logger.info(`Installing ${this.language}-${this.version.raw}`);
+
+    if (fss.exists_sync(this.install_path)) {
+      logger.warn(
+        `${this.language}-${this.version.raw} has residual files. Removing them.`
+      );
+      await fs.rm(this.install_path, { recursive: true, force: true });
     }
 
-    get install_path() {
-        return path.join(
-            config.data_directory,
-            globals.data_directories.packages,
-            this.language,
-            this.version.raw
-        );
+    logger.debug(`Making directory ${this.install_path}`);
+    await fs.mkdir(this.install_path, { recursive: true });
+
+    logger.debug(
+      `Downloading package from ${this.download} in to ${this.install_path}`
+    );
+    const pkgpath = path.join(this.install_path, 'pkg.tar.gz');
+    const download = await fetch(this.download);
+
+    const file_stream = fss.create_write_stream(pkgpath);
+    await new Promise((resolve, reject) => {
+      download.body.pipe(file_stream);
+      download.body.on('error', reject);
+
+      file_stream.on('finish', resolve);
+    });
+
+    logger.debug('Validating checksums');
+    logger.debug(`Assert sha256(pkg.tar.gz) == ${this.checksum}`);
+    const cs = crypto
+      .create_hash('sha256')
+      .update(fss.readFileSync(pkgpath))
+      .digest('hex');
+
+    if (cs !== this.checksum) {
+      throw new Error(`Checksum miss-match want: ${val} got: ${cs}`);
     }
 
-    async install() {
-        if (this.installed) {
-            throw new Error('Already installed');
-        }
+    logger.debug(
+      `Extracting package files from archive ${pkgpath} in to ${this.install_path}`
+    );
 
-        logger.info(`Installing ${this.language}-${this.version.raw}`);
+    await new Promise((resolve, reject) => {
+      const proc = cp.exec(
+        `bash -c 'cd "${this.install_path}" && tar xzf ${pkgpath}'`
+      );
 
-        if (fss.exists_sync(this.install_path)) {
-            logger.warn(`${this.language}-${this.version.raw} has residual files. Removing them.`);
-            await fs.rm(this.install_path, { recursive: true, force: true });
-        }
+      proc.once('exit', (code, _) => {
+        code === 0 ? resolve() : reject();
+      });
 
-        logger.debug(`Making directory ${this.install_path}`);
-        await fs.mkdir(this.install_path, {recursive: true});
+      proc.stdout.pipe(process.stdout);
+      proc.stderr.pipe(process.stderr);
 
-        logger.debug(`Downloading package from ${this.download} in to ${this.install_path}`);
-        const pkgpath = path.join(this.install_path, 'pkg.tar.gz');
-        const download = await fetch(this.download);
+      proc.once('error', reject);
+    });
 
-        const file_stream = fss.create_write_stream(pkgpath);
-        await new Promise((resolve, reject) => {
-            download.body.pipe(file_stream);
-            download.body.on('error', reject);
+    logger.debug('Registering runtime');
+    runtime.load_package(this.install_path);
 
-            file_stream.on('finish', resolve);
-        });
+    logger.debug('Caching environment');
+    const get_env_command = `cd ${this.install_path}; source environment; env`;
 
-        logger.debug('Validating checksums');
-        logger.debug(`Assert sha256(pkg.tar.gz) == ${this.checksum}`);
-        const cs = crypto.create_hash("sha256")
-            .update(fss.readFileSync(pkgpath))
-            .digest('hex');
+    const envout = await new Promise((resolve, reject) => {
+      let stdout = '';
 
-        if (cs !== this.checksum) {
-            throw new Error(`Checksum miss-match want: ${val} got: ${cs}`);
-        }
+      const proc = cp.spawn('env', ['-i', 'bash', '-c', `${get_env_command}`], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
 
-        logger.debug(`Extracting package files from archive ${pkgpath} in to ${this.install_path}`);
+      proc.once('exit', (code, _) => {
+        code === 0 ? resolve(stdout) : reject();
+      });
 
-        await new Promise((resolve, reject) => {
-            const proc = cp.exec(`bash -c 'cd "${this.install_path}" && tar xzf ${pkgpath}'`);
+      proc.stdout.on('data', (data) => {
+        stdout += data;
+      });
 
-            proc.once('exit', (code, _) => {
-                code === 0 ? resolve() : reject();
-            });
+      proc.once('error', reject);
+    });
 
-            proc.stdout.pipe(process.stdout);
-            proc.stderr.pipe(process.stderr);
+    const filtered_env = envout
+      .split('\n')
+      .filter(
+        (l) => !['PWD', 'OLDPWD', '_', 'SHLVL'].includes(l.split('=', 2)[0])
+      )
+      .join('\n');
 
-            proc.once('error', reject);
-        });
+    await fs.write_file(path.join(this.install_path, '.env'), filtered_env);
 
-        logger.debug('Registering runtime');
-        runtime.load_package(this.install_path);
+    logger.debug('Changing Ownership of package directory');
+    await util.promisify(chownr)(this.install_path, 0, 0);
 
-        logger.debug('Caching environment');
-        const get_env_command = `cd ${this.install_path}; source environment; env`;
+    logger.debug('Writing installed state to disk');
+    await fs.write_file(
+      path.join(this.install_path, globals.pkg_installed_file),
+      Date.now().toString()
+    );
 
-        const envout = await new Promise((resolve, reject) => {
-            let stdout = '';
+    logger.info(`Installed ${this.language}-${this.version.raw}`);
 
-            const proc = cp
-                .spawn(
-                    'env',
-                    ['-i','bash','-c',`${get_env_command}`],
-                    {
-                        stdio: ['ignore', 'pipe', 'pipe']
-                    }
-                );
+    return {
+      language: this.language,
+      version: this.version.raw,
+    };
+  }
 
-            proc.once('exit', (code, _) => {
-                code === 0 ? resolve(stdout) : reject();
-            });
+  async uninstall() {
+    logger.info(`Uninstalling ${this.language}-${this.version.raw}`);
 
-            proc.stdout.on('data', data => {
-                stdout += data;
-            });
+    logger.debug('Finding runtime');
+    const found_runtime = runtime.get_runtime_by_name_and_version(
+      this.language,
+      this.version.raw
+    );
 
-            proc.once('error', reject);
-        });
-
-        const filtered_env = envout
-            .split('\n')
-            .filter(l => !['PWD','OLDPWD','_', 'SHLVL'].includes(l.split('=',2)[0]))
-            .join('\n');
-
-        await fs.write_file(path.join(this.install_path, '.env'), filtered_env);
-
-        logger.debug('Changing Ownership of package directory');
-        await util.promisify(chownr)(this.install_path,0,0);
-
-        logger.debug('Writing installed state to disk');
-        await fs.write_file(path.join(this.install_path, globals.pkg_installed_file), Date.now().toString());
-
-        logger.info(`Installed ${this.language}-${this.version.raw}`);
-
-        return {
-            language: this.language,
-            version: this.version.raw
-        };
+    if (!found_runtime) {
+      logger.error(
+        `Uninstalling ${this.language}-${this.version.raw} failed: Not installed`
+      );
+      throw new Error(`${this.language}-${this.version.raw} is not installed`);
     }
 
+    logger.debug('Unregistering runtime');
+    found_runtime.unregister();
 
-    async uninstall(){
-        logger.info(`Uninstalling ${this.language}-${this.version.raw}`);
+    logger.debug('Cleaning files from disk');
+    await fs.rmdir(this.install_path, { recursive: true });
 
-        logger.debug("Finding runtime")
-        const found_runtime = runtime.get_runtime_by_name_and_version(this.language, this.version.raw);
+    logger.info(`Uninstalled ${this.language}-${this.version.raw}`);
 
-        if(!found_runtime){
-            logger.error(`Uninstalling ${this.language}-${this.version.raw} failed: Not installed`)
-            throw new Error(`${this.language}-${this.version.raw} is not installed`)
-        }
+    return {
+      language: this.language,
+      version: this.version.raw,
+    };
+  }
 
-        logger.debug("Unregistering runtime")
-        found_runtime.unregister();
+  static async get_package_list() {
+    const repo_content = await fetch(config.repo_url).then((x) => x.text());
 
-        logger.debug("Cleaning files from disk")
-        await fs.rmdir(this.install_path, {recursive: true})
+    const entries = repo_content.split('\n').filter((x) => x.length > 0);
 
-        logger.info(`Uninstalled ${this.language}-${this.version.raw}`)
+    return entries.map((line) => {
+      const [language, version, checksum, download] = line.split(',', 4);
 
-        return {
-            language: this.language,
-            version: this.version.raw
-        };
+      return new Package({
+        language,
+        version,
+        checksum,
+        download,
+      });
+    });
+  }
 
-    }
+  static async get_package(lang, version) {
+    const packages = await Package.get_package_list();
 
-    static async get_package_list() {
-        const repo_content = await fetch(config.repo_url).then(x => x.text());
+    const candidates = packages.filter((pkg) => {
+      return pkg.language == lang && semver.satisfies(pkg.version, version);
+    });
 
-        const entries = repo_content
-            .split('\n')
-            .filter(x => x.length > 0);
+    candidates.sort((a, b) => semver.rcompare(a.version, b.version));
 
-        return entries.map(line => {
-            const [ language, version, checksum, download ] = line.split(',', 4);
-
-            return new Package({
-                language,
-                version,
-                checksum,
-                download
-            });
-        });
-    }
-
-    static async get_package(lang, version) {
-        const packages = await Package.get_package_list();
-
-        const candidates = packages
-            .filter(pkg => {
-                return pkg.language == lang && semver.satisfies(pkg.version, version)
-            });
-
-        candidates.sort((a, b) => semver.rcompare(a.version, b.version));
-
-        return candidates[0] || null;
-    }
-
+    return candidates[0] || null;
+  }
 }
 
 module.exports = Package;
