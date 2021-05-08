@@ -12,7 +12,7 @@ router.use((req, res, next) => {
     return next();
   }
 
-  if (req.headers['content-type'] !== 'application/json') {
+  if (!req.headers['content-type'].startsWith('application/json')) {
     return res.status(415).send({
       message: 'requests must be of type application/json',
     });

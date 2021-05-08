@@ -17,7 +17,7 @@
   },
   "license": "MIT",
   "scripts": {
-      "lint": "prettier . --write"
+    "lint": "prettier . --write"
   },
   "devDependencies": {
     "prettier": "2.2.1"
