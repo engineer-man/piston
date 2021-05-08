@@ -165,14 +165,14 @@ class Package {
 
     static async get_package_list() {
         const repo_content = await fetch(config.repo_url).then(x => x.text());
-    
+
         const entries = repo_content
             .split('\n')
             .filter(x => x.length > 0);
-    
+
         return entries.map(line => {
             const [ language, version, checksum, download ] = line.split(',', 4);
-    
+
             return new Package({
                 language,
                 version,
@@ -181,17 +181,17 @@ class Package {
             });
         });
     }
-    
-    static async get_package (lang, version) {
+
+    static async get_package(lang, version) {
         const packages = await Package.get_package_list();
-    
+
         const candidates = packages
             .filter(pkg => {
                 return pkg.language == lang && semver.satisfies(pkg.version, version)
             });
-    
+
         candidates.sort((a, b) => semver.rcompare(a.version, b.version));
-    
+
         return candidates[0] || null;
     }
 

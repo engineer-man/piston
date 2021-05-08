@@ -2,9 +2,12 @@
 
 const axios = require('axios').default;
 
-const axios_instance = function(argv){
+const axios_instance = argv => {
     argv.axios = axios.create({
-        baseURL: argv['piston-url']
+        baseURL: argv['piston-url'],
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
 
     return argv;
@@ -18,7 +21,7 @@ require('yargs')(process.argv.slice(2))
         string: true
     })
     .middleware(axios_instance)
-    .scriptName("piston")
+    .scriptName('piston')
     .commandDir('commands')
     .demandCommand()
     .help()

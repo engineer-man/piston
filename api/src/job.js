@@ -1,5 +1,5 @@
 const logger = require('logplease').create('job');
-const {v4: uuidv4} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const cp = require('child_process');
 const path = require('path');
 const config = require('./config');
@@ -25,7 +25,7 @@ class Job {
             name: file.name || `file${i}.code`,
             content: file.content
         }));
-        
+
         this.args = args;
         this.stdin = stdin;
         this.timeouts = timeouts;
@@ -39,7 +39,6 @@ class Job {
 
         uid %= (config.runner_uid_max - config.runner_uid_min) + 1;
         gid %= (config.runner_gid_max - config.runner_gid_min) + 1;
-
 
         this.state = job_states.READY;
         this.dir = path.join(config.data_directory, globals.data_directories.jobs, this.uuid);
@@ -94,7 +93,7 @@ class Job {
             var output = '';
 
             const proc = cp.spawn(proc_call[0], proc_call.splice(1) ,{
-                env: { 
+                env: {
                     ...this.runtime.env_vars,
                     PISTON_LANGUAGE: this.runtime.language
                 },
@@ -189,12 +188,12 @@ class Job {
         };
     }
 
-
-    async cleanup_processes(){
+    async cleanup_processes() {
         let processes = [1];
-        while(processes.length > 0){
-            processes = await new Promise((resolve, reject) => cp.execFile('ps', ['awwxo', 'pid,ruid'], function(err, stdout) {
-                if(err === null){
+
+        while (processes.length > 0) {
+            processes = await new Promise((resolve, reject) => cp.execFile('ps', ['awwxo', 'pid,ruid'], (err, stdout) => {
+                if (err === null) {
                     const lines = stdout.split('\n').slice(1); //Remove header with slice
                     const procs = lines.map(line => {
                         const [pid, ruid] = line
@@ -203,55 +202,57 @@ class Job {
                             .map(n => parseInt(n));
 
                         return { pid, ruid }
-                    })
-                    resolve(procs)
-                }
-                else{
-                    reject(error)
+                    });
+
+                    resolve(procs);
+                } else {
+                    reject(error);
                 }
             }));
 
-            processes = processes.filter(proc => proc.ruid == this.uid);
+            processes = processes.filter(proc => proc.ruid === this.uid);
 
-            for(const proc of processes){
+            for (const proc of processes) {
                 // First stop the processes, but keep their resources allocated so they cant re-fork
-                try{
+                try {
                     process.kill(proc.pid, 'SIGSTOP');
-                }catch{
+                } catch {
                     // Could already be dead
                 }
             }
 
 
-            for(const proc of processes){
+            for (const proc of processes) {
                 // Then clear them out of the process tree
-                try{
+                try {
                     process.kill(proc.pid, 'SIGKILL');
-                }catch{
+                } catch {
                     // Could already be dead and just needs to be waited on
                 }
+
                 wait_pid(proc.pid);
             }
         }
     }
 
-    async cleanup_filesystem(){
-        
+    async cleanup_filesystem() {
         for (const clean_path of globals.clean_directories) {
             const contents = await fs.readdir(clean_path);
 
             for (const file of contents) {
                 const file_path = path.join(clean_path, file);
-                try{
+
+                try {
                     const stat = await fs.stat(file_path);
-                    if(stat.uid == this.uid)
+
+                    if (stat.uid === this.uid) {
                         await fs.rm(file_path,  { recursive: true, force: true });
-                }catch(e){
+                    }
+                } catch (e) {
                     // File was somehow deleted in the time that we read the dir to when we checked the file
                     logger.warn(`Error removing file ${file_path}: ${e}`)
                 }
             }
-
         }
 
         await fs.rm(this.dir, { recursive: true, force: true });
@@ -259,7 +260,7 @@ class Job {
 
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
-        
+
         await Promise.all([
             this.cleanup_processes(),
             this.cleanup_filesystem()

@@ -9,7 +9,7 @@ const runtimes = [];
 
 class Runtime {
 
-    constructor({language, version, aliases, pkgdir, runtime}){
+    constructor({language, version, aliases, pkgdir, runtime}) {
         this.language = language;
         this.version = version;
         this.aliases = aliases || [];
@@ -17,7 +17,7 @@ class Runtime {
         this.runtime = runtime;
     }
 
-    static load_package(package_dir){
+    static load_package(package_dir) {
         let info = JSON.parse(
             fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
         );
@@ -32,7 +32,7 @@ class Runtime {
             );
         }
 
-        if(provides){
+        if (provides) {
             // Multiple languages in 1 package
             provides.forEach(lang => {
                 runtimes.push(new Runtime({
@@ -43,7 +43,7 @@ class Runtime {
                     runtime: language
                 }));
             });
-        }else{
+        } else {
             runtimes.push(new Runtime({
                 language,
                 version,
@@ -53,8 +53,6 @@ class Runtime {
         }
 
         logger.debug(`Package ${language}-${version} was loaded`);
-
-        
     }
 
     get compiled() {
