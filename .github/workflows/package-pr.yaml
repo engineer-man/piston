@@ -94,7 +94,7 @@ jobs:
             PKG_VERSION=$(awk -F- '{ print $2 }' <<< $package)
 
             echo "Installing..."
-            docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/api/v2/packages/$PKG_PATH
+            docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d "{\"language\":\"$PKG_NAME\",\"version\":\"$PKG_VERSION\"}"
 
             TEST_SCRIPTS=packages/$PKG_PATH/test.*
             echo "Tests: $TEST_SCRIPTS"
