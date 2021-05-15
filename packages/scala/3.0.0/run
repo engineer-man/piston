@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Put instructions to run the runtime
-mv $1 $1.scala
-filename=$1.scala
+# Run jar file
 shift
-scala $filename "$@"
+java -jar out.jar "$@"
