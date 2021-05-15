@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
 # Run jar file
-java -jar code.jar
+shift
+java -jar code.jar "$@"
