@@ -68,10 +68,17 @@ class Package {
 
         logger.debug('Validating checksums');
         logger.debug(`Assert sha256(pkg.tar.gz) == ${this.checksum}`);
-        const cs = crypto
-            .create_hash('sha256')
-            .update(fss.readFileSync(pkgpath))
-            .digest('hex');
+        const hash = crypto.create_hash('sha256');
+
+        const read_stream = fss.create_read_stream(pkgpath);
+        await new Promise((resolve, reject) => {
+            read_stream.on('data', chunk => hash.update(chunk));
+            read_stream.on('end', () => resolve());
+            read_stream.on('error', error => reject(error))
+        });
+        
+
+        const cs = hash.digest('hex');
 
         if (cs !== this.checksum) {
             throw new Error(`Checksum miss-match want: ${val} got: ${cs}`);
