@@ -109,7 +109,7 @@ docker-compose up -d api
 cd cli && npm i && cd -
 ```
 
-Thge Piston API will now be online with no language runtimes installed. To install runtimes, [use the CLI](https://github.com/engineer-man/piston#cli).        
+The API will now be online with no language runtimes installed. To install runtimes, [use the CLI](#cli).        
         
 ## Just Piston (no CLI)
 
