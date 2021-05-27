@@ -109,6 +109,8 @@ docker-compose up -d api
 cd cli && npm i && cd -
 ```
 
+The API will now be online with no language runtimes installed. To install runtimes, [use the CLI](#cli).        
+        
 ## Just Piston (no CLI)
 
 ### Host System Package Dependencies
