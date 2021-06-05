@@ -147,7 +147,7 @@ cli/index.js ppman list
 cli/index.js ppman install python
 
 # Install specific version of python
-cli/index.js ppman install python 3.9.4
+cli/index.js ppman install python=3.9.4
 
 # Run a python script using the latest version
 echo 'print("Hello world!")' > test.py

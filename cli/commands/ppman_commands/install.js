@@ -1,6 +1,6 @@
 const chalk = require('chalk');
 
-exports.command = ['install <runtimes...>'];
+exports.command = ['install <packages...>'];
 exports.aliases = ['i'];
 exports.describe = 'Installs the named package';
 
