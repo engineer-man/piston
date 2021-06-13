@@ -51,7 +51,7 @@ exports.handler = async ({axios, specfile}) => {
 
     const installed = packages.filter(pkg => pkg.installed);
 
-    const ensure_packages = [];
+    let ensure_packages = [];
 
     for(const rule of rules){
         if(rule.comment) continue;
@@ -78,10 +78,9 @@ exports.handler = async ({axios, specfile}) => {
                     ensure_packages.push(match)
             }
         }else{
-            for(const package of ensure_packages){
-                if(does_match(package, rule))
-                    ensure_packages.splice(ensure_packages.indexOf(package))
-            }
+            ensure_packages = ensure_packages.filter(
+                pkg => !does_match(pkg, rule)
+            )
         }
 
         
