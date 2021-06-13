@@ -1,0 +1,8 @@
+#!/usr/bin/env -S piston ppman spec
+
+# Development Piston Packages
+# Defines packages to be installed by developers
+
+# All packages, latest version
+# Don't use this when connected to public repo, in excess of 10GB
+* *

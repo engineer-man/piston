@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+require('nocamel');
 const axios = require('axios').default;
 
 const axios_instance = argv => {

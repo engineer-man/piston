@@ -7,6 +7,9 @@
     "dependencies": {
         "axios": "^0.21.1",
         "chalk": "^4.1.0",
+        "minimatch": "^3.0.4",
+        "nocamel": "^1.0.2",
+        "semver": "^7.3.5",
         "yargs": "^16.2.0"
     }
 }
