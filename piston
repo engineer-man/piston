@@ -68,5 +68,10 @@ case $1 in
         docker build repo -t piston-repo-builder
         docker run -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
         ;;
-    *) node cli/index.js "$@" ;;
+    *)
+        cd cli
+        npm i > /dev/null
+        cd ../
+        node cli/index.js "$@"
+    ;;
 esac
