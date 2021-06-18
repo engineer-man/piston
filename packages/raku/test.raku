@@ -1,1 +1,1 @@
-say "Hello Bruh"
+say "OK"
