@@ -1,5 +1,5 @@
 {
     "language": "raku",
-    "version": "6.d",
+    "version": "6.0.0-d",
     "aliases": ["raku", "rakudo", "perl6", "p6", "pl6"]
 }
