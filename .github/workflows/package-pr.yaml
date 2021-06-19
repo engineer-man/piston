@@ -1,4 +1,4 @@
-name: 'Package Pull Requests'
+name: "Package Pull Requests"
 
 on:
   pull_request:
@@ -8,16 +8,37 @@ on:
       - reopened
       - synchronize
     paths:
-      - 'packages/**'
+      - "packages/**"
 
 jobs:
+  check-pkg:
+    name: Validate README
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get list of changed files
+        uses: lots0logs/gh-action-get-changed-files@2.1.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure README was updated
+        run: |
+          MISSING_LINES=$(comm -23 <(jq 'if .provides then .provides[].language else .language end' -r $(find packages -name "metadata.json" ) | sed -e 's/^/`/g' -e 's/$/`,/g' | sort -u) <(awk '/# Supported Languages/{flag=1; next} /<br>/{flag=0} flag' readme.md | sort -u))
+
+          [[ $(echo $MISSING_LINES | wc -c) = "1" ]] && exit 0
+
+          echo "README has supported languages missing: "
+          comm -23 <(jq 'if .provides then .provides[].language else .language end' -r $(find packages -name "metadata.json" ) | sed -e 's/^/`/g' -e 's/$/`,/g' | sort -u) <(awk '/# Supported Languages/{flag=1; next} /<br>/{flag=0} flag' readme.md | sort -u)
+          exit 1
+
   build-pkg:
     name: Check that package builds
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: Login to GitHub registry
         uses: docker/login-action@v1
         with:
@@ -29,7 +50,7 @@ jobs:
         uses: lots0logs/gh-action-get-changed-files@2.1.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-                
+
       - name: Build Packages
         run: |
           PACKAGES=$(jq '.[]' -r ${HOME}/files.json | awk -F/ '{ print $2 "-" $3 }' | sort -u)
@@ -43,7 +64,6 @@ jobs:
           name: packages
           path: packages/*.pkg.tar.gz
 
-
   test-pkg:
     name: Test package
     runs-on: ubuntu-latest
@@ -54,7 +74,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packages
-      
+
       - name: Relocate downloaded packages
         run: mv *.pkg.tar.gz packages/
 
@@ -109,17 +129,8 @@ jobs:
             done
           done
 
-
       - name: Dump logs
         if: ${{ always() }}
         run: |
           docker logs api
           docker logs repo
-
-
-
-
-
-
-
-

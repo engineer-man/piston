@@ -37,6 +37,7 @@
 </h4>
 
 ---
+
 <br>
 
 # About
@@ -49,16 +50,19 @@
 <br>
 
 It's used in numerous places including:
-* [EMKC Challenges](https://emkc.org/challenges)
-* [EMKC Weekly Contests](https://emkc.org/contests)
-* [Engineer Man Discord Server](https://discord.gg/engineerman)
-* Web IDEs
-* 200+ direct integrations
+
+- [EMKC Challenges](https://emkc.org/challenges)
+- [EMKC Weekly Contests](https://emkc.org/contests)
+- [Engineer Man Discord Server](https://discord.gg/engineerman)
+- Web IDEs
+- 200+ direct integrations
 
 <br>
 
 ### Official Extensions
+
 The following are approved and endorsed extensions/utilities to the core Piston offering.
+
 - [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
 - [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 
@@ -72,13 +76,15 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 <br>
 
 When using the public Piston API, use the following two URLs:
+
 ```
 GET  https://emkc.org/api/v2/piston/runtimes
 POST https://emkc.org/api/v2/piston/execute
 ```
+
 > Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
-and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
-so we can discuss potentially getting you an unlimited key.
+> and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
+> so we can discuss potentially getting you an unlimited key.
 
 <br>
 
@@ -109,8 +115,8 @@ docker-compose up -d api
 cd cli && npm i && cd -
 ```
 
-The API will now be online with no language runtimes installed. To install runtimes, [use the CLI](#cli).        
-        
+The API will now be online with no language runtimes installed. To install runtimes, [use the CLI](#cli).
+
 ## Just Piston (no CLI)
 
 ### Host System Package Dependencies
@@ -172,11 +178,13 @@ The container exposes an API on port 2000 by default.
 This is used by the CLI to carry out running jobs and package management.
 
 #### Runtimes Endpoint
+
 `GET /api/v2/runtimes`
 This endpoint will return the supported languages along with the current version and aliases. To execute
 code for a particular language using the `/api/v2/execute` endpoint, either the name or one of the aliases must
 be provided, along with the version.
 Multiple versions of the same language may be present at the same time, and may be selected when running a job.
+
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -201,47 +209,47 @@ Content-Type: application/json
 ```
 
 #### Execute Endpoint
+
 `POST /api/v2/execute`
 This endpoint requests execution of some arbitrary code.
+
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
 - `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
 - `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
-- `files[].name` (*optional*) The name of the file to upload, must be a string containing no path or left out.
+- `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (*optional*) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
-- `args` (*optional*) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
-- `compile_timeout` (*optional*) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
-- `run_timeout` (*optional*) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
-- `compile_memory_limit` (*optional*) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
-- `run_memory_limit` (*optional*) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+- `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
+- `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
+- `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+- `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+- `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+- `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 
 ```json
 {
-    "language": "js",
-    "version": "15.10.0",
-    "files": [
-        {
-            "name": "my_cool_code.js",
-            "content": "console.log(process.argv)"
-        }
-    ],
-    "stdin": "",
-    "args": [
-        "1",
-        "2",
-        "3"
-    ],
-    "compile_timeout": 10000,
-    "run_timeout": 3000,
-    "compile_memory_limit": -1,
-    "run_memory_limit": -1
+  "language": "js",
+  "version": "15.10.0",
+  "files": [
+    {
+      "name": "my_cool_code.js",
+      "content": "console.log(process.argv)"
+    }
+  ],
+  "stdin": "",
+  "args": ["1", "2", "3"],
+  "compile_timeout": 10000,
+  "run_timeout": 3000,
+  "compile_memory_limit": -1,
+  "run_memory_limit": -1
 }
 ```
+
 A typical response upon successful execution will contain 1 or 2 keys `run` and `compile`.
 `compile` will only be present if the language requested requires a compile stage.
 
 Each of these keys has an identical structure, containing both a `stdout` and `stderr` key, which is a string containing the text outputted during the stage into each buffer.
 It also contains the `code` and `signal` which was returned from each process.
+
 ```json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -260,6 +268,7 @@ Content-Type: application/json
 ```
 
 If a problem exists with the request, a `400` status code is returned and the reason in the `message` key.
+
 ```json
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
@@ -272,40 +281,45 @@ Content-Type: application/json
 <br>
 
 # Supported Languages
+
+`awk`,
 `bash`,
 `brainfuck`,
+`c`,
+`c++`,
 `cjam`,
 `clojure`,
 `cobol`,
 `coffeescript`,
 `cow`,
 `crystal`,
+`csharp`,
+`d`,
 `dart`,
 `dash`,
-`deno`,
 `dotnet`,
 `dragon`,
 `elixir`,
 `emacs`,
 `erlang`,
-`gawk`,
-`gcc`,
+`fortran`,
 `go`,
 `golfscript`,
 `groovy`,
 `haskell`,
 `java`,
+`javascript`,
 `jelly`,
 `julia`,
 `kotlin`,
 `lisp`,
 `lolcode`,
 `lua`,
-`mono`,
 `nasm`,
+`nasm64`,
 `nim`,
-`node`,
 `ocaml`,
+`octave`,
 `osabie`,
 `paradoc`,
 `pascal`,
@@ -314,7 +328,9 @@ Content-Type: application/json
 `ponylang`,
 `prolog`,
 `pure`,
+`pyth`,
 `python`,
+`python2`,
 `raku`,
 `rockstar`,
 `ruby`,
@@ -338,9 +354,11 @@ The source file is either ran or compiled and ran (in the case of languages like
 <br>
 
 # Security
+
 Docker provides a great deal of security out of the box in that it's separate from the system.
 Piston takes additional steps to make it resistant to
 various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
+
 - Disabling outgoing network interaction
 - Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
 - Capping max files at 2048 (resists various file based attacks)
@@ -353,4 +371,5 @@ various privilege escalation, denial-of-service, and resource saturation threats
 <br>
 
 # License
+
 Piston is licensed under the MIT license.
