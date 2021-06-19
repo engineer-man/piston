@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Path to raku binary
+export PATH=$PWD/bin:$PATH
