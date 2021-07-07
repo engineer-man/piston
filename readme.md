@@ -66,6 +66,7 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 - [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
 - [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 - [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
+- [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
 
         
 <br>
