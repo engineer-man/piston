@@ -67,7 +67,7 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 - [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 - [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
 - [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
-- [Pyston](https://github.com/ffaanngg/pyston), an Python wrapper for accessing the Piston API.
+- [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
 
         
 <br>
