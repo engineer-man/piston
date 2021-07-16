@@ -210,8 +210,8 @@ router.ws('/connect', async (ws, req) => {
 
     setTimeout(()=>{
         //Terminate the socket after 1 second, if not initialized.
-        //if(job === null)
-        //    ws.close(4001, "Initialization Timeout");
+        if(job === null)
+            ws.close(4001, "Initialization Timeout");
     }, 1000)
 })
 
