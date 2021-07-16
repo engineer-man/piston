@@ -35,11 +35,12 @@ case $1 in
         echo " clean-pkgs                     Clean any package build artifacts on disk"
         echo " clean-repo                     Remove all packages from local repo"
         echo " build-pkg <package> <version>  Build a package"
+        echo " rebuild                        Build and restart the docker container"
         
         else
         
         echo " Switch to developement environment for more info"
-        echo " > piston switch dev"
+        echo " > piston select dev"
         
         fi
         ;;
@@ -51,6 +52,8 @@ case $1 in
     restart) docker_compose restart ;;
     start) docker_compose up -d ;;
     stop) docker_compose down ;;
+
+    rebuild) docker_compose build && docker_compose up -d ;;
 
     update)
         git pull
