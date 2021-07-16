@@ -69,7 +69,7 @@ class Job {
         logger.debug('Primed job');
     }
 
-    async safe_call(file, args, timeout, memory_limit) {
+    async safe_call(file, args, timeout, memory_limit, eventBus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
@@ -102,9 +102,15 @@ class Job {
                 detached: true, //give this process its own process group
             });
 
-            proc.stdin.write(this.stdin);
-            proc.stdin.end();
-            proc.stdin.destroy();
+            if(eventBus === null){
+                proc.stdin.write(this.stdin);
+                proc.stdin.end();
+                proc.stdin.destroy();
+            }else{
+                eventBus.on("stdin", (data) => {
+                    proc.stdin.write(data);
+                })
+            }
 
             const kill_timeout = set_timeout(
                 _ => proc.kill('SIGKILL'),
@@ -115,6 +121,7 @@ class Job {
                 if (stderr.length > config.output_max_size) {
                     proc.kill('SIGKILL');
                 } else {
+                    if(eventBus !== null) eventBus.emit("stderr", data);
                     stderr += data;
                     output += data;
                 }
@@ -124,6 +131,7 @@ class Job {
                 if (stdout.length > config.output_max_size) {
                     proc.kill('SIGKILL');
                 } else {
+                    if(eventBus !== null) eventBus.emit("stdout", data);
                     stdout += data;
                     output += data;
                 }
@@ -194,6 +202,49 @@ class Job {
             language: this.runtime.language,
             version: this.runtime.version.raw,
         };
+    }
+
+    async execute_interactive(eventBus){
+        if (this.state !== job_states.PRIMED) {
+            throw new Error(
+                'Job must be in primed state, current state: ' +
+                    this.state.toString()
+            );
+        }
+
+        logger.info(
+            `Interactively executing job uuid=${this.uuid} uid=${this.uid} gid=${
+                this.gid
+            } runtime=${this.runtime.toString()}`
+        );
+
+        if(this.runtime.compiled){
+            eventBus.emit("stage", "compile")
+            const {error, code, signal} = await this.safe_call(
+                path.join(this.runtime.pkgdir, 'compile'),
+                this.files.map(x => x.name),
+                this.timeouts.compile,
+                this.memory_limits.compile,
+                eventBus
+            )
+
+            eventBus.emit("exit", "compile", {error, code, signal})
+        }
+
+        logger.debug('Running');
+        eventBus.emit("stage", "run")
+        const {error, code, signal} = await this.safe_call(
+            path.join(this.runtime.pkgdir, 'run'),
+            [this.files[0].name, ...this.args],
+            this.timeouts.run,
+            this.memory_limits.run,
+            eventBus
+        );
+
+        eventBus.emit("exit", "run", {error, code, signal})
+
+        
+        this.state = job_states.EXECUTED;
     }
 
     async cleanup_processes() {
