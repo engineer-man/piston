@@ -9,6 +9,8 @@ const { Job } = require('../job');
 const package = require('../package');
 const logger = require('logplease').create('api/v2');
 
+const SIGNALS = ["SIGABRT","SIGALRM","SIGBUS","SIGCHLD","SIGCLD","SIGCONT","SIGEMT","SIGFPE","SIGHUP","SIGILL","SIGINFO","SIGINT","SIGIO","SIGIOT","SIGKILL","SIGLOST","SIGPIPE","SIGPOLL","SIGPROF","SIGPWR","SIGQUIT","SIGSEGV","SIGSTKFLT","SIGSTOP","SIGTSTP","SIGSYS","SIGTERM","SIGTRAP","SIGTTIN","SIGTTOU","SIGUNUSED","SIGURG","SIGUSR1","SIGUSR2","SIGVTALRM","SIGXCPU","SIGXFSZ","SIGWINCH"]
+// ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
 function get_job(body){
     const {
@@ -148,27 +150,28 @@ router.ws('/connect', async (ws, req) => {
         try{
             const msg = JSON.parse(data);
 
-            if(msg.type === "init"){
-                if(job === null){
-                    const job = await get_job(msg);
+            switch(msg.type){
+                case "init":
+                    if(job === null){
+                        job = await get_job(msg);
 
-                    await job.prime();
+                        await job.prime();
 
-                    ws.send(JSON.stringify({
-                        type: "runtime",
-                        language: job.runtime.language,
-                        version: job.runtime.version.raw
-                    }))
+                        ws.send(JSON.stringify({
+                            type: "runtime",
+                            language: job.runtime.language,
+                            version: job.runtime.version.raw
+                        }))
 
-                    await job.execute_interactive(eventBus);
+                        await job.execute_interactive(eventBus);
 
-                    ws.close(4999, "Job Completed");
+                        ws.close(4999, "Job Completed");
 
-                }else{
-                    ws.close(4000, "Already Initialized");
-                }
-
-            }else if(msg.type === "data"){
+                    }else{
+                        ws.close(4000, "Already Initialized");
+                    }
+                    break;
+            case "data":
                 if(job !== null){
                     if(msg.stream === "stdin"){
                         eventBus.emit("stdin", msg.data)
@@ -178,7 +181,20 @@ router.ws('/connect', async (ws, req) => {
                 }else{
                     ws.close(4003, "Not yet initialized")
                 }
+                break;
+            case "signal":
+                if(job !== null){
+                    if(SIGNALS.includes(msg.signal)){
+                        eventBus.emit("signal", msg.signal)
+                    }else{
+                        ws.close(4005, "Invalid signal")
+                    }
+                }else{
+                    ws.close(4003, "Not yet initialized")
+                }
+                break;
             }
+            
         }catch(error){
             ws.send(JSON.stringify({type: "error", message: error.message}))
             ws.close(4002, "Notified Error")

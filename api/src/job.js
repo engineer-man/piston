@@ -110,7 +110,13 @@ class Job {
                 eventBus.on("stdin", (data) => {
                     proc.stdin.write(data);
                 })
+
+                eventBus.on("kill", (signal) => {
+                    proc.kill(signal)
+                })
             }
+            
+            
 
             const kill_timeout = set_timeout(
                 _ => proc.kill('SIGKILL'),
@@ -118,20 +124,22 @@ class Job {
             );
 
             proc.stderr.on('data', data => {
-                if (stderr.length > config.output_max_size) {
+                if(eventBus !== null) {
+                    eventBus.emit("stderr", data);
+                } else if (stderr.length > config.output_max_size) {
                     proc.kill('SIGKILL');
                 } else {
-                    if(eventBus !== null) eventBus.emit("stderr", data);
                     stderr += data;
                     output += data;
                 }
             });
 
             proc.stdout.on('data', data => {
-                if (stdout.length > config.output_max_size) {
+                if(eventBus !== null){
+                    eventBus.emit("stdout", data);
+                } else if (stdout.length > config.output_max_size) {
                     proc.kill('SIGKILL');
                 } else {
-                    if(eventBus !== null) eventBus.emit("stdout", data);
                     stdout += data;
                     output += data;
                 }
