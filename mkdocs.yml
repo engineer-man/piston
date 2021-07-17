@@ -1,0 +1,4 @@
+site_name: Piston Documentation
+nav:
+  - Home: index.md
+  - API: api-v2.md
