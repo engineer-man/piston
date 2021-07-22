@@ -59,6 +59,13 @@ class Job {
 
         for (const file of this.files) {
             let file_path = path.join(this.dir, file.name);
+            const rel = path.relative(this.dir, file_path);
+
+            if(rel.startsWith(".."))
+                throw Error(`File path "${file.name}" tries to escape parent directory: ${rel}`)
+
+            await fs.mkdir(path.dirname(file_path), {recursive: true,  mode: 0o700})
+            await fs.chown(path.dirname(file_path), this.uid, this.gid);
 
             await fs.write_file(file_path, file.content);
             await fs.chown(file_path, this.uid, this.gid);
@@ -139,7 +146,7 @@ class Job {
             proc.on('exit', (code, signal) => {
                 exit_cleanup();
 
-                resolve({ stdout, stderr, code, signal, output });
+                resolve({stdout, stderr, code, signal, output });
             });
 
             proc.on('error', err => {
