@@ -280,10 +280,8 @@ class Job {
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
 
-        await Promise.all([
-            this.cleanup_processes(),
-            this.cleanup_filesystem(),
-        ]);
+        await this.cleanup_processes();
+        await this.cleanup_filesystem();
     }
 }
 
