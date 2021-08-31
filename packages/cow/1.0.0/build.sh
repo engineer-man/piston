@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Grab the latest cow source from github
-git clone -q https://github.com/BigZaphod/COW.git cow
+git clone -q https://github.com/Hydrazer/COW.git cow
 
 # Generate the cow binary into bin
 mkdir -p bin
