@@ -346,6 +346,7 @@ Content-Type: application/json
 `perl`,
 `php`,
 `ponylang`,
+`powershell`,
 `prolog`,
 `pure`,
 `pyth`,
