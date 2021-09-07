@@ -100,7 +100,7 @@ POST https://emkc.org/api/v2/piston/execute
 
 - Docker
 - Docker Compose
-- Node JS
+- Node JS (>= 13, preferably >= 15)
 
 ### After system dependencies are installed, clone this repository:
 
