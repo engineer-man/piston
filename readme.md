@@ -139,6 +139,21 @@ docker run \
     ghcr.io/engineer-man/piston
 ```
 
+## Piston for testing packages locally
+
+### Host System Package Dependencies
+
+- Same as [All In One](#All-In-One)
+
+
+```sh
+# Build the Docker containers
+./piston start
+
+# For more help
+./piston help
+```
+
 <br>
 
 # Usage
