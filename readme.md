@@ -100,7 +100,7 @@ POST https://emkc.org/api/v2/piston/execute
 
 - Docker
 - Docker Compose
-- Node JS
+- Node JS (>= 13, preferably >= 15)
 
 ### After system dependencies are installed, clone this repository:
 
@@ -137,6 +137,22 @@ docker run \
     -p 2000:2000 \
     --name piston_api \
     ghcr.io/engineer-man/piston
+```
+
+## Piston for testing packages locally
+
+### Host System Package Dependencies
+
+- Same as [All In One](#All-In-One)
+
+### Installation
+
+```sh
+# Build the Docker containers
+./piston start
+
+# For more help
+./piston help
 ```
 
 <br>
