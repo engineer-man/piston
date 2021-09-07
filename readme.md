@@ -145,6 +145,7 @@ docker run \
 
 - Same as [All In One](#All-In-One)
 
+### Installation
 
 ```sh
 # Build the Docker containers
