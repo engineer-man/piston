@@ -89,7 +89,7 @@ POST https://emkc.org/api/v2/piston/execute
 > Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
 > and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
 > so we can discuss potentially getting you an unlimited key. What is and isn't a good cause is up to me, but, in general
-> if your project is a) open source, b) helping people at not cost to them, and c) not likely to use tons of resources
+> if your project is a) open source, b) helping people at no cost to them, and c) not likely to use tons of resources
 > thereby impairing another's ability to enjoy Piston, you'll likely be granted a key.
 
 <br>
