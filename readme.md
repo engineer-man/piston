@@ -360,6 +360,7 @@ Content-Type: application/json
 `scala`,
 `swift`,
 `typescript`,
+`basic`,
 `vlang`,
 `yeethon`,
 `zig`,
