@@ -5,6 +5,10 @@
         {
             "language": "csharp",
             "aliases": ["mono", "mono-csharp", "mono-c#", "mono-cs", "c#", "cs"]
+        },
+        {
+            "language": "basic",
+            "aliases": ["vb", "mono-vb", "mono-basic", "visual-basic", "visual basic"]
         }
     ]
 }
