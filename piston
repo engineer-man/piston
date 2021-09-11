@@ -23,24 +23,25 @@ case $1 in
         echo " start                          Starts piston"
         echo " stop                           Stops piston"
         echo " restart                        Restarts piston"
+        echo " bash                           Opens a bash shell for the piston_api container"
         echo
         echo " update                         Fetches and applies latest updates"
         echo
         echo " <args..>                       Passthrough to piston cli tool"
-        echo 
+        echo
         echo "Development Commands:"
-        
+
         if [ $PISTON_ENV == dev ]; then
-        
+
         echo " clean-pkgs                     Clean any package build artifacts on disk"
         echo " clean-repo                     Remove all packages from local repo"
         echo " build-pkg <package> <version>  Build a package"
-        
+
         else
-        
+
         echo " Switch to developement environment for more info"
         echo " > piston switch dev"
-        
+
         fi
         ;;
 
@@ -51,6 +52,7 @@ case $1 in
     restart) docker_compose restart ;;
     start) docker_compose up -d ;;
     stop) docker_compose down ;;
+    bash) docker_compose exec api /bin/bash ;;
 
     update)
         git pull
