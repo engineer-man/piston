@@ -55,7 +55,9 @@ jobs:
         run: |
           PACKAGES=$(jq '.[]' -r ${HOME}/files.json | awk -F/ '{ print $2 "-" $3 }' | sort -u)
           echo "Packages: $PACKAGES"
-          docker run -v "${{ github.workspace }}:/piston" docker.pkg.github.com/engineer-man/piston/repo-builder:latest --no-server $PACKAGES
+          docker pull docker.pkg.github.com/engineer-man/piston/repo-builder:latest
+          docker build -t repo-builder repo
+          docker run -v "${{ github.workspace }}:/piston" repo-builder --no-server $PACKAGES
           ls -la packages
 
       - name: Upload package as artifact
