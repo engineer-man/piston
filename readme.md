@@ -356,6 +356,7 @@ Content-Type: application/json
 `python2`,
 `raku`,
 `rockstar`,
+`rscript`,
 `ruby`,
 `rust`,
 `scala`,
