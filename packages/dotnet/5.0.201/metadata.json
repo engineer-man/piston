@@ -1,5 +1,63 @@
 {
     "language": "dotnet",
     "version": "5.0.201",
-    "aliases": ["cs", "csharp"]
+    "provides": [
+        {
+            "language": "basic",
+            "aliases": [
+                "visual-basic",
+                "visual-basic.net",
+                "vb",
+                "vb.net",
+                "vb-dotnet",
+                "dotnet-vb",
+                "basic.net",
+                "basic-dotnet",
+                "dotnet-basic"
+            ]
+        },
+        {
+            "language": "fsharp",
+            "aliases": [
+                "fs",
+                "f#",
+                "fsharp.net",
+                "fs.net",
+                "f#.net",
+                "fsharp-dotnet",
+                "fs-dotnet",
+                "f#-dotnet",
+                "dotnet-fsharp",
+                "dotnet-fs",
+                "dotnet-fs"
+            ]
+        },
+        {
+            "language": "csharp",
+            "aliases": [
+                "c#",
+                "cs",
+                "c#.net",
+                "cs.net",
+                "csharp.net",
+                "c#-dotnet",
+                "cs-dotnet",
+                "csharp-dotnet",
+                "dotnet-c#",
+                "dotnet-cs",
+                "dotnet-csharp"
+            ]
+        },
+        {
+            "language": "fsi",
+            "aliases": [
+                "fsx",
+                "fsharp-interactive",
+                "f#-interactive",
+                "dotnet-fsi",
+                "fsi-dotnet",
+                "fsi.net"
+            ]
+        }
+    ]
 }
