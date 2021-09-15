@@ -6,8 +6,9 @@ export TMPDIR="$PWD"
 
 # Put instructions to run the runtime
 
-rename 's/$/\.v/' "$@" # Add .v extension
+filename=$1
 
-filename=$1.v
+rename 's/$/\.v/' $filename # Add .v extension
+
 shift
-v run $filename "$@"
+v run $filename.v "$@"
