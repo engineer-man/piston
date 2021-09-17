@@ -340,6 +340,7 @@ Content-Type: application/json
 `erlang`,
 `forte`,
 `fortran`,
+`freebasic`,
 `go`,
 `golfscript`,
 `groovy`,
