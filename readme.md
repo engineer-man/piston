@@ -41,6 +41,20 @@
 
 <br>
 
+# Notes About Hacktoberfest
+        
+While we are accepting pull requests for Hacktoberfest, we will reject any low-quality PRs.
+If we see PR abuse for Hacktoberfest, we will stop providing Hacktoberfest approval for pull requests.
+        
+We are accepting PRs for:
+* Packages - updating package versions, adding new packages
+* Documentation updates
+* CLI/API improvements - please discuss these with us in the Discord first
+
+Any queries or concerns, ping @HexF#0015 in the Discord.
+
+<br>
+
 # About
 
 <h4>
