@@ -1,6 +1,6 @@
 {
     "name": "piston-cli",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Piston Execution Engine CLI tools",
     "main": "index.js",
     "license": "MIT",
@@ -10,6 +10,7 @@
         "minimatch": "^3.0.4",
         "nocamel": "^1.0.2",
         "semver": "^7.3.5",
+        "ws": "^7.5.3",
         "yargs": "^16.2.0"
     }
 }
