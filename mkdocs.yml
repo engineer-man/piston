@@ -1,0 +1,15 @@
+site_name: Piston
+nav:
+  - Home: index.md
+  - Configuration: configuration.md
+  - API: api-v2.md
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - json
+
+markdown_extensions:
+  - admonition

@@ -33,7 +33,8 @@
   <a href="#Supported-Languages">Supported Languages</a> •
   <a href="#Principle-of-Operation">Principles</a> •
   <a href="#Security">Security</a> •
-  <a href="#License">License</a>
+  <a href="#License">License</a> •
+  <a href="https://piston.readthedocs.io">Documentation</a>
 </h4>
 
 ---
@@ -65,6 +66,9 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 
 - [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
 - [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
+- [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
+- [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
+- [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
 
 <br>
 
@@ -84,7 +88,9 @@ POST https://emkc.org/api/v2/piston/execute
 
 > Important Note: The Piston API is rate limited to 5 requests per second. If you have a need for more requests than that
 > and it's for a good cause, please reach out to me (EngineerMan#0001) on [Discord](https://discord.gg/engineerman)
-> so we can discuss potentially getting you an unlimited key.
+> so we can discuss potentially getting you an unlimited key. What is and isn't a good cause is up to me, but, in general
+> if your project is a) open source, b) helping people at no cost to them, and c) not likely to use tons of resources
+> thereby impairing another's ability to enjoy Piston, you'll likely be granted a key.
 
 <br>
 
@@ -96,7 +102,7 @@ POST https://emkc.org/api/v2/piston/execute
 
 - Docker
 - Docker Compose
-- Node JS
+- Node JS (>= 13, preferably >= 15)
 
 ### After system dependencies are installed, clone this repository:
 
@@ -133,6 +139,22 @@ docker run \
     -p 2000:2000 \
     --name piston_api \
     ghcr.io/engineer-man/piston
+```
+
+## Piston for testing packages locally
+
+### Host System Package Dependencies
+
+- Same as [All In One](#All-In-One)
+
+### Installation
+
+```sh
+# Build the Docker containers
+./piston start
+
+# For more help
+./piston help
 ```
 
 <br>
@@ -326,6 +348,7 @@ Content-Type: application/json
 `perl`,
 `php`,
 `ponylang`,
+`powershell`,
 `prolog`,
 `pure`,
 `pyth`,
@@ -333,11 +356,13 @@ Content-Type: application/json
 `python2`,
 `raku`,
 `rockstar`,
+`rscript`,
 `ruby`,
 `rust`,
 `scala`,
 `swift`,
 `typescript`,
+`basic`,
 `vlang`,
 `yeethon`,
 `zig`,
