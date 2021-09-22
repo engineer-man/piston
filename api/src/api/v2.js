@@ -106,7 +106,7 @@ function get_job(body){
             runtime: rt,
             alias: language,
             args: args || [],
-            stdin: '',
+            stdin: stdin || "",
             files,
             timeouts: {
                 run: run_timeout || 3000,
