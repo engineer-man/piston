@@ -2,7 +2,7 @@
 
 ## Naming Languages
 
-Languages should be named after their interpreters, and the command line binaries you call.
+Languages should be named after their interpreters, and the command line binaries you call. The language version should use semantic versioning.
 For example, the full name of the standard python interpreter is `CPython`, however we would name it `python`, after the main binary which it provides.
 In the example of NodeJS, we would call this `node`, after the main binary.
 
