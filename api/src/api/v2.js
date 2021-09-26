@@ -146,7 +146,7 @@ router.ws('/connect', async (ws, req) => {
     eventBus.on("exit", (stage, status) => ws.send(JSON.stringify({type: "exit", stage, ...status})))
 
     ws.on("message", async (data) => {
-        
+
         try{
             const msg = JSON.parse(data);
 
@@ -194,7 +194,7 @@ router.ws('/connect', async (ws, req) => {
                 }
                 break;
             }
-            
+
         }catch(error){
             ws.send(JSON.stringify({type: "error", message: error.message}))
             ws.close(4002, "Notified Error")

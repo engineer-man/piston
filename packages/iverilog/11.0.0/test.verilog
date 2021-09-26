@@ -1,0 +1,7 @@
+module hello;
+  initial
+    begin
+      $display("OK");
+      $finish ;
+    end
+endmodule
