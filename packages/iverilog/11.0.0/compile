@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rename 's/$/\.v/' "$@" # Add .v extension
+iverilog *.v
