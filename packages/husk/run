@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+Husk -ufo"outputFile.hs" "$HUSK_PATH" "$1"
