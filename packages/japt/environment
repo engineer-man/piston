@@ -2,4 +2,4 @@
 
 # node and japt path
 export PATH=$PWD/bin:$PATH
-export JAPT_PATH=$PWD/pyth
+export JAPT_PATH=$PWD/japt
