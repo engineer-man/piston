@@ -1,23 +1,82 @@
 #!/usr/bin/env bash
+cd "$(dirname "$0")"
+
+PISTON_ENV=$(cat .piston_env || echo dev)
+
+docker_compose(){
+    if [ -f "docker-compose.$PISTON_ENV.yaml" ]; then
+        docker-compose -f "docker-compose.$PISTON_ENV.yaml" "$@"
+    else
+        docker-compose "$@"
+    fi
+}
 
 case $1 in
-    dev)
-        shift
-        docker-compose -f docker-compose.dev.yaml "$@"
+    help)
+        echo "=== Piston Management ==="
+        echo "Current Environment: $PISTON_ENV"
+        echo
+        echo "Commands:"
+        echo " select <environment>           Select the environment"
+        echo " docker_compose <args...>       Interact directly with the docker-compose for the selected environment"
+        echo
+        echo " start                          Starts piston"
+        echo " stop                           Stops piston"
+        echo " restart                        Restarts piston"
+        echo " bash                           Opens a bash shell for the piston_api container"
+        echo
+        echo " update                         Fetches and applies latest updates"
+        echo
+        echo " <args..>                       Passthrough to piston cli tool"
+        echo
+        echo "Development Commands:"
+
+        if [ $PISTON_ENV == dev ]; then
+
+        echo " clean-pkgs                     Clean any package build artifacts on disk"
+        echo " clean-repo                     Remove all packages from local repo"
+        echo " build-pkg <package> <version>  Build a package"
+        echo " rebuild                        Build and restart the docker container"
+        
+        else
+
+        echo " Switch to developement environment for more info"
+        echo " > piston select dev"
+        
+        fi
         ;;
-    prod)
-        shift
-        docker-compose -f docker-compose.yaml "$@"
-        ;;
+
+
+    select) echo "$2" > .piston_env ;;
+    docker_compose) shift; docker_compose "$@";;
+
+    restart) docker_compose restart ;;
+    start) docker_compose up -d ;;
+    stop) docker_compose down ;;
+    bash) docker_compose exec api /bin/bash ;;
+
+    rebuild) docker_compose build && docker_compose up -d ;;
+
     update)
         git pull
-        docker-compose pull api
-        docker-compose up -d api
+        docker_compose pull
+        docker_compose up -d
         ;;
-    clean-pkgs)
-        git clean -fqXd packages
+
+    clean-pkgs) git clean -fqXd packages ;;
+    clean-repo) git clean -fqXd repo ;;
+
+    build-pkg)
+        PKGSLUG="$2-$3"
+        echo "Building $PKGSLUG"
+        echo "Ensuring latest builder image"
+        docker build repo -t piston-repo-builder
+        docker run -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
         ;;
     *)
+        cd cli
+        npm i > /dev/null
+        cd ../
         node cli/index.js "$@"
-        ;;
+    ;;
 esac

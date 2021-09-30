@@ -1,0 +1,5 @@
+{
+    "language": "zig",
+    "version": "0.8.0",
+    "aliases": ["zig"]
+}

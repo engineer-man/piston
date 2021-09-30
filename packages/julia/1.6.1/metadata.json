@@ -1,0 +1,5 @@
+{
+    "language": "julia",
+    "version": "1.6.1",
+    "aliases": ["jl"]
+}
