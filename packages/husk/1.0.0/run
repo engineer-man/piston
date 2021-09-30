@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
+ghc Husk
+
 Husk -ufo"outputFile.hs" "$HUSK_PATH" "$1"
