@@ -19,6 +19,7 @@ case $1 in
         echo "Commands:"
         echo " select <environment>           Select the environment"
         echo " docker_compose <args...>       Interact directly with the docker-compose for the selected environment"
+        echo " logs                           Show docker-compose logs"
         echo
         echo " start                          Starts piston"
         echo " stop                           Stops piston"
@@ -37,18 +38,19 @@ case $1 in
         echo " clean-repo                     Remove all packages from local repo"
         echo " build-pkg <package> <version>  Build a package"
         echo " rebuild                        Build and restart the docker container"
-        
+
         else
 
         echo " Switch to developement environment for more info"
         echo " > piston select dev"
-        
+
         fi
         ;;
 
 
     select) echo "$2" > .piston_env ;;
     docker_compose) shift; docker_compose "$@";;
+    logs) docker_compose logs -f ;;
 
     restart) docker_compose restart ;;
     start) docker_compose up -d ;;
