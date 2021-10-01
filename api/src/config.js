@@ -114,6 +114,13 @@ const options = [
             'https://github.com/engineer-man/piston/releases/download/pkgs/index',
         validators: [],
     },
+    {
+        key: 'max_concurrent_jobs',
+        desc: 'Maximum number of concurrent jobs to run at one time',
+        default: 64,
+        parser: parse_int,
+        validators: [(x) => x > 0 || `${x} cannot be negative`]
+    }
 ];
 
 logger.info(`Loading Configuration from environment`);
