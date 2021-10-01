@@ -146,26 +146,31 @@ class Job {
             
 
             const kill_timeout = set_timeout(
-                _ => proc.kill('SIGKILL'),
+                async _ => {
+                    logger.info(`Timeout exceeded timeout=${timeout} uuid=${this.uuid}`)
+                    process.kill(proc.pid, 'SIGKILL')
+                },
                 timeout
             );
 
-            proc.stderr.on('data', data => {
+            proc.stderr.on('data', async data => {
                 if(eventBus !== null) {
                     eventBus.emit("stderr", data);
                 } else if (stderr.length > config.output_max_size) {
-                    proc.kill('SIGKILL');
+                    logger.info(`stderr length exceeded uuid=${this.uuid}`)
+                    process.kill(proc.pid, 'SIGKILL')
                 } else {
                     stderr += data;
                     output += data;
                 }
             });
 
-            proc.stdout.on('data', data => {
+            proc.stdout.on('data', async data => {
                 if(eventBus !== null){
                     eventBus.emit("stdout", data);
                 } else if (stdout.length > config.output_max_size) {
-                    proc.kill('SIGKILL');
+                    logger.info(`stdout length exceeded uuid=${this.uuid}`)
+                    process.kill(proc.pid, 'SIGKILL')
                 } else {
                     stdout += data;
                     output += data;
@@ -179,6 +184,7 @@ class Job {
                 proc.stdout.destroy();
 
                 await this.cleanup_processes()
+                logger.debug(`Finished exit cleanup uuid=${this.uuid}`)
             };
 
             proc.on('exit', async (code, signal) => {
@@ -284,36 +290,47 @@ class Job {
         this.state = job_states.EXECUTED;
     }
 
-    async cleanup_processes() {
+    async cleanup_processes(dont_wait = []) {
         let processes = [1];
+        logger.debug(`Cleaning up processes uuid=${this.uuid}`)
 
         while (processes.length > 0) {
-            processes = await new Promise((resolve, reject) =>
-                cp.execFile('ps', ['awwxo', 'pid,ruid'], (err, stdout) => {
-                    if (err === null) {
-                        const lines = stdout.split('\n').slice(1); //Remove header with slice
-                        const procs = lines.map(line => {
-                            const [pid, ruid] = line
-                                .trim()
-                                .split(/\s+/)
-                                .map(n => parseInt(n));
+            processes = []
 
-                            return { pid, ruid };
-                        });
 
-                        resolve(procs);
-                    } else {
-                        reject(error);
-                    }
-                })
-            );
+            const proc_ids = await fs.readdir("/proc");
 
-            processes = processes.filter(proc => proc.ruid === this.uid);
+
+            processes = await Promise.all(proc_ids.map(async (proc_id) => {
+                if(isNaN(proc_id)) return -1;
+                try{
+                    const proc_status = await fs.read_file(path.join("/proc",proc_id,"status"));
+                    const proc_lines = proc_status.to_string().split("\n")
+                    const uid_line = proc_lines.find(line=>line.starts_with("Uid:"))
+                    const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
+                    
+                    
+                    if(ruid == this.uid || euid == this.uid)
+                        return parse_int(proc_id)
+
+                }catch{
+                    return -1
+                }
+
+                return -1
+            }))
+
+            processes = processes.filter(p => p > 0)
+
+            if(processes.length > 0)
+                logger.debug(`Got processes to kill: ${processes} uuid=${this.uuid}`)
+
+
 
             for (const proc of processes) {
                 // First stop the processes, but keep their resources allocated so they cant re-fork
                 try {
-                    process.kill(proc.pid, 'SIGSTOP');
+                    process.kill(proc, 'SIGSTOP');
                 } catch {
                     // Could already be dead
                 }
@@ -322,14 +339,17 @@ class Job {
             for (const proc of processes) {
                 // Then clear them out of the process tree
                 try {
-                    process.kill(proc.pid, 'SIGKILL');
+                    process.kill(proc, 'SIGKILL');
                 } catch {
                     // Could already be dead and just needs to be waited on
                 }
 
-                wait_pid(proc.pid);
+                if(!dont_wait.includes(proc))
+                    wait_pid(proc);
             }
         }
+
+        logger.debug(`Cleaned up processes uuid=${this.uuid}`)
     }
 
     async cleanup_filesystem() {
