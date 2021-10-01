@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+node "$JAPT_PATH"/node.js "$1"
