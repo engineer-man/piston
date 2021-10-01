@@ -2,6 +2,46 @@ const fss = require('fs');
 const Logger = require('logplease');
 const logger = Logger.create('config');
 
+function parse_overrides(overrides) {
+    try {
+        return JSON.parse(overrides);
+    }
+    catch (e) {
+        return null;
+    }
+}
+
+function validate_overrides(overrides, options) {
+    for (let language in overrides) {
+        for (let key in overrides[language]) {
+            if (
+                ![
+                    'max_process_count', 'max_open_files', 'max_file_size',
+                    'compile_memory_limit', 'run_memory_limit', 'compile_timeout',
+                    'run_timeout', 'output_max_size'
+                ].includes(key)
+            ) {
+                logger.error(`Invalid overridden option: ${key}`);
+                return false;
+            }
+            let option = options.find((o) => o.key == key);
+            let parser = option.parser;
+            let raw = overrides[language][key];
+            let value = parser(raw);
+            let validators = option.validators;
+            for (let validator of validators) {
+                let response = validator(value, raw);
+                if (response !== true) {
+                    logger.error(`Failed to validate overridden option: ${key}`, response);
+                    return false;
+                }
+            }
+            overrides[language][key] = value;
+        }
+    }
+    return overrides;
+}
+
 const options = [
     {
         key: 'log_level',
@@ -92,6 +132,22 @@ const options = [
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
     {
+        key: 'compile_timeout',
+        desc:
+            'Max time allowed for compile stage in milliseconds',
+        default: 10000, // 10 seconds
+        parser: parse_int,
+        validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
+    },
+    {
+        key: 'run_timeout',
+        desc:
+            'Max time allowed for run stage in milliseconds',
+        default: 3000, // 3 seconds
+        parser: parse_int,
+        validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
+    },
+    {
         key: 'compile_memory_limit',
         desc:
             'Max memory usage for compile stage in bytes (set to -1 for no limit)',
@@ -120,6 +176,16 @@ const options = [
         default: 64,
         parser: parse_int,
         validators: [(x) => x > 0 || `${x} cannot be negative`]
+    },
+    {
+        key: 'limit_overrides',
+        desc: 'Per-language exceptions in JSON format for each of:\
+        max_process_count, max_open_files, max_file_size, compile_memory_limit,\
+        run_memory_limit, compile_timeout, run_timeout, output_max_size',
+        default: {},
+        parser: parse_overrides,
+        validators: [(x) => !!x || `Invalid JSON format for the overrides\n${x}`]
+        // More validation is done after the configs are loaded
     }
 ];
 
@@ -138,7 +204,7 @@ options.forEach(option => {
 
     const parsed_val = parser(env_val);
 
-    const value = env_val || option.default;
+    const value = parsed_val || option.default;
 
     option.validators.for_each(validator => {
         let response = null;
@@ -158,9 +224,15 @@ options.forEach(option => {
     config[option.key] = value;
 });
 
+let overrides = validate_overrides(config.limit_overrides, options)
+errored = errored || !overrides;
+
 if (errored) {
     process.exit(1);
 }
+
+config.limit_overrides = overrides;
+console.log(config.limit_overrides);
 
 logger.info('Configuration successfully loaded');
 
