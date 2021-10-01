@@ -344,6 +344,7 @@ Content-Type: application/json
 `groovy`,
 `haskell`,
 `iverilog`,
+`japt`,
 `java`,
 `javascript`,
 `jelly`,
