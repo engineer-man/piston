@@ -2,6 +2,7 @@
 require('nocamel');
 const Logger = require('logplease');
 const express = require('express');
+const expressWs = require('express-ws');
 const globals = require('./globals');
 const config = require('./config');
 const path = require('path');
@@ -12,6 +13,9 @@ const runtime = require('./runtime');
 
 const logger = Logger.create('index');
 const app = express();
+expressWs(app);
+
+
 
 (async () => {
     logger.info('Setting loglevel to', config.log_level);
