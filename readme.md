@@ -375,6 +375,7 @@ Content-Type: application/json
 `ruby`,
 `rust`,
 `scala`,
+`sqlite3`,
 `swift`,
 `typescript`,
 `basic`,

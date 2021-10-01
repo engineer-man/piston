@@ -1,0 +1,5 @@
+{
+    "language": "sqlite3",
+    "version": "3.36.0",
+    "aliases": ["sqlite", "sql"]
+}
