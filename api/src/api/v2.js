@@ -109,8 +109,8 @@ function get_job(body){
             stdin: stdin || "",
             files,
             timeouts: {
-                run: run_timeout || 3000,
-                compile: compile_timeout || 10000,
+                run: run_timeout || config.run_timeout,
+                compile: compile_timeout || config.compile_timeout,
             },
             memory_limits: {
                 run: run_memory_limit || config.run_memory_limit,
@@ -228,7 +228,7 @@ router.post('/execute', async (req, res) => {
 
         return res.status(200).send(result);
     }catch(error){
-        return res.status(400).json(error);
+        return res.status(400).json(error.to_string());
     }
 });
 
