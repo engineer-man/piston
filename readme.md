@@ -42,10 +42,10 @@
 <br>
 
 # Notes About Hacktoberfest
-        
+
 While we are accepting pull requests for Hacktoberfest, we will reject any low-quality PRs.
 If we see PR abuse for Hacktoberfest, we will stop providing Hacktoberfest approval for pull requests.
-        
+
 We are accepting PRs for:
 * Packages - updating package versions, adding new packages
 * Documentation updates
@@ -374,6 +374,7 @@ Content-Type: application/json
 `ruby`,
 `rust`,
 `scala`,
+`sqlite3`,
 `swift`,
 `typescript`,
 `basic`,
