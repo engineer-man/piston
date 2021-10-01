@@ -16,6 +16,19 @@ const job_states = {
 let uid = 0;
 let gid = 0;
 
+let remainingJobSpaces = config.max_concurrent_jobs;
+let jobQueue = [];
+
+
+setInterval(()=>{
+    // Every 10ms try resolve a new job, if there is an available slot
+    if(jobQueue.length > 0 && remainingJobSpaces > 0){
+        jobQueue.shift()()
+    }
+}, 10)
+
+
+
 class Job {
     constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid = uuidv4();
@@ -48,8 +61,15 @@ class Job {
     }
 
     async prime() {
-        logger.info(`Priming job uuid=${this.uuid}`);
+        if(remainingJobSpaces < 1){
+            logger.info(`Awaiting job slot uuid=${this.uuid}`)
+            await new Promise((resolve)=>{
+                jobQueue.push(resolve)
+            })
+        }
 
+        logger.info(`Priming job uuid=${this.uuid}`);
+        remainingJobSpaces--;
         logger.debug('Writing files to job cache');
 
         logger.debug(`Transfering ownership uid=${this.uid} gid=${this.gid}`);
@@ -152,21 +172,23 @@ class Job {
                 }
             });
 
-            const exit_cleanup = () => {
+            const exit_cleanup = async () => {
                 clear_timeout(kill_timeout);
 
                 proc.stderr.destroy();
                 proc.stdout.destroy();
+
+                await this.cleanup_processes()
             };
 
-            proc.on('exit', (code, signal) => {
-                exit_cleanup();
+            proc.on('exit', async (code, signal) => {
+                await exit_cleanup();
 
                 resolve({stdout, stderr, code, signal, output });
             });
 
-            proc.on('error', err => {
-                exit_cleanup();
+            proc.on('error', async err => {
+                await exit_cleanup();
 
                 reject({ error: err, stdout, stderr, output });
             });
@@ -339,10 +361,12 @@ class Job {
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
 
-        await this.cleanup_processes();
         await this.cleanup_filesystem();
+
+        remainingJobSpaces++;
     }
 }
+
 
 module.exports = {
     Job,
