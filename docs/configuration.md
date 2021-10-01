@@ -145,3 +145,12 @@ default: https://github.com/engineer-man/piston/releases/download/pkgs/index
 ```
 
 URL for repository index, where packages will be downloaded from.
+
+## Maximum Concurrent Jobs
+
+```yaml
+key: PISTON_MAX_CONCURRENT_JOBS
+default: 64
+```
+
+Maximum number of jobs to run concurrently.
