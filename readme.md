@@ -339,6 +339,7 @@ Content-Type: application/json
 `emacs`,
 `erlang`,
 `fortran`,
+`freebasic`,
 `go`,
 `golfscript`,
 `groovy`,
