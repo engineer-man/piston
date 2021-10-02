@@ -83,6 +83,7 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 - [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
 - [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
 - [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
+- [Go-Piston](https://github.com/milindmadhukar/go-piston), a Golang wrapper for accessing the Piston API.
 
 <br>
 
