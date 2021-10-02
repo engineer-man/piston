@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Compile bas files
+fbc -lang qb -b "$@" -x out
