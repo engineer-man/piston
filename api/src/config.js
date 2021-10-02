@@ -24,7 +24,7 @@ function validate_overrides(overrides, options) {
                 logger.error(`Invalid overridden option: ${key}`);
                 return false;
             }
-            let option = options.find((o) => o.key == key);
+            let option = options.find((o) => o.key === key);
             let parser = option.parser;
             let raw = overrides[language][key];
             let value = parser(raw);
@@ -38,8 +38,10 @@ function validate_overrides(overrides, options) {
             }
             overrides[language][key] = value;
         }
+        // Modifies the reference
+        options[options.index_of(options.find((o) => o.key === 'limit_overrides'))] = overrides;
     }
-    return overrides;
+    return true;
 }
 
 const options = [
@@ -184,8 +186,10 @@ const options = [
         run_memory_limit, compile_timeout, run_timeout, output_max_size',
         default: {},
         parser: parse_overrides,
-        validators: [(x) => !!x || `Invalid JSON format for the overrides\n${x}`]
-        // More validation is done after the configs are loaded
+        validators: [
+            (x) => !!x || `Invalid JSON format for the overrides\n${x}`,
+            (overrides, _, options) => validate_overrides(overrides, options) || `Failed to validate the overrides`
+        ]
     }
 ];
 
@@ -208,8 +212,8 @@ options.forEach(option => {
 
     option.validators.for_each(validator => {
         let response = null;
-        if (env_val) response = validator(parsed_val, env_val);
-        else response = validator(value, value);
+        if (env_val) response = validator(parsed_val, env_val, options);
+        else response = validator(value, value, options);
 
         if (response !== true) {
             errored = true;
@@ -224,15 +228,9 @@ options.forEach(option => {
     config[option.key] = value;
 });
 
-let overrides = validate_overrides(config.limit_overrides, options)
-errored = errored || !overrides;
-
 if (errored) {
     process.exit(1);
 }
-
-config.limit_overrides = overrides;
-console.log(config.limit_overrides);
 
 logger.info('Configuration successfully loaded');
 
