@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# interpreter location
+export PATH=$PWD/bin:$PATH

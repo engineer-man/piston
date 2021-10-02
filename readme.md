@@ -338,6 +338,7 @@ Content-Type: application/json
 `elixir`,
 `emacs`,
 `erlang`,
+`forte`,
 `fortran`,
 `freebasic`,
 `go`,
