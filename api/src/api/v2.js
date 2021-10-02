@@ -3,7 +3,6 @@ const router = express.Router();
 
 const events = require('events');
 
-const config = require('../config');
 const runtime = require('../runtime');
 const { Job } = require('../job');
 const package = require('../package');
@@ -13,7 +12,7 @@ const SIGNALS = ["SIGABRT","SIGALRM","SIGBUS","SIGCHLD","SIGCLD","SIGCONT","SIGE
 // ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
 function get_job(body){
-    const {
+    let {
         language,
         version,
         args,
@@ -31,19 +30,16 @@ function get_job(body){
                 message: 'language is required as a string',
             });
         }
-
         if (!version || typeof version !== 'string') {
             return reject({
                 message: 'version is required as a string',
             });
         }
-
         if (!files || !Array.isArray(files)) {
             return reject({
                 message: 'files is required as an array',
             });
         }
-
         for (const [i, file] of files.entries()) {
             if (typeof file.content !== 'string') {
                 return reject({
@@ -52,73 +48,64 @@ function get_job(body){
             }
         }
 
-        if (compile_memory_limit) {
-            if (typeof compile_memory_limit !== 'number') {
-                return reject({
-                    message: 'if specified, compile_memory_limit must be a number',
-                });
-            }
-
-            if (
-                config.compile_memory_limit >= 0 &&
-                (compile_memory_limit > config.compile_memory_limit ||
-                    compile_memory_limit < 0)
-            ) {
-                return reject({
-                    message:
-                        'compile_memory_limit cannot exceed the configured limit of ' +
-                        config.compile_memory_limit,
-                });
-            }
-        }
-
-        if (run_memory_limit) {
-            if (typeof run_memory_limit !== 'number') {
-                return reject({
-                    message: 'if specified, run_memory_limit must be a number',
-                });
-            }
-
-            if (
-                config.run_memory_limit >= 0 &&
-                (run_memory_limit > config.run_memory_limit || run_memory_limit < 0)
-            ) {
-                return reject({
-                    message:
-                        'run_memory_limit cannot exceed the configured limit of ' +
-                        config.run_memory_limit,
-                });
-            }
-        }
-
         const rt = runtime.get_latest_runtime_matching_language_version(
             language,
             version
         );
-
         if (rt === undefined) {
             return reject({
                 message: `${language}-${version} runtime is unknown`,
             });
         }
 
+        for (let constraint of ['memory_limit', 'timeout']) {
+            for (let type of ['compile', 'run']) {
+                let constraint_name = `${type}_${constraint}`;
+                let constraint_value = body[constraint_name];
+                let configured_limit = rt[`${constraint}s`][type];
+                if (!constraint_value) {
+                    continue;
+                }
+                if (typeof constraint_value !== 'number') {
+                    return reject({
+                        message: `If specified, ${constraint_name} must be a number`
+                    });
+                }
+                if (configured_limit <= 0) {
+                    continue;
+                }
+                if (constraint_value > configured_limit) {
+                    return reject({
+                        message: `${constraint_name} cannot exceed the configured limit of ${configured_limit}`
+                    });
+                }
+                if (constraint_value < 0) {
+                    return reject({
+                        message: `${constraint_name} must be non-negative`
+                    });
+                }
+            }
+        }
+
+        compile_timeout = compile_timeout || rt.timeouts.compile;
+        run_timeout = run_timeout || rt.timeouts.run;
+        compile_memory_limit = compile_memory_limit || rt.memory_limits.compile;
+        run_timeout = run_timeout || rt.timeouts.run;
         resolve(new Job({
             runtime: rt,
-            alias: language,
             args: args || [],
             stdin: stdin || "",
             files,
             timeouts: {
-                run: run_timeout || config.run_timeout,
-                compile: compile_timeout || config.compile_timeout,
+                run: run_timeout,
+                compile: compile_timeout,
             },
             memory_limits: {
-                run: run_memory_limit || config.run_memory_limit,
-                compile: compile_memory_limit || config.compile_memory_limit,
+                run: run_memory_limit,
+                compile: compile_memory_limit,
             }
         }));
-    })
-
+    });
 }
 
 router.use((req, res, next) => {
@@ -228,7 +215,7 @@ router.post('/execute', async (req, res) => {
 
         return res.status(200).send(result);
     }catch(error){
-        return res.status(400).json(error.to_string());
+        return res.status(400).json(error);
     }
 });
 
