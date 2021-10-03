@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# japt only takes filename and stdin
+node "$JAPT_PATH"/node.js "$1"

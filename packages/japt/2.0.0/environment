@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# node and japt path
+export PATH=$PWD/bin:$PATH
+export JAPT_PATH=$PWD/japt
