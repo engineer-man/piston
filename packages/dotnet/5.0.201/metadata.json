@@ -1,5 +1,66 @@
 {
     "language": "dotnet",
     "version": "5.0.201",
-    "aliases": ["cs", "csharp"]
+    "provides": [
+        {
+            "language": "basic.net",
+            "aliases": [
+                "basic",
+                "visual-basic",
+                "visual-basic.net",
+                "vb",
+                "vb.net",
+                "vb-dotnet",
+                "dotnet-vb",
+                "basic-dotnet",
+                "dotnet-basic"
+            ],
+            "limit_overrides": { "max_process_count": 128 }
+        },
+        {
+            "language": "fsharp.net",
+            "aliases": [
+                "fsharp",
+                "fs",
+                "f#",
+                "fs.net",
+                "f#.net",
+                "fsharp-dotnet",
+                "fs-dotnet",
+                "f#-dotnet",
+                "dotnet-fsharp",
+                "dotnet-fs",
+                "dotnet-fs"
+            ],
+            "limit_overrides": { "max_process_count": 128 }
+        },
+        {
+            "language": "csharp.net",
+            "aliases": [
+                "csharp",
+                "c#",
+                "cs",
+                "c#.net",
+                "cs.net",
+                "c#-dotnet",
+                "cs-dotnet",
+                "csharp-dotnet",
+                "dotnet-c#",
+                "dotnet-cs",
+                "dotnet-csharp"
+            ],
+            "limit_overrides": { "max_process_count": 128 }
+        },
+        {
+            "language": "fsi",
+            "aliases": [
+                "fsx",
+                "fsharp-interactive",
+                "f#-interactive",
+                "dotnet-fsi",
+                "fsi-dotnet",
+                "fsi.net"
+            ]
+        }
+    ]
 }

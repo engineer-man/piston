@@ -100,9 +100,9 @@ class Job {
 
             const prlimit = [
                 'prlimit',
-                '--nproc=' + this.runtime.max_process_count ,
-                '--nofile=' + this.runtime.max_open_files ,
-                '--fsize=' + this.runtime.max_file_size ,
+                '--nproc=' + this.runtime.max_process_count,
+                '--nofile=' + this.runtime.max_open_files,
+                '--fsize=' + this.runtime.max_file_size,
             ];
 
             if (memory_limit >= 0) {
