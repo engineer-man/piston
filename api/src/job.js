@@ -30,7 +30,7 @@ setInterval(()=>{
 
 
 class Job {
-    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
+    constructor({ runtime, files, args, stdin }) {
         this.uuid = uuidv4();
         this.runtime = runtime;
         this.files = files.map((file, i) => ({
@@ -40,8 +40,6 @@ class Job {
 
         this.args = args;
         this.stdin = stdin;
-        this.timeouts = timeouts;
-        this.memory_limits = memory_limits;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -102,9 +100,9 @@ class Job {
 
             const prlimit = [
                 'prlimit',
-                '--nproc=' + config.max_process_count,
-                '--nofile=' + config.max_open_files,
-                '--fsize=' + config.max_file_size,
+                '--nproc=' + this.runtime.max_process_count ,
+                '--nofile=' + this.runtime.max_open_files ,
+                '--fsize=' + this.runtime.max_file_size ,
             ];
 
             if (memory_limit >= 0) {
@@ -142,8 +140,6 @@ class Job {
                     proc.kill(signal)
                 })
             }
-            
-            
 
             const kill_timeout = set_timeout(
                 async _ => {
@@ -156,7 +152,7 @@ class Job {
             proc.stderr.on('data', async data => {
                 if(eventBus !== null) {
                     eventBus.emit("stderr", data);
-                } else if (stderr.length > config.output_max_size) {
+                } else if (stderr.length > this.runtime.output_max_size) {
                     logger.info(`stderr length exceeded uuid=${this.uuid}`)
                     process.kill(proc.pid, 'SIGKILL')
                 } else {
@@ -168,7 +164,7 @@ class Job {
             proc.stdout.on('data', async data => {
                 if(eventBus !== null){
                     eventBus.emit("stdout", data);
-                } else if (stdout.length > config.output_max_size) {
+                } else if (stdout.length > this.runtime.output_max_size) {
                     logger.info(`stdout length exceeded uuid=${this.uuid}`)
                     process.kill(proc.pid, 'SIGKILL')
                 } else {
@@ -223,8 +219,8 @@ class Job {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.timeouts.compile,
-                this.memory_limits.compile
+                this.runtime.timeouts.compile,
+                this.runtime.memory_limits.compile
             );
         }
 
@@ -233,8 +229,8 @@ class Job {
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.timeouts.run,
-            this.memory_limits.run
+            this.runtime.timeouts.run,
+            this.runtime.memory_limits.run
         );
 
         this.state = job_states.EXECUTED;
@@ -266,8 +262,8 @@ class Job {
             const {error, code, signal} = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.timeouts.compile,
-                this.memory_limits.compile,
+                this.runtime.timeouts.compile,
+                this.runtime.memory_limits.compile,
                 eventBus
             )
 
@@ -279,14 +275,14 @@ class Job {
         const {error, code, signal} = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.timeouts.run,
-            this.memory_limits.run,
+            this.runtime.timeouts.run,
+            this.runtime.memory_limits.run,
             eventBus
         );
 
         eventBus.emit("exit", "run", {error, code, signal})
 
-        
+
         this.state = job_states.EXECUTED;
     }
 
@@ -308,8 +304,7 @@ class Job {
                     const proc_lines = proc_status.to_string().split("\n")
                     const uid_line = proc_lines.find(line=>line.starts_with("Uid:"))
                     const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
-                    
-                    
+
                     if(ruid == this.uid || euid == this.uid)
                         return parse_int(proc_id)
 
