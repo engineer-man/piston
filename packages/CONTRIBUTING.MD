@@ -40,7 +40,7 @@ public class Test
 }
 ```
 
-8. Create a `metadata.json` file which contains metadata about the language and interpreter. This simply contains the language name, as in the folder name, the version as in the folder name, aliases that can be used to call this package, and finally a dependencies map.
+8. Create a `metadata.json` file which contains metadata about the language and interpreter. This simply contains the language name, as in the folder name, the version as in the folder name, aliases that can be used to call this package, limit overrides (if any) that can be used to override the default constraints and finally a dependencies map.
 The dependencies map contains the keys as language names, and the values as semver selectors for packages.
 ```json
 {
@@ -50,9 +50,49 @@ The dependencies map contains the keys as language names, and the values as semv
     "aliases": ["deno-ts", "deno-js"]
 }
 ```
+If the interpreter/compiler provides multiple languages, then the provides property should be used:
+```json
+{
+    "language": "dotnet",
+    "version": "5.0.201",
+    "provides": [
+        {
+            "language": "basic.net",
+            "aliases": [
+                "basic",
+                "visual-basic",
+                "visual-basic.net",
+                "vb",
+                "vb.net",
+                "vb-dotnet",
+                "dotnet-vb",
+                "basic-dotnet",
+                "dotnet-basic"
+            ],
+            "limit_overrides": { "max_process_count": 128 }
+        },
+        {
+            "language": "fsi",
+            "aliases": [
+                "fsx",
+                "fsharp-interactive",
+                "f#-interactive",
+                "dotnet-fsi",
+                "fsi-dotnet",
+                "fsi.net"
+            ]
+        }
+    ]
+}
+```
 
 9. Test your package builds with running `make [language]-[version].pkg.tar.gz`.
-If it all goes to plan, you should have a file named `[language]-[version].pkg.tar.gz`, in this case your good to go!
+If it all goes to plan, you should have a file named `[language]-[version].pkg.tar.gz`, in this case you're good to go, albeit it is preferable to test the package locally as follows
+```shell
+./piston build-pkg [package] [version]
+./piston ppman install [package]=[version]
+./piston run [package] -l [version] packages/[package]/[version]/test.*
+```
 
 10. Commit your changes, using message format of `pkg([language]-[version]): Added [language] [version]`
 Any additional commits regarding this package should start with `pkg([language]-[version]): `
