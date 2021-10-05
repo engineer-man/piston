@@ -13,6 +13,7 @@ services:
       - ./data/piston:/piston
     environment:
       - PISTON_REPO_URL=http://repo:8000/index
+      - PISTON_LOG_LEVEL=DEBUG
     tmpfs:
       - /piston/jobs:exec
 
