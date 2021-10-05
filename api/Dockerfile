@@ -18,10 +18,11 @@ RUN apt-get update && \
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
-RUN mkdir -m 0755 /nix && chown node /nix
+RUN mkdir -m 0755 /nix && chown node /nix && touch /nix/piston_detected
 RUN runuser -l node -c 'curl -L https://nixos.org/nix/install | sh -s -- --no-daemon '
 RUN runuser -l node -c 'source ~/.profile; nix-env -iA nixpkgs.nixUnstable'
 RUN runuser -l node -c 'mkdir -p /home/node/.config/nix/; echo "experimental-features = nix-command flakes" >> /home/node/.config/nix/nix.conf'
+RUN cp -r /nix /var/nix
 
 WORKDIR /piston_api
 COPY ["package.json", "package-lock.json", "./"]
@@ -30,5 +31,7 @@ COPY ./src ./src
 
 RUN make -C ./src/nosocket/ all && make -C ./src/nosocket/ install
 
-CMD [ "node", "src"]
+COPY ./entrypoint.sh . 
+
+CMD [ "./entrypoint.sh"]
 EXPOSE 2000/tcp
