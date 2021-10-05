@@ -13,10 +13,15 @@ RUN apt-get update && \
     libncurses6 libncurses5 libedit-dev libseccomp-dev rename procps python3 \
     libreadline-dev libblas-dev liblapack-dev libpcre3-dev libarpack2-dev \
     libfftw3-dev libglpk-dev libqhull-dev libqrupdate-dev libsuitesparse-dev \
-    libsundials-dev libpcre2-dev && \
+    libsundials-dev libpcre2-dev curl sudo && \
     rm -rf /var/lib/apt/lists/*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+
+RUN mkdir -m 0755 /nix && chown node /nix
+RUN runuser -l node -c 'curl -L https://nixos.org/nix/install | sh -s -- --no-daemon '
+RUN runuser -l node -c 'source ~/.profile; nix-env -iA nixpkgs.nixUnstable'
+RUN runuser -l node -c 'mkdir -p /home/node/.config/nix/; echo "experimental-features = nix-command flakes" >> /home/node/.config/nix/nix.conf'
 
 WORKDIR /piston_api
 COPY ["package.json", "package-lock.json", "./"]
