@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+llc "$@" -o binary.s
+clang binary.s -o binary
