@@ -86,11 +86,11 @@ key: PISTON_MAX_PROCESS_COUNT
 default: 64
 ```
 
-Maximum number of processess allowed to to have open for a job.
+Maximum number of processes allowed to to have open for a job.
 
 Resists against exhausting the process table, causing a full system lockup.
 
-## Output Max Side
+## Output Max Size
 
 ```yaml
 key: PISTON_OUTPUT_MAX_SIZE
@@ -123,6 +123,19 @@ Maximum size for a singular file written to disk.
 
 Resists against large file writes to exhaust disk space.
 
+## Compile/Run timeouts
+```yaml
+key:
+  - PISTON_COMPILE_TIMEOUT
+default: 10000
+
+key:
+  - PISTON_RUN_TIMEOUT
+default: 3000
+```
+The maximum time that is allowed to be taken by a stage in milliseconds.
+Use -1 for unlimited time.
+
 ## Compile/Run memory limits
 
 ```yaml
@@ -154,3 +167,17 @@ default: 64
 ```
 
 Maximum number of jobs to run concurrently.
+
+## Limit overrides
+
+```yaml
+key: PISTON_LIMIT_OVERRIDES
+default: {}
+```
+
+Per-language overrides/exceptions for the each of `max_process_count`, `max_open_files`, `max_file_size`,
+`compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `output_max_size`. Defined as follows:
+```
+PISTON_LIMIT_OVERRIDES={"c++":{"max_process_count":128}}
+```
+This will give `c++` a max_process_count of 128 regardless of the configuration.
