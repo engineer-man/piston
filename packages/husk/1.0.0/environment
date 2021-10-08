@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# haskell and husk path
+export PATH=$PWD/bin:$PATH
+export HUSK_PATH=$PWD/husk
+export LANG=en_US.UTF8

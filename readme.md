@@ -348,6 +348,7 @@ Content-Type: application/json
 `golfscript`,
 `groovy`,
 `haskell`,
+`husk`,
 `iverilog`,
 `japt`,
 `java`,
