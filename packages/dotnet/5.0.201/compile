@@ -7,6 +7,11 @@ export HOME=$PWD
 
 dotnet build --help > /dev/null # Shut the thing up
 
+check_errors () {
+    grep -q 'error [A-Z]\+[0-9]\+:' check.txt && cat check.txt 1>&2
+    rm check.txt
+}
+
 case "${PISTON_LANGUAGE}" in
     basic.net)
         rename 's/$/\.vb/' "$@" # Add .vb extension
@@ -33,4 +38,5 @@ case "${PISTON_LANGUAGE}" in
 esac
 
 dotnet restore --source $DOTNET_ROOT/.nuget/packages
-dotnet build --no-restore
+dotnet build --no-restore | tee check.txt
+check_errors
