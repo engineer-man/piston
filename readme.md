@@ -397,7 +397,7 @@ Content-Type: application/json
 # Principle of Operation
 
 Piston uses Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
-which takes in execution requests and executees them within the container safely.
+which takes in execution requests and executes them within the container safely.
 High level, the API writes any source code to a temporary directory in `/piston/jobs`.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
