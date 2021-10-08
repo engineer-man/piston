@@ -74,9 +74,8 @@ class Package {
         await new Promise((resolve, reject) => {
             read_stream.on('data', chunk => hash.update(chunk));
             read_stream.on('end', () => resolve());
-            read_stream.on('error', error => reject(error))
+            read_stream.on('error', error => reject(error));
         });
-        
 
         const cs = hash.digest('hex');
 

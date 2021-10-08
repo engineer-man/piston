@@ -50,15 +50,15 @@ Absolute path to piston related data, including packages and job contexts.
 
 ```yaml
 key:
-  - PISTON_RUNNER_UID_MIN
-  - PISTON_RUNNER_UID_MAX
-  - PISTON_RUNNER_GID_MIN
-  - PISTON_RUNNER_GID_MAX
+    - PISTON_RUNNER_UID_MIN
+    - PISTON_RUNNER_UID_MAX
+    - PISTON_RUNNER_GID_MIN
+    - PISTON_RUNNER_GID_MAX
 default:
-  - 1001
-  - 1500
-  - 1001
-  - 1500
+    - 1001
+    - 1500
+    - 1001
+    - 1500
 ```
 
 UID and GID ranges to use when executing jobs.
@@ -124,6 +124,7 @@ Maximum size for a singular file written to disk.
 Resists against large file writes to exhaust disk space.
 
 ## Compile/Run timeouts
+
 ```yaml
 key:
   - PISTON_COMPILE_TIMEOUT
@@ -133,6 +134,7 @@ key:
   - PISTON_RUN_TIMEOUT
 default: 3000
 ```
+
 The maximum time that is allowed to be taken by a stage in milliseconds.
 Use -1 for unlimited time.
 
@@ -140,8 +142,8 @@ Use -1 for unlimited time.
 
 ```yaml
 key:
-  - PISTON_COMPILE_MEMORY_LIMIT
-  - PISTON_RUN_MEMORY_LIMIT
+    - PISTON_COMPILE_MEMORY_LIMIT
+    - PISTON_RUN_MEMORY_LIMIT
 default: -1
 ```
 
@@ -177,7 +179,9 @@ default: {}
 
 Per-language overrides/exceptions for the each of `max_process_count`, `max_open_files`, `max_file_size`,
 `compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `output_max_size`. Defined as follows:
+
 ```
 PISTON_LIMIT_OVERRIDES={"c++":{"max_process_count":128}}
 ```
+
 This will give `c++` a max_process_count of 128 regardless of the configuration.

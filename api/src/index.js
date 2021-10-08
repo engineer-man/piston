@@ -15,8 +15,6 @@ const logger = Logger.create('index');
 const app = express();
 expressWs(app);
 
-
-
 (async () => {
     logger.info('Setting loglevel to', config.log_level);
     Logger.setLogLevel(config.log_level);

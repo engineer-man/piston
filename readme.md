@@ -47,9 +47,10 @@ While we are accepting pull requests for Hacktoberfest, we will reject any low-q
 If we see PR abuse for Hacktoberfest, we will stop providing Hacktoberfest approval for pull requests.
 
 We are accepting PRs for:
-* Packages - updating package versions, adding new packages
-* Documentation updates
-* CLI/API improvements - please discuss these with us in the Discord first
+
+-   Packages - updating package versions, adding new packages
+-   Documentation updates
+-   CLI/API improvements - please discuss these with us in the Discord first
 
 Any queries or concerns, ping @HexF#0015 in the Discord.
 
@@ -66,11 +67,11 @@ Any queries or concerns, ping @HexF#0015 in the Discord.
 
 It's used in numerous places including:
 
-- [EMKC Challenges](https://emkc.org/challenges)
-- [EMKC Weekly Contests](https://emkc.org/contests)
-- [Engineer Man Discord Server](https://discord.gg/engineerman)
-- Web IDEs
-- 200+ direct integrations
+-   [EMKC Challenges](https://emkc.org/challenges)
+-   [EMKC Weekly Contests](https://emkc.org/contests)
+-   [Engineer Man Discord Server](https://discord.gg/engineerman)
+-   Web IDEs
+-   200+ direct integrations
 
 <br>
 
@@ -78,19 +79,19 @@ It's used in numerous places including:
 
 The following are approved and endorsed extensions/utilities to the core Piston offering.
 
-- [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
-- [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
-- [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
-- [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
-- [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
-- [Go-Piston](https://github.com/milindmadhukar/go-piston), a Golang wrapper for accessing the Piston API.
+-   [I Run Code](https://github.com/engineer-man/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
+-   [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
+-   [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
+-   [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
+-   [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
+-   [Go-Piston](https://github.com/milindmadhukar/go-piston), a Golang wrapper for accessing the Piston API.
 
 <br>
 
 # Public API
 
-- Requires no installation and you can use it immediately.
-- Reference the Runtimes/Execute sections below to learn about the request and response formats.
+-   Requires no installation and you can use it immediately.
+-   Reference the Runtimes/Execute sections below to learn about the request and response formats.
 
 <br>
 
@@ -115,9 +116,9 @@ POST https://emkc.org/api/v2/piston/execute
 
 ### Host System Package Dependencies
 
-- Docker
-- Docker Compose
-- Node JS (>= 13, preferably >= 15)
+-   Docker
+-   Docker Compose
+-   Node JS (>= 13, preferably >= 15)
 
 ### After system dependencies are installed, clone this repository:
 
@@ -142,7 +143,7 @@ The API will now be online with no language runtimes installed. To install runti
 
 ### Host System Package Dependencies
 
-- Docker
+-   Docker
 
 ### Installation
 
@@ -160,7 +161,7 @@ docker run \
 
 ### Host System Package Dependencies
 
-- Same as [All In One](#All-In-One)
+-   Same as [All In One](#All-In-One)
 
 ### Installation
 
@@ -250,34 +251,34 @@ Content-Type: application/json
 `POST /api/v2/execute`
 This endpoint requests execution of some arbitrary code.
 
-- `language` (**required**) The language to use for execution, must be a string and must be installed.
-- `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
-- `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
-- `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
-- `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
-- `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
-- `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
-- `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
-- `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
-- `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+-   `language` (**required**) The language to use for execution, must be a string and must be installed.
+-   `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
+-   `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
+-   `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
+-   `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
+-   `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
+-   `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
+-   `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+-   `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 
 ```json
 {
-  "language": "js",
-  "version": "15.10.0",
-  "files": [
-    {
-      "name": "my_cool_code.js",
-      "content": "console.log(process.argv)"
-    }
-  ],
-  "stdin": "",
-  "args": ["1", "2", "3"],
-  "compile_timeout": 10000,
-  "run_timeout": 3000,
-  "compile_memory_limit": -1,
-  "run_memory_limit": -1
+    "language": "js",
+    "version": "15.10.0",
+    "files": [
+        {
+            "name": "my_cool_code.js",
+            "content": "console.log(process.argv)"
+        }
+    ],
+    "stdin": "",
+    "args": ["1", "2", "3"],
+    "compile_timeout": 10000,
+    "run_timeout": 3000,
+    "compile_memory_limit": -1,
+    "run_memory_limit": -1
 }
 ```
 
@@ -409,14 +410,14 @@ Docker provides a great deal of security out of the box in that it's separate fr
 Piston takes additional steps to make it resistant to
 various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
 
-- Disabling outgoing network interaction
-- Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
-- Capping max files at 2048 (resists various file based attacks)
-- Cleaning up all temp space after each execution (resists out of drive space attacks)
-- Running as a variety of unprivileged users
-- Capping runtime execution at 3 seconds
-- Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
-- SIGKILLing misbehaving code
+-   Disabling outgoing network interaction
+-   Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
+-   Capping max files at 2048 (resists various file based attacks)
+-   Cleaning up all temp space after each execution (resists out of drive space attacks)
+-   Running as a variety of unprivileged users
+-   Capping runtime execution at 3 seconds
+-   Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
+-   SIGKILLing misbehaving code
 
 <br>
 

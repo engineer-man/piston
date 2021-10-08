@@ -1,0 +1,12 @@
+node_modules
+data/
+api/_piston
+repo/build
+packages/*/*/*
+packages/*.pkg.tar.gz
+!packages/*/*/metadata.json
+!packages/*/*/build.sh
+!packages/*/*/environment
+!packages/*/*/run
+!packages/*/*/compile
+!packages/*/*/test.*

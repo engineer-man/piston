@@ -16,11 +16,5 @@
         "uuid": "^8.3.2",
         "waitpid": "git+https://github.com/HexF/node-waitpid.git"
     },
-    "license": "MIT",
-    "scripts": {
-        "lint": "prettier . --write"
-    },
-    "devDependencies": {
-        "prettier": "2.2.1"
-    }
+    "license": "MIT"
 }

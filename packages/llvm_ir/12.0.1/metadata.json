@@ -1,5 +1,5 @@
 {
-  "language": "llvm_ir",
-  "version": "12.0.1",
-  "aliases": ["llvm", "llvm-ir", "ll"]
+    "language": "llvm_ir",
+    "version": "12.0.1",
+    "aliases": ["llvm", "llvm-ir", "ll"]
 }

@@ -9,8 +9,17 @@ const runtimes = [];
 
 class Runtime {
     constructor({
-        language, version, aliases, pkgdir, runtime, timeouts, memory_limits, max_process_count,
-        max_open_files, max_file_size, output_max_size
+        language,
+        version,
+        aliases,
+        pkgdir,
+        runtime,
+        timeouts,
+        memory_limits,
+        max_process_count,
+        max_open_files,
+        max_file_size,
+        output_max_size,
     }) {
         this.language = language;
         this.version = version;
@@ -25,37 +34,67 @@ class Runtime {
         this.output_max_size = output_max_size;
     }
 
-    static compute_single_limit(language_name, limit_name, language_limit_overrides) {
+    static compute_single_limit(
+        language_name,
+        limit_name,
+        language_limit_overrides
+    ) {
         return (
-            config.limit_overrides[language_name] && config.limit_overrides[language_name][limit_name]
-            || language_limit_overrides && language_limit_overrides[limit_name]
-            || config[limit_name]
+            (config.limit_overrides[language_name] &&
+                config.limit_overrides[language_name][limit_name]) ||
+            (language_limit_overrides &&
+                language_limit_overrides[limit_name]) ||
+            config[limit_name]
         );
     }
 
     static compute_all_limits(language_name, language_limit_overrides) {
         return {
             timeouts: {
-                compile:
-                    this.compute_single_limit(language_name, 'compile_timeout', language_limit_overrides),
-                run:
-                    this.compute_single_limit(language_name, 'run_timeout', language_limit_overrides)
+                compile: this.compute_single_limit(
+                    language_name,
+                    'compile_timeout',
+                    language_limit_overrides
+                ),
+                run: this.compute_single_limit(
+                    language_name,
+                    'run_timeout',
+                    language_limit_overrides
+                ),
             },
             memory_limits: {
-                compile:
-                    this.compute_single_limit(language_name, 'compile_memory_limit', language_limit_overrides),
-                run:
-                    this.compute_single_limit(language_name, 'run_memory_limit', language_limit_overrides)
+                compile: this.compute_single_limit(
+                    language_name,
+                    'compile_memory_limit',
+                    language_limit_overrides
+                ),
+                run: this.compute_single_limit(
+                    language_name,
+                    'run_memory_limit',
+                    language_limit_overrides
+                ),
             },
-            max_process_count:
-                this.compute_single_limit(language_name, 'max_process_count', language_limit_overrides),
-            max_open_files:
-                this.compute_single_limit(language_name, 'max_open_files', language_limit_overrides),
-            max_file_size:
-                this.compute_single_limit(language_name, 'max_file_size', language_limit_overrides),
-            output_max_size:
-                this.compute_single_limit(language_name, 'output_max_size', language_limit_overrides),
-        }
+            max_process_count: this.compute_single_limit(
+                language_name,
+                'max_process_count',
+                language_limit_overrides
+            ),
+            max_open_files: this.compute_single_limit(
+                language_name,
+                'max_open_files',
+                language_limit_overrides
+            ),
+            max_file_size: this.compute_single_limit(
+                language_name,
+                'max_file_size',
+                language_limit_overrides
+            ),
+            output_max_size: this.compute_single_limit(
+                language_name,
+                'output_max_size',
+                language_limit_overrides
+            ),
+        };
     }
 
     static load_package(package_dir) {
@@ -63,7 +102,14 @@ class Runtime {
             fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
         );
 
-        let { language, version, build_platform, aliases, provides, limit_overrides } = info;
+        let {
+            language,
+            version,
+            build_platform,
+            aliases,
+            provides,
+            limit_overrides,
+        } = info;
         version = semver.parse(version);
 
         if (build_platform !== globals.platform) {
@@ -83,7 +129,10 @@ class Runtime {
                         version,
                         pkgdir: package_dir,
                         runtime: language,
-                        ...Runtime.compute_all_limits(lang.language, lang.limit_overrides)
+                        ...Runtime.compute_all_limits(
+                            lang.language,
+                            lang.limit_overrides
+                        ),
                     })
                 );
             });
@@ -94,7 +143,7 @@ class Runtime {
                     version,
                     aliases,
                     pkgdir: package_dir,
-                    ...Runtime.compute_all_limits(language, limit_overrides)
+                    ...Runtime.compute_all_limits(language, limit_overrides),
                 })
             );
         }

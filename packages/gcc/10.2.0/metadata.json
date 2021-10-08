@@ -3,7 +3,7 @@
     "version": "10.2.0",
     "provides": [
         {
-            "language":"c",
+            "language": "c",
             "aliases": ["gcc"]
         },
         {
