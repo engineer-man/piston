@@ -73,7 +73,7 @@ case $1 in
         echo "Building $PKGSLUG"
         echo "Ensuring latest builder image"
         docker build repo -t piston-repo-builder
-        docker run -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
+        docker run --rm -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
         ;;
     *)
         cd cli
