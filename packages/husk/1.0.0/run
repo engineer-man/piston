@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Store the current path because we'll need it to run the program file
+PROGRAM_PATH=$PWD
+
+# For now, Husk can only be run within the folder that has the imported modules
+cd $HUSK_PATH
+
+# Run Husk from file in unicode format with the given args
+./Husk -uf "${PROGRAM_PATH}/${@}"
