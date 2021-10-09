@@ -2,7 +2,7 @@
 
 # Put instructions to run the runtime
 
-CODE=$(sed 's/ts$/js/' <<<"$1")
+CODE=$1.js
 shift
 
 node $CODE "$@"
