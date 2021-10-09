@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Python and Vyxal path
+export PATH=$PWD/bin:$PATH
+export VYXAL_PATH=$PWD/vyxal
+
+# export term to fix curses warning
+export TERM=xterm
