@@ -143,12 +143,15 @@ class Job {
                 });
             }
 
-            const kill_timeout = set_timeout(async _ => {
-                logger.info(
-                    `Timeout exceeded timeout=${timeout} uuid=${this.uuid}`
-                );
-                process.kill(proc.pid, 'SIGKILL');
-            }, timeout);
+            const kill_timeout =
+                (timeout >= 0 &&
+                    set_timeout(async _ => {
+                        logger.info(
+                            `Timeout exceeded timeout=${timeout} uuid=${this.uuid}`
+                        );
+                        process.kill(proc.pid, 'SIGKILL');
+                    }, timeout)) ||
+                null;
 
             proc.stderr.on('data', async data => {
                 if (eventBus !== null) {
