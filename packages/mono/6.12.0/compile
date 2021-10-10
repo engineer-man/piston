@@ -1,20 +1,13 @@
 #!/bin/bash
 
-check_errors () {
-    grep -q 'error [A-Z]\+[0-9]\+:' check.txt && cat check.txt 1>&2 || cat check.txt
-    rm check.txt
-}
-
 case "${PISTON_LANGUAGE}" in
     csharp)
         rename 's/$/\.cs/' "$@" # Add .cs extension
-        csc -out:out *.cs > check.txt
-        check_errors
+        csc -out:out *.cs
         ;;
     basic)
         rename 's/$/\.vb/' "$@" # Add .vb extension
-        vbnc -out:out *.vb > check.txt
-        check_errors
+        vbnc -out:out *.vb
         ;;
     *)
         echo "How did you get here? (${PISTON_LANGUAGE})"
