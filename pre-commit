@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Linting staged files..."
-npm install
+npm install > /dev/null || exit 1
 
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
 [ -z "$FILES" ] && exit 0
