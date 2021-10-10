@@ -389,6 +389,7 @@ Content-Type: application/json
 `basic`,
 `basic.net`,
 `vlang`,
+`vyxal`,
 `yeethon`,
 `zig`,
 
