@@ -5,8 +5,7 @@ const logger = Logger.create('config');
 function parse_overrides(overrides) {
     try {
         return JSON.parse(overrides);
-    }
-    catch (e) {
+    } catch (e) {
         return null;
     }
 }
@@ -16,15 +15,20 @@ function validate_overrides(overrides, options) {
         for (let key in overrides[language]) {
             if (
                 ![
-                    'max_process_count', 'max_open_files', 'max_file_size',
-                    'compile_memory_limit', 'run_memory_limit', 'compile_timeout',
-                    'run_timeout', 'output_max_size'
+                    'max_process_count',
+                    'max_open_files',
+                    'max_file_size',
+                    'compile_memory_limit',
+                    'run_memory_limit',
+                    'compile_timeout',
+                    'run_timeout',
+                    'output_max_size',
                 ].includes(key)
             ) {
                 logger.error(`Invalid overridden option: ${key}`);
                 return false;
             }
-            let option = options.find((o) => o.key === key);
+            let option = options.find(o => o.key === key);
             let parser = option.parser;
             let raw = overrides[language][key];
             let value = parser(raw);
@@ -32,14 +36,19 @@ function validate_overrides(overrides, options) {
             for (let validator of validators) {
                 let response = validator(value, raw);
                 if (response !== true) {
-                    logger.error(`Failed to validate overridden option: ${key}`, response);
+                    logger.error(
+                        `Failed to validate overridden option: ${key}`,
+                        response
+                    );
                     return false;
                 }
             }
             overrides[language][key] = value;
         }
         // Modifies the reference
-        options[options.index_of(options.find((o) => o.key === 'limit_overrides'))] = overrides;
+        options[
+            options.index_of(options.find(o => o.key === 'limit_overrides'))
+        ] = overrides;
     }
     return true;
 }
@@ -135,32 +144,28 @@ const options = [
     },
     {
         key: 'compile_timeout',
-        desc:
-            'Max time allowed for compile stage in milliseconds',
+        desc: 'Max time allowed for compile stage in milliseconds',
         default: 10000, // 10 seconds
         parser: parse_int,
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
     {
         key: 'run_timeout',
-        desc:
-            'Max time allowed for run stage in milliseconds',
+        desc: 'Max time allowed for run stage in milliseconds',
         default: 3000, // 3 seconds
         parser: parse_int,
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
     {
         key: 'compile_memory_limit',
-        desc:
-            'Max memory usage for compile stage in bytes (set to -1 for no limit)',
+        desc: 'Max memory usage for compile stage in bytes (set to -1 for no limit)',
         default: -1, // no limit
         parser: parse_int,
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
     {
         key: 'run_memory_limit',
-        desc:
-            'Max memory usage for run stage in bytes (set to -1 for no limit)',
+        desc: 'Max memory usage for run stage in bytes (set to -1 for no limit)',
         default: -1, // no limit
         parser: parse_int,
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
@@ -177,7 +182,7 @@ const options = [
         desc: 'Maximum number of concurrent jobs to run at one time',
         default: 64,
         parser: parse_int,
-        validators: [(x) => x > 0 || `${x} cannot be negative`]
+        validators: [x => x > 0 || `${x} cannot be negative`],
     },
     {
         key: 'limit_overrides',
@@ -187,10 +192,12 @@ const options = [
         default: {},
         parser: parse_overrides,
         validators: [
-            (x) => !!x || `Invalid JSON format for the overrides\n${x}`,
-            (overrides, _, options) => validate_overrides(overrides, options) || `Failed to validate the overrides`
-        ]
-    }
+            x => !!x || `Invalid JSON format for the overrides\n${x}`,
+            (overrides, _, options) =>
+                validate_overrides(overrides, options) ||
+                `Failed to validate the overrides`,
+        ],
+    },
 ];
 
 logger.info(`Loading Configuration from environment`);

@@ -8,7 +8,13 @@
         },
         {
             "language": "basic",
-            "aliases": ["vb", "mono-vb", "mono-basic", "visual-basic", "visual basic"]
+            "aliases": [
+                "vb",
+                "mono-vb",
+                "mono-basic",
+                "visual-basic",
+                "visual basic"
+            ]
         }
     ]
 }

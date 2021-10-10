@@ -19,15 +19,12 @@ let gid = 0;
 let remainingJobSpaces = config.max_concurrent_jobs;
 let jobQueue = [];
 
-
-setInterval(()=>{
+setInterval(() => {
     // Every 10ms try resolve a new job, if there is an available slot
-    if(jobQueue.length > 0 && remainingJobSpaces > 0){
-        jobQueue.shift()()
+    if (jobQueue.length > 0 && remainingJobSpaces > 0) {
+        jobQueue.shift()();
     }
-}, 10)
-
-
+}, 10);
 
 class Job {
     constructor({ runtime, files, args, stdin }) {
@@ -59,11 +56,11 @@ class Job {
     }
 
     async prime() {
-        if(remainingJobSpaces < 1){
-            logger.info(`Awaiting job slot uuid=${this.uuid}`)
-            await new Promise((resolve)=>{
-                jobQueue.push(resolve)
-            })
+        if (remainingJobSpaces < 1) {
+            logger.info(`Awaiting job slot uuid=${this.uuid}`);
+            await new Promise(resolve => {
+                jobQueue.push(resolve);
+            });
         }
 
         logger.info(`Priming job uuid=${this.uuid}`);
@@ -79,10 +76,15 @@ class Job {
             let file_path = path.join(this.dir, file.name);
             const rel = path.relative(this.dir, file_path);
 
-            if(rel.startsWith(".."))
-                throw Error(`File path "${file.name}" tries to escape parent directory: ${rel}`)
+            if (rel.startsWith('..'))
+                throw Error(
+                    `File path "${file.name}" tries to escape parent directory: ${rel}`
+                );
 
-            await fs.mkdir(path.dirname(file_path), {recursive: true,  mode: 0o700})
+            await fs.mkdir(path.dirname(file_path), {
+                recursive: true,
+                mode: 0o700,
+            });
             await fs.chown(path.dirname(file_path), this.uid, this.gid);
 
             await fs.write_file(file_path, file.content);
@@ -127,34 +129,33 @@ class Job {
                 detached: true, //give this process its own process group
             });
 
-            if(eventBus === null){
+            if (eventBus === null) {
                 proc.stdin.write(this.stdin);
                 proc.stdin.end();
                 proc.stdin.destroy();
-            }else{
-                eventBus.on("stdin", (data) => {
+            } else {
+                eventBus.on('stdin', data => {
                     proc.stdin.write(data);
-                })
+                });
 
-                eventBus.on("kill", (signal) => {
-                    proc.kill(signal)
-                })
+                eventBus.on('kill', signal => {
+                    proc.kill(signal);
+                });
             }
 
-            const kill_timeout = set_timeout(
-                async _ => {
-                    logger.info(`Timeout exceeded timeout=${timeout} uuid=${this.uuid}`)
-                    process.kill(proc.pid, 'SIGKILL')
-                },
-                timeout
-            );
+            const kill_timeout = set_timeout(async _ => {
+                logger.info(
+                    `Timeout exceeded timeout=${timeout} uuid=${this.uuid}`
+                );
+                process.kill(proc.pid, 'SIGKILL');
+            }, timeout);
 
             proc.stderr.on('data', async data => {
-                if(eventBus !== null) {
-                    eventBus.emit("stderr", data);
+                if (eventBus !== null) {
+                    eventBus.emit('stderr', data);
                 } else if (stderr.length > this.runtime.output_max_size) {
-                    logger.info(`stderr length exceeded uuid=${this.uuid}`)
-                    process.kill(proc.pid, 'SIGKILL')
+                    logger.info(`stderr length exceeded uuid=${this.uuid}`);
+                    process.kill(proc.pid, 'SIGKILL');
                 } else {
                     stderr += data;
                     output += data;
@@ -162,11 +163,11 @@ class Job {
             });
 
             proc.stdout.on('data', async data => {
-                if(eventBus !== null){
-                    eventBus.emit("stdout", data);
+                if (eventBus !== null) {
+                    eventBus.emit('stdout', data);
                 } else if (stdout.length > this.runtime.output_max_size) {
-                    logger.info(`stdout length exceeded uuid=${this.uuid}`)
-                    process.kill(proc.pid, 'SIGKILL')
+                    logger.info(`stdout length exceeded uuid=${this.uuid}`);
+                    process.kill(proc.pid, 'SIGKILL');
                 } else {
                     stdout += data;
                     output += data;
@@ -179,14 +180,14 @@ class Job {
                 proc.stderr.destroy();
                 proc.stdout.destroy();
 
-                await this.cleanup_processes()
-                logger.debug(`Finished exit cleanup uuid=${this.uuid}`)
+                await this.cleanup_processes();
+                logger.debug(`Finished exit cleanup uuid=${this.uuid}`);
             };
 
             proc.on('exit', async (code, signal) => {
                 await exit_cleanup();
 
-                resolve({stdout, stderr, code, signal, output });
+                resolve({ stdout, stderr, code, signal, output });
             });
 
             proc.on('error', async err => {
@@ -243,7 +244,7 @@ class Job {
         };
     }
 
-    async execute_interactive(eventBus){
+    async execute_interactive(eventBus) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -252,27 +253,27 @@ class Job {
         }
 
         logger.info(
-            `Interactively executing job uuid=${this.uuid} uid=${this.uid} gid=${
-                this.gid
-            } runtime=${this.runtime.toString()}`
+            `Interactively executing job uuid=${this.uuid} uid=${
+                this.uid
+            } gid=${this.gid} runtime=${this.runtime.toString()}`
         );
 
-        if(this.runtime.compiled){
-            eventBus.emit("stage", "compile")
-            const {error, code, signal} = await this.safe_call(
+        if (this.runtime.compiled) {
+            eventBus.emit('stage', 'compile');
+            const { error, code, signal } = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
                 this.runtime.timeouts.compile,
                 this.runtime.memory_limits.compile,
                 eventBus
-            )
+            );
 
-            eventBus.emit("exit", "compile", {error, code, signal})
+            eventBus.emit('exit', 'compile', { error, code, signal });
         }
 
         logger.debug('Running');
-        eventBus.emit("stage", "run")
-        const {error, code, signal} = await this.safe_call(
+        eventBus.emit('stage', 'run');
+        const { error, code, signal } = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
             this.runtime.timeouts.run,
@@ -280,47 +281,50 @@ class Job {
             eventBus
         );
 
-        eventBus.emit("exit", "run", {error, code, signal})
-
+        eventBus.emit('exit', 'run', { error, code, signal });
 
         this.state = job_states.EXECUTED;
     }
 
     async cleanup_processes(dont_wait = []) {
         let processes = [1];
-        logger.debug(`Cleaning up processes uuid=${this.uuid}`)
+        logger.debug(`Cleaning up processes uuid=${this.uuid}`);
 
         while (processes.length > 0) {
-            processes = []
+            processes = [];
 
+            const proc_ids = await fs.readdir('/proc');
 
-            const proc_ids = await fs.readdir("/proc");
+            processes = await Promise.all(
+                proc_ids.map(async proc_id => {
+                    if (isNaN(proc_id)) return -1;
+                    try {
+                        const proc_status = await fs.read_file(
+                            path.join('/proc', proc_id, 'status')
+                        );
+                        const proc_lines = proc_status.to_string().split('\n');
+                        const uid_line = proc_lines.find(line =>
+                            line.starts_with('Uid:')
+                        );
+                        const [_, ruid, euid, suid, fuid] =
+                            uid_line.split(/\s+/);
 
+                        if (ruid == this.uid || euid == this.uid)
+                            return parse_int(proc_id);
+                    } catch {
+                        return -1;
+                    }
 
-            processes = await Promise.all(proc_ids.map(async (proc_id) => {
-                if(isNaN(proc_id)) return -1;
-                try{
-                    const proc_status = await fs.read_file(path.join("/proc",proc_id,"status"));
-                    const proc_lines = proc_status.to_string().split("\n")
-                    const uid_line = proc_lines.find(line=>line.starts_with("Uid:"))
-                    const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
+                    return -1;
+                })
+            );
 
-                    if(ruid == this.uid || euid == this.uid)
-                        return parse_int(proc_id)
+            processes = processes.filter(p => p > 0);
 
-                }catch{
-                    return -1
-                }
-
-                return -1
-            }))
-
-            processes = processes.filter(p => p > 0)
-
-            if(processes.length > 0)
-                logger.debug(`Got processes to kill: ${processes} uuid=${this.uuid}`)
-
-
+            if (processes.length > 0)
+                logger.debug(
+                    `Got processes to kill: ${processes} uuid=${this.uuid}`
+                );
 
             for (const proc of processes) {
                 // First stop the processes, but keep their resources allocated so they cant re-fork
@@ -339,12 +343,11 @@ class Job {
                     // Could already be dead and just needs to be waited on
                 }
 
-                if(!dont_wait.includes(proc))
-                    wait_pid(proc);
+                if (!dont_wait.includes(proc)) wait_pid(proc);
             }
         }
 
-        logger.debug(`Cleaned up processes uuid=${this.uuid}`)
+        logger.debug(`Cleaned up processes uuid=${this.uuid}`);
     }
 
     async cleanup_filesystem() {
@@ -381,7 +384,6 @@ class Job {
         remainingJobSpaces++;
     }
 }
-
 
 module.exports = {
     Job,

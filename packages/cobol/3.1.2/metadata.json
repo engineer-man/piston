@@ -1,5 +1,5 @@
 {
-  "language": "cobol",
-  "version": "3.1.2",
-  "aliases": ["cob"]
+    "language": "cobol",
+    "version": "3.1.2",
+    "aliases": ["cob"]
 }

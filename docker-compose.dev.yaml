@@ -1,24 +1,24 @@
-version: "3.2"
+version: '3.2'
 
 services:
-  api:
-    build: api
-    container_name: piston_api
-    cap_add:
-      - CAP_SYS_ADMIN
-    restart: always
-    ports:
-      - 2000:2000
-    volumes:
-      - ./data/piston:/piston
-    environment:
-      - PISTON_REPO_URL=http://repo:8000/index
-    tmpfs:
-      - /piston/jobs:exec
+    api:
+        build: api
+        container_name: piston_api
+        cap_add:
+            - CAP_SYS_ADMIN
+        restart: always
+        ports:
+            - 2000:2000
+        volumes:
+            - ./data/piston:/piston
+        environment:
+            - PISTON_REPO_URL=http://repo:8000/index
+        tmpfs:
+            - /piston/jobs:exec
 
-  repo: # Local testing of packages
-    build: repo
-    container_name: piston_repo
-    command: ["--no-build"] # Don't build anything
-    volumes:
-      - .:/piston
+    repo: # Local testing of packages
+        build: repo
+        container_name: piston_repo
+        command: ['--no-build'] # Don't build anything
+        volumes:
+            - .:/piston

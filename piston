@@ -38,6 +38,7 @@ case $1 in
         echo " clean-repo                     Remove all packages from local repo"
         echo " build-pkg <package> <version>  Build a package"
         echo " rebuild                        Build and restart the docker container"
+        echo " lint                           Lint the codebase using prettier"
 
         else
 
@@ -53,7 +54,11 @@ case $1 in
     logs) docker_compose logs -f ;;
 
     restart) docker_compose restart ;;
-    start) docker_compose up -d ;;
+    start)
+        rm -f .git/hooks/pre-commit
+        ln -s $(realpath $(dirname "$0"))/pre-commit .git/hooks/pre-commit
+        docker_compose up -d
+        ;;
     stop) docker_compose down ;;
     bash) docker_compose exec api /bin/bash ;;
 
@@ -74,6 +79,11 @@ case $1 in
         echo "Ensuring latest builder image"
         docker build repo -t piston-repo-builder
         docker run --rm -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
+        ;;
+
+    lint)
+        npm install
+        npx prettier --ignore-unknown --write .
         ;;
     *)
         cd cli
