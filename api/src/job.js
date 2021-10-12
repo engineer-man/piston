@@ -27,7 +27,7 @@ setInterval(() => {
 }, 10);
 
 class Job {
-    constructor({ runtime, files, args, stdin }) {
+    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid = uuidv4();
         this.runtime = runtime;
         this.files = files.map((file, i) => ({
@@ -37,6 +37,9 @@ class Job {
 
         this.args = args;
         this.stdin = stdin;
+
+        this.timeouts = timeouts;
+        this.memory_limits = memory_limits;
 
         this.uid = config.runner_uid_min + uid;
         this.gid = config.runner_gid_min + gid;
@@ -220,8 +223,8 @@ class Job {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.runtime.timeouts.compile,
-                this.runtime.memory_limits.compile
+                this.timeouts.compile,
+                this.memory_limits.compile
             );
         }
 
@@ -230,8 +233,8 @@ class Job {
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.runtime.timeouts.run,
-            this.runtime.memory_limits.run
+            this.timeouts.run,
+            this.memory_limits.run
         );
 
         this.state = job_states.EXECUTED;
@@ -263,8 +266,8 @@ class Job {
             const { error, code, signal } = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
                 this.files.map(x => x.name),
-                this.runtime.timeouts.compile,
-                this.runtime.memory_limits.compile,
+                this.timeouts.compile,
+                this.memory_limits.compile,
                 eventBus
             );
 
@@ -276,8 +279,8 @@ class Job {
         const { error, code, signal } = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
             [this.files[0].name, ...this.args],
-            this.runtime.timeouts.run,
-            this.runtime.memory_limits.run,
+            this.timeouts.run,
+            this.memory_limits.run,
             eventBus
         );
 

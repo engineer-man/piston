@@ -129,7 +129,7 @@ function get_job(body) {
         compile_timeout = compile_timeout || rt.timeouts.compile;
         run_timeout = run_timeout || rt.timeouts.run;
         compile_memory_limit = compile_memory_limit || rt.memory_limits.compile;
-        run_timeout = run_timeout || rt.timeouts.run;
+        run_memory_limit = run_memory_limit || rt.memory_limits.run;
         resolve(
             new Job({
                 runtime: rt,
