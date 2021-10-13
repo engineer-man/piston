@@ -215,7 +215,7 @@ options.forEach(option => {
 
     const parsed_val = parser(env_val);
 
-    const value = parsed_val || option.default;
+    const value = env_val === undefined ? option.default : parsed_val;
 
     option.validators.for_each(validator => {
         let response = null;
