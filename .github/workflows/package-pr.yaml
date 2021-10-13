@@ -53,7 +53,7 @@ jobs:
 
             - name: Build Packages
               run: |
-                  PACKAGES=$(jq '.[]' -r ${HOME}/files.json | awk -F/ '$2 && $3{ print $2 "-" $3 }' | sort -u)
+                  PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
                   echo "Packages: $PACKAGES"
                   docker pull docker.pkg.github.com/engineer-man/piston/repo-builder:latest
                   docker build -t repo-builder repo
