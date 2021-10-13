@@ -256,6 +256,7 @@ This endpoint requests execution of some arbitrary code.
 -   `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
 -   `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
 -   `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
+-   `files[].encoding` (_optional_) The encoding scheme used for the file content. One of `base64`, `hex` or `utf8`. Defaults to `utf8`.
 -   `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
 -   `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
 -   `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
