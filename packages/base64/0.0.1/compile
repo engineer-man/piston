@@ -1,0 +1,4 @@
+#!/bin/bash
+
+base64 -d $1 > a.out
+chmod +x a.out
