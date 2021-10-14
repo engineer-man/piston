@@ -17,7 +17,7 @@ docker_compose(){
 init_precommit() {
     if [ $PISTON_ENV == "dev" ]; then
         rm -f .git/hooks/pre-commit
-        ln -s $(realpath $(dirname "$0"))/pre-commit .git/hooks/pre-commit
+        ln -s "$PISTON_PATH/pre-commit" "$PISTON_PATH/.git/hooks/pre-commit"
     fi
 }
 
@@ -67,8 +67,6 @@ case $1 in
     restart) docker_compose restart ;;
     start)
         init_precommit
-        rm -f .git/hooks/pre-commit
-        ln -s "$PISTON_PATH/pre-commit" "$PISTON_PATH/.git/hooks/pre-commit"
         docker_compose up -d
         ;;
     stop) docker_compose down ;;
