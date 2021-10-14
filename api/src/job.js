@@ -37,6 +37,7 @@ class Job {
                 ? file.encoding
                 : 'utf8',
         }));
+        this.code_files = this.files.filter(file => file.encoding === 'utf8');
 
         this.args = args;
         this.stdin = stdin;
@@ -81,7 +82,6 @@ class Job {
         for (const file of this.files) {
             const file_path = path.join(this.dir, file.name);
             const rel = path.relative(this.dir, file_path);
-            const file_content = Buffer.from(file.content, file.encoding);
 
             if (rel.startsWith('..'))
                 throw Error(
@@ -94,7 +94,7 @@ class Job {
             });
             await fs.chown(path.dirname(file_path), this.uid, this.gid);
 
-            await fs.write_file(file_path, file_content);
+            await fs.write_file(file_path, file.content, file.encoding);
             await fs.chown(file_path, this.uid, this.gid);
         }
 
@@ -222,8 +222,6 @@ class Job {
             } runtime=${this.runtime.toString()}`
         );
 
-        const code_files = this.files.filter(file => file.encoding == 'utf8');
-
         logger.debug('Compiling');
 
         let compile;
@@ -231,7 +229,7 @@ class Job {
         if (this.runtime.compiled) {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
-                code_files.map(x => x.name),
+                this.code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
             );
@@ -241,7 +239,7 @@ class Job {
 
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
-            [code_files[0].name, ...this.args],
+            [this.code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run
         );
@@ -270,13 +268,11 @@ class Job {
             } gid=${this.gid} runtime=${this.runtime.toString()}`
         );
 
-        const code_files = this.files.filter(file => file.encoding == 'utf8');
-
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
-                code_files.map(x => x.name),
+                this.code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
                 eventBus
@@ -289,7 +285,7 @@ class Job {
         eventBus.emit('stage', 'run');
         const { error, code, signal } = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
-            [code_files[0].name, ...this.args],
+            [this.code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run,
             eventBus

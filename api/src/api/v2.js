@@ -86,6 +86,14 @@ function get_job(body) {
                 });
             }
         }
+        if (
+            files.filter(file => !file.encoding || file.encoding === 'utf8')
+                .length === 0
+        ) {
+            return reject({
+                message: 'files must include at least one utf8 encoded file',
+            });
+        }
 
         const rt = runtime.get_latest_runtime_matching_language_version(
             language,
