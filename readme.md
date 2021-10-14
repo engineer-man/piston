@@ -321,6 +321,7 @@ Content-Type: application/json
 # Supported Languages
 
 `awk`,
+`base64`,
 `bash`,
 `brainfuck`,
 `c`,
