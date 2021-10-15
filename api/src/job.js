@@ -16,12 +16,12 @@ const job_states = {
 let uid = 0;
 let gid = 0;
 
-let remainingJobSpaces = config.max_concurrent_jobs;
+let remaining_job_spaces = config.max_concurrent_jobs;
 let jobQueue = [];
 
 setInterval(() => {
     // Every 10ms try resolve a new job, if there is an available slot
-    if (jobQueue.length > 0 && remainingJobSpaces > 0) {
+    if (jobQueue.length > 0 && remaining_job_spaces > 0) {
         jobQueue.shift()();
     }
 }, 10);
@@ -33,6 +33,9 @@ class Job {
         this.files = files.map((file, i) => ({
             name: file.name || `file${i}.code`,
             content: file.content,
+            encoding: ['base64', 'hex', 'utf8'].includes(file.encoding)
+                ? file.encoding
+                : 'utf8',
         }));
 
         this.args = args;
@@ -59,7 +62,7 @@ class Job {
     }
 
     async prime() {
-        if (remainingJobSpaces < 1) {
+        if (remaining_job_spaces < 1) {
             logger.info(`Awaiting job slot uuid=${this.uuid}`);
             await new Promise(resolve => {
                 jobQueue.push(resolve);
@@ -67,7 +70,7 @@ class Job {
         }
 
         logger.info(`Priming job uuid=${this.uuid}`);
-        remainingJobSpaces--;
+        remaining_job_spaces--;
         logger.debug('Writing files to job cache');
 
         logger.debug(`Transfering ownership uid=${this.uid} gid=${this.gid}`);
@@ -76,8 +79,9 @@ class Job {
         await fs.chown(this.dir, this.uid, this.gid);
 
         for (const file of this.files) {
-            let file_path = path.join(this.dir, file.name);
+            const file_path = path.join(this.dir, file.name);
             const rel = path.relative(this.dir, file_path);
+            const file_content = Buffer.from(file.content, file.encoding);
 
             if (rel.startsWith('..'))
                 throw Error(
@@ -90,7 +94,7 @@ class Job {
             });
             await fs.chown(path.dirname(file_path), this.uid, this.gid);
 
-            await fs.write_file(file_path, file.content);
+            await fs.write_file(file_path, file_content);
             await fs.chown(file_path, this.uid, this.gid);
         }
 
@@ -218,6 +222,8 @@ class Job {
             } runtime=${this.runtime.toString()}`
         );
 
+        const code_files = this.files.filter(file => file.encoding == 'utf8');
+
         logger.debug('Compiling');
 
         let compile;
@@ -225,7 +231,7 @@ class Job {
         if (this.runtime.compiled) {
             compile = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
-                this.files.map(x => x.name),
+                code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
             );
@@ -235,7 +241,7 @@ class Job {
 
         const run = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
-            [this.files[0].name, ...this.args],
+            [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run
         );
@@ -264,11 +270,13 @@ class Job {
             } gid=${this.gid} runtime=${this.runtime.toString()}`
         );
 
+        const code_files = this.files.filter(file => file.encoding == 'utf8');
+
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
                 path.join(this.runtime.pkgdir, 'compile'),
-                this.files.map(x => x.name),
+                code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
                 eventBus
@@ -281,7 +289,7 @@ class Job {
         eventBus.emit('stage', 'run');
         const { error, code, signal } = await this.safe_call(
             path.join(this.runtime.pkgdir, 'run'),
-            [this.files[0].name, ...this.args],
+            [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run,
             eventBus
@@ -387,7 +395,7 @@ class Job {
 
         await this.cleanup_filesystem();
 
-        remainingJobSpaces++;
+        remaining_job_spaces++;
     }
 }
 

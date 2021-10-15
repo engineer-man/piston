@@ -60,6 +60,7 @@ Runs the given code, using the given runtime and arguments, returning the result
 -   `files`: An array of files which should be uploaded into the job context
 -   `files[].name` (_optional_): Name of file to be written, if none a random name is picked
 -   `files[].content`: Content of file to be written
+-   `files[].encoding` (_optional_): The encoding scheme used for the file content. One of `base64`, `hex` or `utf8`. Defaults to `utf8`.
 -   `stdin` (_optional_): Text to pass into stdin of the program. Defaults to blank string.
 -   `args` (_optional_): Arguments to pass to the program. Defaults to none
 -   `run_timeout` (_optional_): The maximum allowed time in milliseconds for the compile stage to finish before bailing out. Must be a number, less than or equal to the configured maximum timeout.
