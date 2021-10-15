@@ -99,8 +99,7 @@ function get_job(body) {
 
         if (
             rt.language !== 'file' &&
-            files.filter(file => !file.encoding || file.encoding === 'utf8')
-                .length === 0
+            !files.some(file => !file.encoding || file.encoding === 'utf8')
         ) {
             return reject({
                 message: 'files must include at least one utf8 encoded file',
