@@ -222,7 +222,9 @@ class Job {
             } runtime=${this.runtime.toString()}`
         );
 
-        const code_files = this.files.filter(file => file.encoding == 'utf8');
+        const code_files =
+            (this.runtime.language === 'file' && this.files) ||
+            this.files.filter(file => file.encoding == 'utf8');
 
         logger.debug('Compiling');
 
@@ -270,7 +272,9 @@ class Job {
             } gid=${this.gid} runtime=${this.runtime.toString()}`
         );
 
-        const code_files = this.files.filter(file => file.encoding == 'utf8');
+        const code_files =
+            (this.runtime.language === 'file' && this.files) ||
+            this.files.filter(file => file.encoding == 'utf8');
 
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
