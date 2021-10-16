@@ -11,8 +11,8 @@ function parse_overrides(overrides) {
 }
 
 function validate_overrides(overrides, options) {
-    for (let language in overrides) {
-        for (let key in overrides[language]) {
+    for (const language in overrides) {
+        for (const key in overrides[language]) {
             if (
                 ![
                     'max_process_count',
@@ -28,13 +28,13 @@ function validate_overrides(overrides, options) {
                 logger.error(`Invalid overridden option: ${key}`);
                 return false;
             }
-            let option = options.find(o => o.key === key);
-            let parser = option.parser;
-            let raw = overrides[language][key];
-            let value = parser(raw);
-            let validators = option.validators;
-            for (let validator of validators) {
-                let response = validator(value, raw);
+            const option = options.find(o => o.key === key);
+            const parser = option.parser;
+            const raw = overrides[language][key];
+            const value = parser(raw);
+            const validators = option.validators;
+            for (const validator of validators) {
+                const response = validator(value, raw);
                 if (response !== true) {
                     logger.error(
                         `Failed to validate overridden option: ${key}`,

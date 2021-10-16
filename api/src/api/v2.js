@@ -106,11 +106,11 @@ function get_job(body) {
             });
         }
 
-        for (let constraint of ['memory_limit', 'timeout']) {
-            for (let type of ['compile', 'run']) {
-                let constraint_name = `${type}_${constraint}`;
-                let constraint_value = body[constraint_name];
-                let configured_limit = rt[`${constraint}s`][type];
+        for (const constraint of ['memory_limit', 'timeout']) {
+            for (const type of ['compile', 'run']) {
+                const constraint_name = `${type}_${constraint}`;
+                const constraint_value = body[constraint_name];
+                const configured_limit = rt[`${constraint}s`][type];
                 if (!constraint_value) {
                     continue;
                 }
