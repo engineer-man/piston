@@ -18,3 +18,4 @@ cd ..
 
 rm -rf build
 
+bin/pip3 install numpy scipy pandas pycrypto whoosh bcrypt passlib sympy
