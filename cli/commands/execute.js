@@ -245,9 +245,18 @@ async function run_non_interactively(files, argv) {
 
 exports.handler = async argv => {
     const files = [...(argv.files || []), argv.file].map(file_path => {
+        const buffer = fs.readFileSync(file_path);
+        const encoding =
+            (buffer
+                .toString()
+                .split('')
+                .some(x => x.charCodeAt(0) >= 128) &&
+                'base64') ||
+            'utf8';
         return {
             name: path.basename(file_path),
-            content: fs.readFileSync(file_path).toString(),
+            content: buffer.toString(encoding),
+            encoding,
         };
     });
 

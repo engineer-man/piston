@@ -1,0 +1,5 @@
+{
+    "language": "file",
+    "version": "0.0.1",
+    "aliases": ["executable", "elf", "binary"]
+}
