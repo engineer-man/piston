@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('./config');
 const globals = require('./globals');
 const fs = require('fs/promises');
+const fss = require('fs');
 const wait_pid = require('waitpid');
 
 const job_states = {
@@ -184,24 +185,24 @@ class Job {
                 }
             });
 
-            const exit_cleanup = async () => {
+            const exit_cleanup = () => {
                 clear_timeout(kill_timeout);
 
                 proc.stderr.destroy();
                 proc.stdout.destroy();
 
-                await this.cleanup_processes();
+                this.cleanup_processes();
                 logger.debug(`Finished exit cleanup uuid=${this.uuid}`);
             };
 
-            proc.on('exit', async (code, signal) => {
-                await exit_cleanup();
+            proc.on('exit', (code, signal) => {
+                exit_cleanup();
 
                 resolve({ stdout, stderr, code, signal, output });
             });
 
-            proc.on('error', async err => {
-                await exit_cleanup();
+            proc.on('error', err => {
+                exit_cleanup();
 
                 reject({ error: err, stdout, stderr, output });
             });
@@ -304,38 +305,46 @@ class Job {
         this.state = job_states.EXECUTED;
     }
 
-    async cleanup_processes(dont_wait = []) {
+    cleanup_processes(dont_wait = []) {
         let processes = [1];
+        const to_wait = [];
         logger.debug(`Cleaning up processes uuid=${this.uuid}`);
 
         while (processes.length > 0) {
             processes = [];
 
-            const proc_ids = await fs.readdir('/proc');
+            const proc_ids = fss.readdir_sync('/proc');
 
-            processes = await Promise.all(
-                proc_ids.map(async proc_id => {
-                    if (isNaN(proc_id)) return -1;
-                    try {
-                        const proc_status = await fs.read_file(
-                            path.join('/proc', proc_id, 'status')
-                        );
-                        const proc_lines = proc_status.to_string().split('\n');
-                        const uid_line = proc_lines.find(line =>
-                            line.starts_with('Uid:')
-                        );
-                        const [_, ruid, euid, suid, fuid] =
-                            uid_line.split(/\s+/);
+            processes = proc_ids.map(proc_id => {
+                if (isNaN(proc_id)) return -1;
+                try {
+                    const proc_status = fss.read_file_sync(
+                        path.join('/proc', proc_id, 'status')
+                    );
+                    const proc_lines = proc_status.to_string().split('\n');
+                    const state_line = proc_lines.find(line =>
+                        line.starts_with('State:')
+                    );
+                    const uid_line = proc_lines.find(line =>
+                        line.starts_with('Uid:')
+                    );
+                    const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
 
-                        if (ruid == this.uid || euid == this.uid)
-                            return parse_int(proc_id);
-                    } catch {
+                    const [_1, state, user_friendly] = state_line.split(/\s+/);
+
+                    if (state == 'Z')
+                        // Zombie process, just needs to be waited
                         return -1;
-                    }
+                    // We should kill in all other state (Sleep, Stopped & Running)
 
+                    if (ruid == this.uid || euid == this.uid)
+                        return parse_int(proc_id);
+                } catch {
                     return -1;
-                })
-            );
+                }
+
+                return -1;
+            });
 
             processes = processes.filter(p => p > 0);
 
@@ -348,8 +357,12 @@ class Job {
                 // First stop the processes, but keep their resources allocated so they cant re-fork
                 try {
                     process.kill(proc, 'SIGSTOP');
-                } catch {
+                } catch (e) {
                     // Could already be dead
+                    logger.debug(
+                        `Got error while SIGSTOPping process ${proc}:`,
+                        e
+                    );
                 }
             }
 
@@ -359,10 +372,24 @@ class Job {
                     process.kill(proc, 'SIGKILL');
                 } catch {
                     // Could already be dead and just needs to be waited on
+                    logger.debug(
+                        `Got error while SIGKILLing process ${proc}:`,
+                        e
+                    );
                 }
 
-                if (!dont_wait.includes(proc)) wait_pid(proc);
+                to_wait.push(proc);
             }
+        }
+
+        logger.debug(
+            `Finished kill-loop, calling wait_pid to end any zombie processes uuid=${this.uuid}`
+        );
+
+        for (const proc of to_wait) {
+            if (dont_wait.includes(proc)) continue;
+
+            wait_pid(proc);
         }
 
         logger.debug(`Cleaned up processes uuid=${this.uuid}`);
@@ -397,6 +424,7 @@ class Job {
     async cleanup() {
         logger.info(`Cleaning up job uuid=${this.uuid}`);
 
+        this.cleanup_processes(); // Run process janitor, just incase there are any residual processes somehow
         await this.cleanup_filesystem();
 
         remaining_job_spaces++;
