@@ -68,7 +68,7 @@ const options = [
     {
         key: 'bind_address',
         desc: 'Address to bind REST API on',
-        default: '0.0.0.0:2000',
+        default: `0.0.0.0:${process.env["PORT"] || 2000}`,
         validators: [],
     },
     {
