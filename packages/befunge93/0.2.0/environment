@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Put 'export' statements here for environment variables
+export PATH=$PWD/bin:$PATH
+export BEFUNGE93_PATH=$PWD/befunge93

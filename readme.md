@@ -323,6 +323,7 @@ Content-Type: application/json
 
 `awk`,
 `bash`,
+`befunge93`,
 `brainfuck`,
 `c`,
 `c++`,
