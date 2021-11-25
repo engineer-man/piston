@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# run the befunge program with the file name
+python2.7 "$BEFUNGE93_PATH"/befungee.py "$1"
