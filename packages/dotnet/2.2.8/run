@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Put instructions to run the runtime
+export DOTNET_CLI_HOME=$PWD
+
+shift
+dotnet bin/Debug/net5.0/$(basename $(realpath .)).dll "$@"

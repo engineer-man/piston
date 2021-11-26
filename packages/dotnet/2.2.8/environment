@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+
+export DOTNET_ROOT=$PWD
+export PATH=$DOTNET_ROOT:$PATH

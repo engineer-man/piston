@@ -1,0 +1,23 @@
+{
+  "language": "dotnet",
+  "version": "2.2.8",
+  "provides": [
+    {
+      "language": "csharp.net",
+      "aliases": [
+        "csharp",
+        "c#",
+        "cs",
+        "c#.net",
+        "cs.net",
+        "c#-dotnet",
+        "cs-dotnet",
+        "csharp-dotnet",
+        "dotnet-c#",
+        "dotnet-cs",
+        "dotnet-csharp"
+      ],
+      "limit_overrides": { "max_process_count": 128 }
+    }
+  ]
+}
