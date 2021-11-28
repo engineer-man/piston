@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# retina doesn't take interactive stdin and doesn't take args either
+
+# save the file for later
+file="$1"
+
+# remove file from $@
+shift
+
+# join arguments on newline
+stdin=`printf "%s\n" "$@"`
+
+# pass stdin into Retina command with file as argument
+echo "$stdin" | "$RETINA_PATH"/Retina "$file"

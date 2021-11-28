@@ -382,6 +382,7 @@ Content-Type: application/json
 `pyth`,
 `python`,
 `python2`,
+`retina`,
 `raku`,
 `rockstar`,
 `rscript`,
