@@ -1,0 +1,3 @@
+#!/bin/bash
+
+"$RACKET_PATH"/bin/racket "$@"

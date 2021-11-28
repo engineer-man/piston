@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Path to racket binary
+export PATH=$PWD/bin:$PATH
+export RACKET_PATH=$PWD/racket
