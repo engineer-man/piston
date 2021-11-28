@@ -85,6 +85,7 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 -   [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
 -   [Pyston](https://github.com/ffaanngg/pyston), a Python wrapper for accessing the Piston API.
 -   [Go-Piston](https://github.com/milindmadhukar/go-piston), a Golang wrapper for accessing the Piston API.
+-   [piston_rs](https://github.com/Jonxslays/piston_rs), a Rust wrapper for accessing the Piston API.
 
 <br>
 
