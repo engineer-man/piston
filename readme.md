@@ -325,6 +325,7 @@ Content-Type: application/json
 `awk`,
 `bash`,
 `befunge93`,
+`brachylog`,
 `brainfuck`,
 `c`,
 `c++`,

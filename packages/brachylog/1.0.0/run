@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# save the file for later
+file="$1"
+
+# remove the file from $@
+shift
+
+# save stdin as $@ joined by newlines
+stdin=`printf "%s\n" "$@"`
+
+# save code as the contents of $file
+code=`cat "$file"`
+
+# go to the directory where brachylog.pl is so the imports work
+cd "$BRACHYLOG_PATH"/prolog_parser
+
+# run swi prolog with code and stdin
+swipl -f brachylog.pl "$code" "$stdin"
