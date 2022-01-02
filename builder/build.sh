@@ -2,6 +2,9 @@
 
 # Build a container using the spec file provided
 
+START_DIR=$PWD
+cd "$(dirname "$BASH_SOURCE[0]}")"
+
 help_msg(){
     echo "Usage: $0 [specfile] [tag]"
     echo
@@ -37,14 +40,14 @@ fetch_packages(){
 }
 
 build_container(){
-    docker build -t $1 -f "$(dirname $0)/Dockerfile" "$PWD/build"
+    docker build -t $1 -f "Dockerfile" "$START_DIR/build"
 }
 
 
-SPEC_FILE=$1
+SPEC_FILE=$START_DIR/$1
 TAG=$2
 
-[ -z "$SPEC_FILE" ] && help_msg "specfile is required"
+[ -z "$1" ] && help_msg "specfile is required"
 [ -z "$TAG" ] && help_msg "tag is required"
 
 [ -f "$SPEC_FILE" ] || help_msg "specfile does not exist"
