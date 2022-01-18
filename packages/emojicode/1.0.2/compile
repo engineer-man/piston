@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+"$EMOJI_PATH"/emojicodec -S "$EMOJI_PATH"/packages "$1" -o "bruh.exe"
+chmod +x "bruh.exe"
