@@ -11,7 +11,7 @@
         "is-docker": "^2.1.1",
         "logplease": "^1.2.15",
         "nocamel": "HexF/nocamel#patch-1",
-        "node-fetch": "^2.6.1",
+        "node-fetch": "^3.1.1",
         "semver": "^7.3.4",
         "uuid": "^8.3.2",
         "waitpid": "git+https://github.com/HexF/node-waitpid.git"
