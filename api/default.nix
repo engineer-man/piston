@@ -1,5 +1,5 @@
-{pkgs, ...}:
-with pkgs; {
+{pkgs, nosocket, ...}:
+with pkgs; rec {
   package = mkYarnPackage {
     name = "piston";
     src = ./.;
@@ -22,6 +22,49 @@ with pkgs; {
         postInstall = ''
         yarn --offline run install
         '';
+      };
+    };
+  };
+  container = pkgs.dockerTools.buildLayeredImageWithNixDb {
+    name = "piston";
+    tag = "base-latest";
+
+    contents = with pkgs; [
+      package
+      nosocket
+      bash
+      nixFlakes
+      coreutils-full
+      cacert.out
+      git
+      gnutar
+      gzip
+      gnugrep
+      util-linux
+    ];
+
+    extraCommands = ''
+      mkdir -p piston/{jobs,runtimes} etc/nix {,var/}tmp run/lock
+      echo -e "experimental-features = nix-command flakes" >> etc/nix/nix.conf
+      echo "nixbld:x:30000:nixbld1,nixbld10,nixbld11,nixbld12,nixbld13,nixbld14,nixbld15,nixbld16,nixbld17,nixbld18,nixbld19,nixbld2,nixbld20,nixbld21,nixbld22,nixbld23,nixbld24,nixbld25,nixbld26,nixbld27,nixbld28,nixbld29,nixbld3,nixbld30,nixbld31,nixbld32,nixbld4,nixbld5,nixbld6,nixbld7,nixbld8,nixbld9" >> etc/group
+      for i in $(seq 1 32)
+      do
+        echo "nixbld$i:x:$(( $i + 30000 )):30000:Nix build user $i:/var/empty:/run/current-system/sw/bin/nologin" >> etc/passwd
+      done
+    '';
+
+    config = {
+      Cmd = ["${package}/bin/pistond"];
+      Env = [
+        "NIX_PAGER=cat"
+        "USER=nobody"
+        "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
+        "GIT_SSL_CAINFO=/etc/ssl/certs/ca-bundle.crt"
+        "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
+      ];
+
+      ExposedPorts = {
+        "2000/tcp" = {};
       };
     };
   };

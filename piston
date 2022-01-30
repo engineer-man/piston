@@ -1,84 +1,93 @@
 #!/usr/bin/env bash
-cd "$(dirname "$0")"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-PISTON_ENV=$(cat .piston_env || echo dev)
 
-docker_compose(){
-    if [ -f "docker-compose.$PISTON_ENV.yaml" ]; then
-        docker-compose -f "docker-compose.$PISTON_ENV.yaml" "$@"
-    else
-        docker-compose "$@"
-    fi
+CONTAINER_NAME="piston_api"
+
+IMAGE_TAG="base-latest"
+IMAGE_NAME="ghcr.io/piston"
+IMAGE_NAME_DEV="piston"
+
+SUBCOMMAND="$1"
+shift
+
+cmd_build(){
+    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)"
+    docker load -i $CONTAINER_PATH
 }
 
-case $1 in
-    help)
+case "$SUBCOMMAND" in
+    logs) docker logs -f $CONTAINER_NAME;;
+
+    restart) docker restart $CONTAINER_NAME ;;
+    start) 
+        docker run \
+            --rm \
+            --name $CONTAINER_NAME \
+            -it "$IMAGE_NAME:$IMAGE_TAG"
+    ;;
+    stop) docker stop $CONTAINER_NAME ;;
+    bash|shell) docker exec -it $CONTAINER_NAME bash ;;
+
+    update)
+        git pull
+        docker pull "$IMAGE_NAME:$IMAGE_TAG"
+        ;;
+
+    # dev commands
+    
+    build) cmd_build ;;
+
+    start-dev) 
+        cmd_build
+        docker run \
+            --rm \
+            -it \
+            --name $CONTAINER_NAME \
+            -e PISTON_FLAKE_PATH=/piston/packages \
+            -v $PWD:/piston/packages \
+            -it "$IMAGE_NAME_DEV:$IMAGE_TAG"
+    ;;
+
+    test)
+        cmd_build
+        docker run \
+            --rm \
+            -it \
+            -e PISTON_FLAKE_PATH=/piston/packages \
+            -v $PWD:/piston/packages \
+            --name piston_test_runner \
+            -it "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            piston-test $1
+
+        ;;
+
+    *)
         echo "=== Piston Management ==="
-        echo "Current Environment: $PISTON_ENV"
         echo
         echo "Commands:"
-        echo " select <environment>           Select the environment"
-        echo " docker_compose <args...>       Interact directly with the docker-compose for the selected environment"
-        echo " logs                           Show docker-compose logs"
+        echo " logs                           Show piston logs"
         echo
         echo " start                          Starts piston"
         echo " stop                           Stops piston"
         echo " restart                        Restarts piston"
-        echo " bash                           Opens a bash shell for the piston_api container"
+        echo " shell                          Opens a bash shell for the api container"
         echo
-        echo " update                         Fetches and applies latest updates"
+        echo " update                         Fetches latest updates"
         echo
-        echo " <args..>                       Passthrough to piston cli tool"
+        echo " exec <language> <file>         Execute the files on piston with language"
         echo
         echo "Development Commands:"
-
-        if [ $PISTON_ENV == dev ]; then
-
-        echo " clean-pkgs                     Clean any package build artifacts on disk"
-        echo " clean-repo                     Remove all packages from local repo"
-        echo " build-pkg <package> <version>  Build a package"
-        echo " rebuild                        Build and restart the docker container"
-
-        else
-
-        echo " Switch to developement environment for more info"
-        echo " > piston select dev"
-
-        fi
+        echo "Running some of these commands require a nix environment setup and on the path"
+        echo "See https://nixos.wiki/wiki/Nix_Installation_Guide#Stable_Nix"
+        echo
+        echo " start-dev                      Builds a container locally and starts piston"
+        echo " build                          Builds and loads the API container"
+        echo " scaffold <language> [runtime]  Initializes a new runtime"
+        echo " test <runtime>                 Runs unit tests on the given runtime"
+        echo "                                Optionally set runtime to --all to test all"
+        echo "                                NOTE: This is only for the runtimes contained"
+        echo "                                      within this repo"
+        echo
         ;;
-
-
-    select) echo "$2" > .piston_env ;;
-    docker_compose) shift; docker_compose "$@";;
-    logs) docker_compose logs -f ;;
-
-    restart) docker_compose restart ;;
-    start) docker_compose up -d ;;
-    stop) docker_compose down ;;
-    bash) docker_compose exec api /bin/bash ;;
-
-    rebuild) docker_compose build && docker_compose up -d ;;
-
-    update)
-        git pull
-        docker_compose pull
-        docker_compose up -d
-        ;;
-
-    clean-pkgs) git clean -fqXd packages ;;
-    clean-repo) git clean -fqXd repo ;;
-
-    build-pkg)
-        PKGSLUG="$2-$3"
-        echo "Building $PKGSLUG"
-        echo "Ensuring latest builder image"
-        docker build repo -t piston-repo-builder
-        docker run -v "$(realpath $(dirname "$0")):/piston" piston-repo-builder --no-server $PKGSLUG
-        ;;
-    *)
-        cd cli
-        npm i > /dev/null
-        cd ../
-        node cli/index.js "$@"
-    ;;
 esac

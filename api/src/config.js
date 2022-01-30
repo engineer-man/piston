@@ -114,6 +114,12 @@ const options = [
         validators: [],
     },
     {
+        key: 'runtime_set',
+        desc: 'Key on the flake specified by flake_path to access runtimes from',
+        default: 'all',
+        validators: []
+    },
+    {
         key: 'max_concurrent_jobs',
         desc: 'Maximum number of concurrent jobs to run at one time',
         default: 64,
