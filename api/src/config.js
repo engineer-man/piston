@@ -108,10 +108,9 @@ const options = [
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
     {
-        key: 'repo_url',
-        desc: 'URL of repo index',
-        default:
-            'https://github.com/engineer-man/piston/releases/download/pkgs/index',
+        key: 'flake_path',
+        desc: 'Path to nix flake defining runtimes to install',
+        default: 'github:engineer-man/piston?directory=packages',
         validators: [],
     },
     {

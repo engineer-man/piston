@@ -13,7 +13,7 @@ const SIGNALS = ["SIGABRT","SIGALRM","SIGBUS","SIGCHLD","SIGCLD","SIGCONT","SIGE
 
 function get_job(body){
     const {
-        language,
+        runtime_id,
         args,
         stdin,
         files,
@@ -24,13 +24,13 @@ function get_job(body){
     } = body;
 
     return new Promise((resolve, reject) => {
-        if (!language || typeof language !== 'string') {
+        if (typeof runtime_id !== 'number') {
             return reject({
-                message: 'language is required as a string',
+                message: 'runtime_id is required as a number'
             });
         }
 
-        if (!files || !Array.isArray(files)) {
+        if (!Array.isArray(files)) {
             return reject({
                 message: 'files is required as an array',
             });
@@ -82,21 +82,17 @@ function get_job(body){
                 });
             }
         }
+        const rt = runtime[runtime_id];
 
-        const rt = runtime.find(rt => [
-            ...rt.aliases,
-            rt.language
-        ].includes(rt.language))
 
         if (rt === undefined) {
             return reject({
-                message: `${language}-${version} runtime is unknown`,
+                message: `Runtime #${runtime_id} is unknown`,
             });
         }
 
         resolve(new Job({
             runtime: rt,
-            alias: language,
             args: args || [],
             stdin: stdin || "",
             files,
@@ -211,7 +207,6 @@ router.post('/execute', async (req, res) => {
 
     try{
         const job = await get_job(req.body);
-
         await job.prime();
 
         const result = await job.execute();
@@ -231,6 +226,7 @@ router.get('/runtimes', (req, res) => {
             version: rt.version.raw,
             aliases: rt.aliases,
             runtime: rt.runtime,
+            id: rt.id
         };
     });
 

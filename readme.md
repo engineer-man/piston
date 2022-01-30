@@ -227,6 +227,7 @@ Content-Type: application/json
 
 [
     {
+        "id": 1,
         "language": "bash",
         "version": "5.1.0",
         "aliases": [
@@ -234,6 +235,7 @@ Content-Type: application/json
         ]
     },
     {
+        "id": 2,
         "language": "brainfuck",
         "version": "2.7.3",
         "aliases": [
@@ -250,7 +252,6 @@ Content-Type: application/json
 This endpoint requests execution of some arbitrary code.
 
 - `language` (**required**) The language to use for execution, must be a string and must be installed.
-- `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
 - `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
 - `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
 - `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
@@ -264,7 +265,6 @@ This endpoint requests execution of some arbitrary code.
 ```json
 {
   "language": "js",
-  "version": "15.10.0",
   "files": [
     {
       "name": "my_cool_code.js",

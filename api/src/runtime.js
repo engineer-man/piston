@@ -1,5 +1,5 @@
 const logger = require('logplease').create('runtime');
-const semver = require('semver');
+const cp = require('child_process');
 const config = require('./config');
 const globals = require('./globals');
 const fss = require('fs');
@@ -7,119 +7,72 @@ const path = require('path');
 
 const runtimes = [];
 
+
 class Runtime {
-    constructor({ language, version, aliases, pkgdir, runtime }) {
+    constructor({ language, version, aliases, runtime, run, compile, packageSupport, flake_key }) {
         this.language = language;
-        this.version = version;
-        this.aliases = aliases || [];
-        this.pkgdir = pkgdir;
         this.runtime = runtime;
+        this.aliases = aliases;
+        this.version = version; 
+        
+        this.run = run;
+        this.compile = compile;
+
+        this.flake_key = flake_key;
+        this.package_support = packageSupport;
     }
 
-    static load_package(package_dir) {
-        let info = JSON.parse(
-            fss.read_file_sync(path.join(package_dir, 'pkg-info.json'))
-        );
+    ensure_built(){
+        logger.info(`Ensuring ${this} is built`);
 
-        let { language, version, build_platform, aliases, provides } = info;
-        version = semver.parse(version);
+        const flake_key = this.flake_key;
 
-        if (build_platform !== globals.platform) {
-            logger.warn(
-                `Package ${language}-${version} was built for platform ${build_platform}, ` +
-                    `but our platform is ${globals.platform}`
-            );
+        function _ensure_built(key){
+            const command = `nix build ${config.flake_path}#pistonRuntimes.${flake_key}.metadata.${key} --no-link`;
+            cp.execSync(command, {stdio: "pipe"})
         }
 
-        if (provides) {
-            // Multiple languages in 1 package
-            provides.forEach(lang => {
-                runtimes.push(
-                    new Runtime({
-                        language: lang.language,
-                        aliases: lang.aliases,
-                        version,
-                        pkgdir: package_dir,
-                        runtime: language,
-                    })
-                );
-            });
-        } else {
-            runtimes.push(
-                new Runtime({
-                    language,
-                    version,
-                    aliases,
-                    pkgdir: package_dir,
-                })
-            );
-        }
+        _ensure_built("run");
+        if(this.compiled) _ensure_built("compile");
 
-        logger.debug(`Package ${language}-${version} was loaded`);
+        logger.debug(`Finished ensuring ${this} is installed`)
+
+    }
+
+    static load_runtime(flake_key){
+        logger.info(`Loading ${flake_key}`)
+        const metadata_command = `nix eval --json ${config.flake_path}#pistonRuntimes.${flake_key}.metadata`;
+        const metadata = JSON.parse(cp.execSync(metadata_command));
+        
+        const this_runtime = new Runtime({
+            ...metadata,
+            flake_key
+        });
+
+        this_runtime.ensure_built();
+
+        runtimes.push(this_runtime);
+        
+        
+        logger.debug(`Package ${flake_key} was loaded`);
+
     }
 
     get compiled() {
-        if (this._compiled === undefined) {
-            this._compiled = fss.exists_sync(path.join(this.pkgdir, 'compile'));
-        }
-
-        return this._compiled;
+        return this.compile !== null;
     }
 
-    get env_vars() {
-        if (!this._env_vars) {
-            const env_file = path.join(this.pkgdir, '.env');
-            const env_content = fss.read_file_sync(env_file).toString();
-
-            this._env_vars = {};
-
-            env_content
-                .trim()
-                .split('\n')
-                .map(line => line.split('=', 2))
-                .forEach(([key, val]) => {
-                    this._env_vars[key.trim()] = val.trim();
-                });
-        }
-
-        return this._env_vars;
+    get id(){
+        return runtimes.indexOf(this);
     }
 
     toString() {
-        return `${this.language}-${this.version.raw}`;
+        return `${this.language}-${this.version}`;
     }
 
-    unregister() {
-        const index = runtimes.indexOf(this);
-        runtimes.splice(index, 1); //Remove from runtimes list
-    }
 }
 
 module.exports = runtimes;
 module.exports.Runtime = Runtime;
-module.exports.get_runtimes_matching_language_version = function (lang, ver) {
-    return runtimes.filter(
-        rt =>
-            (rt.language == lang || rt.aliases.includes(lang)) &&
-            semver.satisfies(rt.version, ver)
-    );
-};
-module.exports.get_latest_runtime_matching_language_version = function (
-    lang,
-    ver
-) {
-    return module.exports
-        .get_runtimes_matching_language_version(lang, ver)
-        .sort((a, b) => semver.rcompare(a.version, b.version))[0];
-};
+module.exports.load_runtime = Runtime.load_runtime;
 
-module.exports.get_runtime_by_name_and_version = function (runtime, ver) {
-    return runtimes.find(
-        rt =>
-            (rt.runtime == runtime ||
-                (rt.runtime === undefined && rt.language == runtime)) &&
-            semver.satisfies(rt.version, ver)
-    );
-};
-
-module.exports.load_package = Runtime.load_package;
