@@ -240,8 +240,8 @@ class Job {
 
         if (this.runtime.compiled) {
             compile = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
-                code_files.map(x => x.name),
+                this.runtime.compile,
+                this.files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
             );
@@ -262,7 +262,7 @@ class Job {
             compile,
             run,
             language: this.runtime.language,
-            version: this.runtime.version.raw,
+            version: this.runtime.version,
         };
     }
 

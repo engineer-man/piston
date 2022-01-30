@@ -5,8 +5,7 @@ const events = require('events');
 
 const runtime = require('../runtime');
 const { Job } = require('../job');
-const package = require('../package');
-const logger = require('logplease').create('api/v2');
+const logger = require('logplease').create('api/v3');
 
 const SIGNALS = [
     'SIGABRT',
@@ -53,7 +52,6 @@ const SIGNALS = [
 function get_job(body) {
     let {
         language,
-        version,
         args,
         stdin,
         files,
@@ -69,11 +67,7 @@ function get_job(body) {
                 message: 'language is required as a string',
             });
         }
-        if (!version || typeof version !== 'string') {
-            return reject({
-                message: 'version is required as a string',
-            });
-        }
+
         if (!files || !Array.isArray(files)) {
             return reject({
                 message: 'files is required as an array',
@@ -87,10 +81,50 @@ function get_job(body) {
             }
         }
 
-        const rt = runtime.get_latest_runtime_matching_language_version(
-            language,
-            version
-        );
+        if (compile_memory_limit) {
+            if (typeof compile_memory_limit !== 'number') {
+                return reject({
+                    message: 'if specified, compile_memory_limit must be a number',
+                });
+            }
+
+            if (
+                config.compile_memory_limit >= 0 &&
+                (compile_memory_limit > config.compile_memory_limit ||
+                    compile_memory_limit < 0)
+            ) {
+                return reject({
+                    message:
+                        'compile_memory_limit cannot exceed the configured limit of ' +
+                        config.compile_memory_limit,
+                });
+            }
+        }
+
+        if (run_memory_limit) {
+            if (typeof run_memory_limit !== 'number') {
+                return reject({
+                    message: 'if specified, run_memory_limit must be a number',
+                });
+            }
+
+            if (
+                config.run_memory_limit >= 0 &&
+                (run_memory_limit > config.run_memory_limit || run_memory_limit < 0)
+            ) {
+                return reject({
+                    message:
+                        'run_memory_limit cannot exceed the configured limit of ' +
+                        config.run_memory_limit,
+                });
+            }
+        }
+
+        const rt = runtime.find(rt => [
+            ...rt.aliases,
+            rt.language
+        ].includes(rt.language))
+
         if (rt === undefined) {
             return reject({
                 message: `${language}-${version} runtime is unknown`,
@@ -296,79 +330,6 @@ router.get('/runtimes', (req, res) => {
     });
 
     return res.status(200).send(runtimes);
-});
-
-router.get('/packages', async (req, res) => {
-    logger.debug('Request to list packages');
-    let packages = await package.get_package_list();
-
-    packages = packages.map(pkg => {
-        return {
-            language: pkg.language,
-            language_version: pkg.version.raw,
-            installed: pkg.installed,
-        };
-    });
-
-    return res.status(200).send(packages);
-});
-
-router.post('/packages', async (req, res) => {
-    logger.debug('Request to install package');
-
-    const { language, version } = req.body;
-
-    const pkg = await package.get_package(language, version);
-
-    if (pkg == null) {
-        return res.status(404).send({
-            message: `Requested package ${language}-${version} does not exist`,
-        });
-    }
-
-    try {
-        const response = await pkg.install();
-
-        return res.status(200).send(response);
-    } catch (e) {
-        logger.error(
-            `Error while installing package ${pkg.language}-${pkg.version}:`,
-            e.message
-        );
-
-        return res.status(500).send({
-            message: e.message,
-        });
-    }
-});
-
-router.delete('/packages', async (req, res) => {
-    logger.debug('Request to uninstall package');
-
-    const { language, version } = req.body;
-
-    const pkg = await package.get_package(language, version);
-
-    if (pkg == null) {
-        return res.status(404).send({
-            message: `Requested package ${language}-${version} does not exist`,
-        });
-    }
-
-    try {
-        const response = await pkg.uninstall();
-
-        return res.status(200).send(response);
-    } catch (e) {
-        logger.error(
-            `Error while uninstalling package ${pkg.language}-${pkg.version}:`,
-            e.message
-        );
-
-        return res.status(500).send({
-            message: e.message,
-        });
-    }
 });
 
 module.exports = router;

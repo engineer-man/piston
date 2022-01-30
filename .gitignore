@@ -1,3 +1,4 @@
 data/
 .piston_env
 node_modules
+result
