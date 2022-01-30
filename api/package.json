@@ -2,7 +2,7 @@
     "name": "piston-api",
     "version": "4.0.0",
     "description": "API for piston - a high performance code execution engine",
-    "main": "src/pistond.js",
+    "main": "src/bin/pistond.js",
     "dependencies": {
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
@@ -23,6 +23,8 @@
         "prettier": "2.2.1"
     },
     "bin": {
-        "pistond": "./src/pistond.js"
+        "pistond": "./src/bin/pistond.js",
+        "piston-install": "./src/bin/install.js",
+        "piston-test": "./src/bin/test.js"
     }
 }

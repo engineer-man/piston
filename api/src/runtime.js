@@ -17,7 +17,7 @@ class Runtime {
         run,
         compile,
         packageSupport,
-        flake_key,
+        flake_path,
         timeouts,
         memory_limits,
         max_process_count,
@@ -41,7 +41,7 @@ class Runtime {
         this.run = run;
         this.compile = compile;
 
-        this.flake_key = flake_key;
+        this.flake_path = flake_path;
         this.package_support = packageSupport;
     }
     
@@ -112,10 +112,10 @@ class Runtime {
     ensure_built(){
         logger.info(`Ensuring ${this} is built`);
 
-        const flake_key = this.flake_key;
+        const flake_path = this.flake_path;
 
         function _ensure_built(key){
-            const command = `nix build ${config.flake_path}#pistonRuntimes.${flake_key}.metadata.${key} --no-link`;
+            const command = `nix build ${flake_path}.metadata.${key} --no-link`;
             cp.execSync(command, {stdio: "pipe"})
         }
 
@@ -128,7 +128,8 @@ class Runtime {
 
     static load_runtime(flake_key){
         logger.info(`Loading ${flake_key}`)
-        const metadata_command = `nix eval --json ${config.flake_path}#pistonRuntimes.${flake_key}.metadata`;
+        const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${flake_key}`;
+        const metadata_command = `nix eval --json ${flake_path}.metadata`;
         const metadata = JSON.parse(cp.execSync(metadata_command));
         
         const this_runtime = new Runtime({
@@ -137,7 +138,7 @@ class Runtime {
                 metadata.language,
                 metadata.limit_overrides
             ),
-            flake_key
+            flake_path
         });
 
         this_runtime.ensure_built();

@@ -3,16 +3,16 @@ require('nocamel');
 const Logger = require('logplease');
 const express = require('express');
 const expressWs = require('express-ws');
-const globals = require('./globals');
-const config = require('./config');
+const globals = require('../globals');
+const config = require('../config');
 const cp = require('child_process');
 const path = require('path');
 const fs = require('fs/promises');
 const fss = require('fs');
 const body_parser = require('body-parser');
-const runtime = require('./runtime');
+const runtime = require('../runtime');
 
-const logger = Logger.create('index');
+const logger = Logger.create('pistond');
 const app = express();
 expressWs(app);
 
@@ -39,7 +39,7 @@ expressWs(app);
 
     logger.info('Loading packages');
 
-    const runtimes_data = cp.execSync(`nix eval --json ${config.flake_path}#pistonRuntimes --apply builtins.attrNames`).toString();
+    const runtimes_data = cp.execSync(`nix eval --json ${config.flake_path}#pistonRuntimeSets.${config.runtime_set} --apply builtins.attrNames`).toString();
     const runtimes = JSON.parse(runtimes_data);
     
     runtimes.for_each(pkg => runtime.load_runtime(pkg));
@@ -59,8 +59,8 @@ expressWs(app);
 
     logger.debug('Registering Routes');
 
-    const api_v2 = require('./api/v2');
-    const api_v3 = require('./api/v3');
+    const api_v2 = require('../api/v2');
+    const api_v3 = require('../api/v3');
     app.use('/api/v2', api_v2);
     app.use('/api/v3', api_v3);
 
