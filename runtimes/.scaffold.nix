@@ -49,6 +49,9 @@ in piston.mkRuntime {
 
     # Specify a list of tests.
     # These should output "OK" to STDOUT if everything looks good
+    # 
+    # Run the following command to test the package:
+    # $ ./piston test %NAME%
     tests = [
         (piston.mkTest {
             files = {

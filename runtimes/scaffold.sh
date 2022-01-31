@@ -28,10 +28,13 @@ else
     echo "    \"$NAME\" = import ./$NAME.nix args;" >> default.nix
     sed -e 's/%LANGUAGE%/'"$LANGUAGE"'/g' \
         -e 's/%RUNTIME%/'"$RUNTIME"'/g' \
+        -e 's/%NAME%/'"$NAME"'/g' \
         .scaffold.nix > $NAME.nix
-    git add $NAME.nix
     echo "}" >> default.nix
+
+    git add $NAME.nix default.nix
 
     echo "Scaffolded $NAME"
     echo "Edit $NAME.nix to get started"
+    echo "Once you are done, run ./piston test $NAME to test it"
 fi
