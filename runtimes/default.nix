@@ -5,4 +5,12 @@ args: {
     "bash" = import ./bash.nix args;
     "clojure" = import ./clojure.nix args;
     "cobol-gnu-cobol" = import ./cobol-gnu-cobol.nix args;
+    "crystal" = import ./crystal.nix args;
+    "dart" = import ./dart.nix args;
+    "dash" = import ./dash.nix args;
+    "deno-javascript" = import ./deno-javascript.nix args;
+    "deno-typescript" = import ./deno-typescript.nix args;
+    "elixir" = import ./elixir.nix args;
+    "erlang" = import ./erlang.nix args;
+    "gawk-awk" = import ./gawk-awk.nix args;
 }

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-DENO_DIR=$PWD deno run $@
