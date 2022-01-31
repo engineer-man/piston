@@ -1,0 +1,12 @@
+# This "FROM" image is previously emitted by nix
+FROM ghcr.io/engineer-man/piston:base-latest
+
+ENV PISTON_FLAKE_PATH=/piston/packages
+COPY runtimes/ /piston/packages/runtimes
+COPY flake.nix flake.lock /piston/packages/
+
+
+ARG RUNTIMESET=all
+ENV PISTON_RUNTIME_SET=$RUNTIMESET
+
+RUN piston-install

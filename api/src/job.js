@@ -139,10 +139,6 @@ class Job {
             var output = '';
 
             const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
-                env: {
-                    ...this.runtime.env_vars,
-                    PISTON_LANGUAGE: this.runtime.language,
-                },
                 stdio: 'pipe',
                 cwd: this.dir,
                 uid: this.uid,
@@ -250,7 +246,7 @@ class Job {
         this.logger.debug('Running');
 
         const run = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            this.runtime.run,
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run

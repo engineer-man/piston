@@ -51,6 +51,8 @@ with pkgs; rec {
       do
         echo "nixbld$i:x:$(( $i + 30000 )):30000:Nix build user $i:/var/empty:/run/current-system/sw/bin/nologin" >> etc/passwd
       done
+
+      chmod 1777 {,var/}tmp/
     '';
 
     config = {
@@ -61,6 +63,21 @@ with pkgs; rec {
         "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
         "GIT_SSL_CAINFO=/etc/ssl/certs/ca-bundle.crt"
         "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
+         "PATH=${lib.concatStringsSep ":" [
+           "/usr/local/sbin"
+           "/usr/local/bin"
+           "/usr/sbin"
+           "/usr/bin"
+           "/sbin"
+           "/bin"
+           "/root/.nix-profile/bin"
+           "/nix/var/nix/profiles/default/bin"
+           "/nix/var/nix/profiles/default/sbin"
+         ]}"
+         "MANPATH=${lib.concatStringsSep ":" [
+           "/root/.nix-profile/share/man"
+           "/nix/var/nix/profiles/default/share/man"
+         ]}"
       ];
 
       ExposedPorts = {

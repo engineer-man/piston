@@ -5,15 +5,16 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CONTAINER_NAME="piston_api"
 
 IMAGE_TAG="base-latest"
-IMAGE_NAME="ghcr.io/piston"
+IMAGE_NAME="ghcr.io/engineer-man/piston"
 IMAGE_NAME_DEV="piston"
 
 SUBCOMMAND="$1"
 shift
 
-cmd_build(){
+build_base(){
     CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)"
     docker load -i $CONTAINER_PATH
+    docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG"
 }
 
 case "$SUBCOMMAND" in
@@ -22,9 +23,10 @@ case "$SUBCOMMAND" in
     restart) docker restart $CONTAINER_NAME ;;
     start) 
         docker run \
+            -p 2000:2000 \
             --rm \
             --name $CONTAINER_NAME \
-            -it "$IMAGE_NAME:$IMAGE_TAG"
+            -d "$IMAGE_NAME:$IMAGE_TAG"
     ;;
     stop) docker stop $CONTAINER_NAME ;;
     bash|shell) docker exec -it $CONTAINER_NAME bash ;;
@@ -35,22 +37,40 @@ case "$SUBCOMMAND" in
         ;;
 
     # dev commands
+
+    scaffold)
+        pushd $SCRIPT_DIR/runtimes > /dev/null
+        ./scaffold.sh $1 $2
+        popd > /dev/null
+        ;;
     
-    build) cmd_build ;;
+    build)
+        build_base
+        if [[ ! -z "$1" ]]; then
+            # $1 contains a variant to build
+            docker build \
+                --build-arg RUNTIMESET=$1 \
+                -f $SCRIPT_DIR/Dockerfile.withset \
+                -t "$IMAGE_NAME_DEV:$1-latest" \
+                .
+        fi
+        ;;
 
     start-dev) 
-        cmd_build
+        build_base
         docker run \
             --rm \
+            -p 2000:2000 \
             -it \
             --name $CONTAINER_NAME \
+            -e PISTON_LOG_LEVEL=DEBUG \
             -e PISTON_FLAKE_PATH=/piston/packages \
             -v $PWD:/piston/packages \
-            -it "$IMAGE_NAME_DEV:$IMAGE_TAG"
+            -d "$IMAGE_NAME_DEV:$IMAGE_TAG"
     ;;
 
     test)
-        cmd_build
+        build_base
         docker run \
             --rm \
             -it \
@@ -82,7 +102,8 @@ case "$SUBCOMMAND" in
         echo "See https://nixos.wiki/wiki/Nix_Installation_Guide#Stable_Nix"
         echo
         echo " start-dev                      Builds a container locally and starts piston"
-        echo " build                          Builds and loads the API container"
+        echo " build [runtime-set]            Builds and loads the API container optionally"
+        echo "                                including the runtime set within it"
         echo " scaffold <language> [runtime]  Initializes a new runtime"
         echo " test <runtime>                 Runs unit tests on the given runtime"
         echo "                                Optionally set runtime to --all to test all"
