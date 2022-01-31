@@ -12,16 +12,16 @@ SUBCOMMAND="$1"
 shift
 
 build_base(){
-    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)"
-    docker load -i $CONTAINER_PATH
-    docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG"
+    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)" || exit 1
+    docker load -i $CONTAINER_PATH || exit 1
+    docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG" || exit 1
 }
 
 case "$SUBCOMMAND" in
     logs) docker logs -f $CONTAINER_NAME;;
 
     restart) docker restart $CONTAINER_NAME ;;
-    start) 
+    start)
         docker run \
             -p 2000:2000 \
             --rm \
@@ -43,7 +43,7 @@ case "$SUBCOMMAND" in
         ./scaffold.sh $1 $2
         popd > /dev/null
         ;;
-    
+
     build)
         build_base
         if [[ ! -z "$1" ]]; then
@@ -56,7 +56,7 @@ case "$SUBCOMMAND" in
         fi
         ;;
 
-    start-dev) 
+    start-dev)
         build_base
         docker run \
             --rm \
