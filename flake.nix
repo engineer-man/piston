@@ -21,6 +21,7 @@
             compile? null,
             packages? null,
             aliases? [],
+            limitOverrides? {},
             tests
         }: let
           compileFile = if compile != null then
@@ -28,7 +29,7 @@
             else null;
           runFile = pkgs.writeShellScript "run" run;
           metadata = {
-            inherit language version runtime aliases;
+            inherit language version runtime aliases limitOverrides;
             run = runFile;
             compile = compileFile;
             packageSupport = packages != null;

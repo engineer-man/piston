@@ -7,7 +7,6 @@ const path = require('path');
 
 const runtimes = [];
 
-
 class Runtime {
     constructor({
         language,
@@ -23,11 +22,11 @@ class Runtime {
         max_process_count,
         max_open_files,
         max_file_size,
-        output_max_size
+        output_max_size,
     }) {
         this.language = language;
         this.runtime = runtime;
-        
+
         this.timeouts = timeouts;
         this.memory_limits = memory_limits;
         this.max_process_count = max_process_count;
@@ -36,15 +35,14 @@ class Runtime {
         this.output_max_size = output_max_size;
 
         this.aliases = aliases;
-        this.version = version; 
-        
+        this.version = version;
+
         this.run = run;
         this.compile = compile;
 
         this.flake_path = flake_path;
         this.package_support = packageSupport;
     }
-    
 
     static compute_single_limit(
         language_name,
@@ -109,62 +107,57 @@ class Runtime {
         };
     }
 
-    ensure_built(){
+    ensure_built() {
         logger.info(`Ensuring ${this} is built`);
 
         const flake_path = this.flake_path;
 
-        function _ensure_built(key){
+        function _ensure_built(key) {
             const command = `nix build ${flake_path}.metadata.${key} --no-link`;
-            cp.execSync(command, {stdio: "pipe"})
+            cp.execSync(command, { stdio: 'pipe' });
         }
 
-        _ensure_built("run");
-        if(this.compiled) _ensure_built("compile");
+        _ensure_built('run');
+        if (this.compiled) _ensure_built('compile');
 
-        logger.debug(`Finished ensuring ${this} is installed`)
-
+        logger.debug(`Finished ensuring ${this} is installed`);
     }
 
-    static load_runtime(flake_key){
-        logger.info(`Loading ${flake_key}`)
+    static load_runtime(flake_key) {
+        logger.info(`Loading ${flake_key}`);
         const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${flake_key}`;
         const metadata_command = `nix eval --json ${flake_path}.metadata`;
         const metadata = JSON.parse(cp.execSync(metadata_command));
-        
+
         const this_runtime = new Runtime({
             ...metadata,
             ...Runtime.compute_all_limits(
                 metadata.language,
-                metadata.limit_overrides
+                metadata.limitOverrides
             ),
-            flake_path
+            flake_path,
         });
 
         this_runtime.ensure_built();
 
         runtimes.push(this_runtime);
-        
-        
-        logger.debug(`Package ${flake_key} was loaded`);
 
+        logger.debug(`Package ${flake_key} was loaded`);
     }
 
     get compiled() {
         return this.compile !== null;
     }
 
-    get id(){
+    get id() {
         return runtimes.indexOf(this);
     }
 
     toString() {
         return `${this.language}-${this.version}`;
     }
-
 }
 
 module.exports = runtimes;
 module.exports.Runtime = Runtime;
 module.exports.load_runtime = Runtime.load_runtime;
-

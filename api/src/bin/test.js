@@ -46,7 +46,7 @@ const { Job } = require('../job');
             ...metadata,
             ...runtime.Runtime.compute_all_limits(
                 metadata.language,
-                metadata.limit_overrides
+                metadata.limitOverrides
             ),
             flake_path: runtime_path,
         });
