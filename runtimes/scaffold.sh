@@ -15,7 +15,7 @@ NAME=$1
 
 if [[ $# -eq 2 ]]; then
     RUNTIME=$2
-    NAME=$LANGUAGE-$RUNTIME
+    NAME=$RUNTIME-$LANGUAGE
 fi
 
 
