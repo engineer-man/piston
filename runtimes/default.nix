@@ -15,4 +15,5 @@ args: {
     "gawk-awk" = import ./gawk-awk.nix args;
     "openjdk11_headless-java" = import ./openjdk11_headless-java.nix args;
     "zig" = import ./zig.nix args;
+    "ruby" = import ./ruby.nix args;
 }
