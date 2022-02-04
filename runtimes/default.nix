@@ -17,4 +17,5 @@ args: {
     "ruby" = import ./ruby.nix args;
     "zig" = import ./zig.nix args;
     "vlang" = import ./vlang.nix args;
+    "swift" = import ./swift.nix args;
 }

@@ -1,6 +1,6 @@
 {pkgs, piston, ...}:
 let 
-    pkg = pkgs.ruby_3_1; # ruby 3.1 stable from unstable channel
+    pkg = pkgs.ruby_3_1;
 in piston.mkRuntime {
     language = "ruby";
     version = pkg.version;
