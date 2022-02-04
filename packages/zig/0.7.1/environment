@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-# compiler path
-export PATH=$PWD/bin:$PATH
