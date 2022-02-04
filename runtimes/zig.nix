@@ -8,7 +8,7 @@ in piston.mkRuntime {
 
     # Add .zig extension for compile script and optimize compiler for small programs
     compile = ''
-        rename 's/$/\.zig/' "$@"
+        for f; do mv "$f" "$f.zig"; done
         ${pkg}/bin/zig build-exe -O ReleaseSafe --color off --cache-dir . --global-cache-dir . --name out *.zig
     '';
 
@@ -22,10 +22,10 @@ in piston.mkRuntime {
     # Run the following command to test the package:
     # $ ./piston test zig
     tests = [
-        # Standard output test
+        # Standard output test with generic file extension
         (piston.mkTest {
             files = {
-                "test.zig" = ''
+                "file0.code" = ''
                     const std = @import("std");
 
                     pub fn main() !void {
@@ -37,7 +37,7 @@ in piston.mkRuntime {
             args = [];
             stdin = "";
             packages = [];
-            main = "test.zig";
+            main = "file0.code";
         })
     ];
 }
