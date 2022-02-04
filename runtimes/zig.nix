@@ -8,7 +8,7 @@ in piston.mkRuntime {
 
     # Add .zig extension for compile script and optimize compiler for small programs
     compile = ''
-        for f; do mv "$f" "$f.zig"; done
+        rename 's/$/.zig/' "$@"
         ${pkg}/bin/zig build-exe -O ReleaseSafe --color off --cache-dir . --global-cache-dir . --name out *.zig
     '';
 

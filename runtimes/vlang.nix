@@ -15,11 +15,11 @@ in piston.mkRuntime {
         export TMPDIR="$PWD"
 
         # modify file extension
-        mv "$1" "$1.v"
-        filename="$1.v"
+        filename="$1"
+        rename 's/$/.v/' "$filename"
         shift
 
-        ${pkg}/bin/v run "$filename" "$@"
+        ${pkg}/bin/v run "$filename.v" "$@"
     '';
 
     tests = [
