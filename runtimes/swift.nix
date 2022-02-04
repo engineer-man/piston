@@ -3,25 +3,24 @@ let
     pkg = pkgs.swift;
 in piston.mkRuntime {
     language = "swift";
-    version = "5.4.2";
+    version = "5.4.2"; # pkg.version attribute is missing, so pinning it to 5.4.2
     aliases = [];
 
     run = ''
-        ls ${pkg}
         ${pkg}/bin/swift -module-cache-path . "$@"
     '';
 
     tests = [
         (piston.mkTest {
             files = {
-                "test.swift" = ''
+                "file0.code" = ''
                     print("OK");
                 '';
             };
             args = [];
             stdin = "";
             packages = [];
-            main = "test.swift";
+            main = "file0.code";
         })
     ];
 }

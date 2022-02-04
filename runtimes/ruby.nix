@@ -20,14 +20,14 @@ in piston.mkRuntime {
         # standard output test
         (piston.mkTest {
             files = {
-                "test.rb" = ''
+                "file0.code" = ''
                     puts("OK");
                 '';
             };
             args = [];
             stdin = "";
             packages = [];
-            main = "test.rb";
+            main = "file0.code";
         })
         # args test
         (piston.mkTest {
