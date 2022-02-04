@@ -58,6 +58,10 @@ case "$SUBCOMMAND" in
 
     start-dev)
         build_base
+        runtime_set=all
+        if [[ ! -z "$1" ]]; then
+            runtime_set=$1
+        fi
         docker run \
             --rm \
             -p 2000:2000 \
@@ -65,6 +69,7 @@ case "$SUBCOMMAND" in
             --name $CONTAINER_NAME \
             -e PISTON_LOG_LEVEL=DEBUG \
             -e PISTON_FLAKE_PATH=/piston/packages \
+            -e PISTON_RUNTIME_SET=$runtime_set \
             -v $PWD:/piston/packages \
             -d "$IMAGE_NAME_DEV:$IMAGE_TAG"
     ;;
