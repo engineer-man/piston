@@ -239,32 +239,32 @@ Content-Type: application/json
 `POST /api/v2/execute`
 This endpoint requests execution of some arbitrary code.
 
-- `language` (**required**) The language to use for execution, must be a string and must be installed.
-- `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
-- `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
-- `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
-- `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
-- `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
-- `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
-- `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
-- `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
-- `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+-   `language` (**required**) The language to use for execution, must be a string and must be installed.
+-   `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
+-   `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
+-   `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
+-   `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
+-   `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
+-   `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
+-   `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 
 ```json
 {
-  "language": "js",
-  "files": [
-    {
-      "name": "my_cool_code.js",
-      "content": "console.log(process.argv)"
-    }
-  ],
-  "stdin": "",
-  "args": ["1", "2", "3"],
-  "compile_timeout": 10000,
-  "run_timeout": 3000,
-  "compile_memory_limit": -1,
-  "run_memory_limit": -1
+    "language": "js",
+    "files": [
+        {
+            "name": "my_cool_code.js",
+            "content": "console.log(process.argv)"
+        }
+    ],
+    "stdin": "",
+    "args": ["1", "2", "3"],
+    "compile_timeout": 10000,
+    "run_timeout": 3000,
+    "compile_memory_limit": -1,
+    "run_memory_limit": -1
 }
 ```
 
@@ -350,6 +350,7 @@ Content-Type: application/json
 `llvm_ir`,
 `lolcode`,
 `lua`,
+`matl`,
 `nasm`,
 `nasm64`,
 `nim`,

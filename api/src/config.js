@@ -2,57 +2,6 @@ const fss = require('fs');
 const Logger = require('logplease');
 const logger = Logger.create('config');
 
-function parse_overrides(overrides) {
-    try {
-        return JSON.parse(overrides);
-    } catch (e) {
-        return null;
-    }
-}
-
-function validate_overrides(overrides, options) {
-    for (const language in overrides) {
-        for (const key in overrides[language]) {
-            if (
-                ![
-                    'max_process_count',
-                    'max_open_files',
-                    'max_file_size',
-                    'compile_memory_limit',
-                    'run_memory_limit',
-                    'compile_timeout',
-                    'run_timeout',
-                    'output_max_size',
-                ].includes(key)
-            ) {
-                logger.error(`Invalid overridden option: ${key}`);
-                return false;
-            }
-            const option = options.find(o => o.key === key);
-            const parser = option.parser;
-            const raw = overrides[language][key];
-            const value = parser(raw);
-            const validators = option.validators;
-            for (const validator of validators) {
-                const response = validator(value, raw);
-                if (response !== true) {
-                    logger.error(
-                        `Failed to validate overridden option: ${key}`,
-                        response
-                    );
-                    return false;
-                }
-            }
-            overrides[language][key] = value;
-        }
-        // Modifies the reference
-        options[
-            options.index_of(options.find(o => o.key === 'limit_overrides'))
-        ] = overrides;
-    }
-    return true;
-}
-
 const options = [
     {
         key: 'log_level',
@@ -68,7 +17,7 @@ const options = [
     {
         key: 'bind_address',
         desc: 'Address to bind REST API on',
-        default: `0.0.0.0:${process.env["PORT"] || 2000}`,
+        default: `0.0.0.0:${process.env['PORT'] || 2000}`,
         validators: [],
     },
     {
@@ -180,7 +129,7 @@ const options = [
         key: 'runtime_set',
         desc: 'Key on the flake specified by flake_path to access runtimes from',
         default: 'all',
-        validators: []
+        validators: [],
     },
     {
         key: 'max_concurrent_jobs',
@@ -197,52 +146,109 @@ const options = [
         default: {},
         parser: parse_overrides,
         validators: [
-            x => !!x || `Invalid JSON format for the overrides\n${x}`,
-            (overrides, _, options) =>
-                validate_overrides(overrides, options) ||
-                `Failed to validate the overrides`,
+            x => !!x || `Failed to parse the overrides\n${x}`,
+            validate_overrides,
         ],
     },
 ];
 
-logger.info(`Loading Configuration from environment`);
+Object.freeze(options);
 
-let errored = false;
+function apply_validators(validators, validator_parameters) {
+    for (const validator of validators) {
+        const validation_response = validator(...validator_parameters);
+        if (validation_response !== true) {
+            return validation_response;
+        }
+    }
+    return true;
+}
+
+function parse_overrides(overrides_string) {
+    function get_parsed_json_or_null(overrides) {
+        try {
+            return JSON.parse(overrides);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const overrides = get_parsed_json_or_null(overrides_string);
+    if (typeof overrides === null) {
+        return null;
+    }
+    const parsed_overrides = {};
+    for (const language in overrides) {
+        parsed_overrides[language] = {};
+        for (const key in overrides[language]) {
+            if (
+                ![
+                    'max_process_count',
+                    'max_open_files',
+                    'max_file_size',
+                    'compile_memory_limit',
+                    'run_memory_limit',
+                    'compile_timeout',
+                    'run_timeout',
+                    'output_max_size',
+                ].includes(key)
+            ) {
+                return null;
+            }
+            // Find the option for the override
+            const option = options.find(o => o.key === key);
+            const parser = option.parser;
+            const raw = overrides[language][key];
+            const value = parser(raw);
+            parsed_overrides[language][key] = value;
+        }
+    }
+    return parsed_overrides;
+}
+
+function validate_overrides(overrides) {
+    for (const language in overrides) {
+        for (const key in overrides[language]) {
+            const value = overrides[language][key];
+            const option = options.find(o => o.key === key);
+            const validators = option.validators;
+            const validation_response = apply_validators(validators, [
+                value,
+                value,
+            ]);
+            if (validation_response !== true) {
+                return `In overridden option ${key} for ${language}, ${validation_response}`;
+            }
+        }
+    }
+    return true;
+}
+
+logger.info(`Loading Configuration from environment`);
 
 let config = {};
 
 options.forEach(option => {
     const env_key = 'PISTON_' + option.key.to_upper_case();
-
     const parser = option.parser || (x => x);
-
     const env_val = process.env[env_key];
-
     const parsed_val = parser(env_val);
-
     const value = env_val === undefined ? option.default : parsed_val;
-
-    option.validators.for_each(validator => {
-        let response = null;
-        if (env_val) response = validator(parsed_val, env_val, options);
-        else response = validator(value, value, options);
-
-        if (response !== true) {
-            errored = true;
-            logger.error(
-                `Config option ${option.key} failed validation:`,
-                response
-            );
-            return;
-        }
-    });
-
+    const validator_parameters =
+        env_val === undefined ? [value, value] : [parsed_val, env_val];
+    const validation_response = apply_validators(
+        option.validators,
+        validator_parameters
+    );
+    if (validation_response !== true) {
+        logger.error(
+            `Config option ${option.key} failed validation:`,
+            validation_response
+        );
+        process.exit(1);
+    }
     config[option.key] = value;
 });
-
-if (errored) {
-    process.exit(1);
-}
 
 logger.info('Configuration successfully loaded');
 
