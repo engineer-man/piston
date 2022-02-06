@@ -1,5 +1,0 @@
-{
-    "language": "typescript",
-    "version": "4.2.3",
-    "aliases": ["ts", "node-ts", "tsc"]
-}
