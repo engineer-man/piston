@@ -18,4 +18,5 @@ args: {
     "zig" = import ./zig.nix args;
     "vlang" = import ./vlang.nix args;
     "swift" = import ./swift.nix args;
+    "node-typescript" = import ./node-typescript.nix args;
 }
