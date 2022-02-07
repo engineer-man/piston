@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Put instructions to run the runtime
-shift
-./binary "$@"

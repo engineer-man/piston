@@ -31,4 +31,6 @@ args: {
     "octave" = import ./octave.nix args;
     "ocaml" = import ./ocaml.nix args;
     "nim" = import ./nim.nix args;
+    "nasm" = import ./nasm.nix args;
+    "nasm-nasm64" = import ./nasm-nasm64.nix args;
 }
