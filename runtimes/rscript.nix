@@ -1,9 +1,9 @@
 {pkgs, piston, ...}:
 let
-    pkg = pkgs.rWrapper;
+    pkg = pkgs.R;
 in piston.mkRuntime {
     language = "rscript";
-    version = "4.1.2-wrapper";
+    version = pkg.version;
 
     aliases = [
         "r"
