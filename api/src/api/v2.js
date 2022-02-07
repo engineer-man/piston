@@ -5,7 +5,6 @@ const events = require('events');
 
 const runtime = require('../runtime');
 const { Job } = require('../job');
-const logger = require('logplease').create('api/v3');
 
 const SIGNALS = [
     'SIGABRT',
@@ -81,49 +80,9 @@ function get_job(body) {
             }
         }
 
-        if (compile_memory_limit) {
-            if (typeof compile_memory_limit !== 'number') {
-                return reject({
-                    message: 'if specified, compile_memory_limit must be a number',
-                });
-            }
-
-            if (
-                config.compile_memory_limit >= 0 &&
-                (compile_memory_limit > config.compile_memory_limit ||
-                    compile_memory_limit < 0)
-            ) {
-                return reject({
-                    message:
-                        'compile_memory_limit cannot exceed the configured limit of ' +
-                        config.compile_memory_limit,
-                });
-            }
-        }
-
-        if (run_memory_limit) {
-            if (typeof run_memory_limit !== 'number') {
-                return reject({
-                    message: 'if specified, run_memory_limit must be a number',
-                });
-            }
-
-            if (
-                config.run_memory_limit >= 0 &&
-                (run_memory_limit > config.run_memory_limit || run_memory_limit < 0)
-            ) {
-                return reject({
-                    message:
-                        'run_memory_limit cannot exceed the configured limit of ' +
-                        config.run_memory_limit,
-                });
-            }
-        }
-
-        const rt = runtime.find(rt => [
-            ...rt.aliases,
-            rt.language
-        ].includes(rt.language))
+        const rt = runtime.find(rt =>
+            [...rt.aliases, rt.language].includes(rt.language)
+        );
 
         if (rt === undefined) {
             return reject({

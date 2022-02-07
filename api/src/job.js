@@ -281,7 +281,7 @@ class Job {
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                this.runtime.compile,
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
@@ -294,7 +294,7 @@ class Job {
         this.logger.debug('Running');
         eventBus.emit('stage', 'run');
         const { error, code, signal } = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            this.runtime.run,
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run,
