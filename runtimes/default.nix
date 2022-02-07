@@ -24,4 +24,5 @@ args: {
     "raku" = import ./raku.nix args;
     "racket" = import ./racket.nix args;
     "powershell" = import ./powershell.nix args;
+    "prolog" = import ./prolog.nix args;
 }
