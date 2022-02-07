@@ -3,7 +3,7 @@ let
     pkg = pkgs.swift;
 in piston.mkRuntime {
     language = "swift";
-    version = "5.4.2"; # pkg.version attribute is missing, so pinning it to 5.4.2
+    version = (builtins.parseDrvName pkg.name).version;
     aliases = [];
 
     run = ''
