@@ -35,4 +35,5 @@ args: {
     "nasm-nasm64" = import ./nasm-nasm64.nix args;
     "mono-csharp" = import ./mono-csharp.nix args;
     "lua" = import ./lua.nix args;
+    "lolcode" = import ./lolcode.nix args;
 }
