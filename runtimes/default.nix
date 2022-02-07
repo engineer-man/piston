@@ -28,4 +28,5 @@ args: {
     "ponylang" = import ./ponylang.nix args;
     "php" = import ./php.nix args;
     "perl" = import ./perl.nix args;
+    "octave" = import ./octave.nix args;
 }
