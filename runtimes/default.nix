@@ -26,4 +26,5 @@ args: {
     "powershell" = import ./powershell.nix args;
     "prolog" = import ./prolog.nix args;
     "ponylang" = import ./ponylang.nix args;
+    "php" = import ./php.nix args;
 }
