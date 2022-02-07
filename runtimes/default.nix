@@ -22,4 +22,5 @@ args: {
     "sqlite3" = import ./sqlite3.nix args;
     "rscript" = import ./rscript.nix args;
     "raku" = import ./raku.nix args;
+    "racket" = import ./racket.nix args;
 }
