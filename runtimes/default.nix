@@ -21,4 +21,5 @@ args: {
     "node-typescript" = import ./node-typescript.nix args;
     "sqlite3" = import ./sqlite3.nix args;
     "rscript" = import ./rscript.nix args;
+    "raku" = import ./raku.nix args;
 }
