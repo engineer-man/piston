@@ -27,4 +27,5 @@ args: {
     "prolog" = import ./prolog.nix args;
     "ponylang" = import ./ponylang.nix args;
     "php" = import ./php.nix args;
+    "perl" = import ./perl.nix args;
 }
