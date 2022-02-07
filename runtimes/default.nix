@@ -19,7 +19,7 @@ args: {
     "vlang" = import ./vlang.nix args;
     "swift" = import ./swift.nix args;
     "node-typescript" = import ./node-typescript.nix args;
-    "sqlite3" = import ./sqlite3.nix args;
+    "sqlite" = import ./sqlite.nix args;
     "rscript" = import ./rscript.nix args;
     "raku" = import ./raku.nix args;
     "racket" = import ./racket.nix args;

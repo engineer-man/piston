@@ -6,7 +6,6 @@ in piston.mkRuntime {
     version = pkg.version;
 
     aliases = [
-        "raku"
         "rakudo"
         "perl6"
         "p6"

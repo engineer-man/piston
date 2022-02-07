@@ -2,11 +2,10 @@
 let
     pkg = pkgs.sqlite;
 in piston.mkRuntime {
-    language = "sqlite3";
+    language = "sqlite";
     version = pkg.version;
 
     aliases = [
-        "sqlite"
         "sql"
     ];
     
