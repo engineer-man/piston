@@ -1,9 +1,6 @@
 const logger = require('logplease').create('runtime');
 const cp = require('child_process');
 const config = require('./config');
-const globals = require('./globals');
-const fss = require('fs');
-const path = require('path');
 
 const runtimes = [];
 
