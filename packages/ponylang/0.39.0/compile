@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Compile pony file(s)
-rename 's/$/\.pony/' "$@" # Add .pony extension
-ponyc -b out
