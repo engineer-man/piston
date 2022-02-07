@@ -33,4 +33,5 @@ args: {
     "nim" = import ./nim.nix args;
     "nasm" = import ./nasm.nix args;
     "nasm-nasm64" = import ./nasm-nasm64.nix args;
+    "mono-csharp" = import ./mono-csharp.nix args;
 }
