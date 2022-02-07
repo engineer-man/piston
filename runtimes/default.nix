@@ -23,4 +23,5 @@ args: {
     "rscript" = import ./rscript.nix args;
     "raku" = import ./raku.nix args;
     "racket" = import ./racket.nix args;
+    "powershell" = import ./powershell.nix args;
 }
