@@ -36,4 +36,5 @@ args: {
     "mono-csharp" = import ./mono-csharp.nix args;
     "lua" = import ./lua.nix args;
     "lolcode" = import ./lolcode.nix args;
+    "sbcl-lisp" = import ./sbcl-lisp.nix args;
 }
