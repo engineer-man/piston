@@ -39,9 +39,13 @@ expressWs(app);
 
     logger.info('Loading packages');
 
-    const runtimes_data = cp.execSync(`nix eval --json ${config.flake_path}#pistonRuntimeSets.${config.runtime_set} --apply builtins.attrNames`).toString();
+    const runtimes_data = cp
+        .execSync(
+            `nix eval --json ${config.flake_path}#pistonRuntimeSets.${config.runtime_set} --apply builtins.attrNames`
+        )
+        .toString();
     const runtimes = JSON.parse(runtimes_data);
-    
+
     runtimes.for_each(pkg => runtime.load_runtime(pkg));
 
     logger.info('Starting API Server');

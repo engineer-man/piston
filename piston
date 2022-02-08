@@ -12,7 +12,8 @@ SUBCOMMAND="$1"
 shift
 
 build_base(){
-    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)" || exit 1
+    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)"
+    echo "The image archive was created at: $CONTAINER_PATH"
     docker load -i $CONTAINER_PATH || exit 1
     docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG" || exit 1
 }
@@ -39,7 +40,7 @@ case "$SUBCOMMAND" in
     # dev commands
 
     scaffold)
-        pushd $SCRIPT_DIR/runtimes > /dev/null
+        pushd "$SCRIPT_DIR"/runtimes > /dev/null
         ./scaffold.sh $1 $2
         popd > /dev/null
         ;;
@@ -50,7 +51,7 @@ case "$SUBCOMMAND" in
             # $1 contains a variant to build
             docker build \
                 --build-arg RUNTIMESET=$1 \
-                -f $SCRIPT_DIR/Dockerfile.withset \
+                -f "$SCRIPT_DIR"/Dockerfile.withset \
                 -t "$IMAGE_NAME_DEV:$1-latest" \
                 .
         fi
@@ -70,7 +71,7 @@ case "$SUBCOMMAND" in
             -e PISTON_LOG_LEVEL=DEBUG \
             -e PISTON_FLAKE_PATH=/piston/packages \
             -e PISTON_RUNTIME_SET=$runtime_set \
-            -v $PWD:/piston/packages \
+            -v "$SCRIPT_DIR":/piston/packages \
             -d "$IMAGE_NAME_DEV:$IMAGE_TAG"
     ;;
 
@@ -80,9 +81,9 @@ case "$SUBCOMMAND" in
             --rm \
             -it \
             -e PISTON_FLAKE_PATH=/piston/packages \
-            -v $PWD:/piston/packages \
+            -v "$SCRIPT_DIR":/piston/packages \
             --name piston_test_runner \
-            -it "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
             piston-test $1
 
         ;;
