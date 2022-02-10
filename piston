@@ -3,6 +3,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 
 CONTAINER_NAME="piston_api"
+DEV_VOLUME_NAME="piston_nix"
 
 IMAGE_TAG="base-latest"
 IMAGE_NAME="ghcr.io/engineer-man/piston"
@@ -37,6 +38,19 @@ case "$SUBCOMMAND" in
         docker pull "$IMAGE_NAME:$IMAGE_TAG"
         ;;
 
+    build)
+        runtime_set=all
+        if [[ ! -z "$1" ]]; then
+            runtime_Set=$1
+        fi
+        # $1 contains a variant to build
+        docker build \
+            --build-arg RUNTIMESET=$1 \
+            -f "$SCRIPT_DIR"/Dockerfile.withset \
+            -t "$IMAGE_NAME_DEV:$1-latest" \
+            .
+        ;;
+
     # dev commands
 
     scaffold)
@@ -45,20 +59,27 @@ case "$SUBCOMMAND" in
         popd > /dev/null
         ;;
 
-    build)
+    build-dev)
+        echo "Removing the Nix volume if it exists"
+        docker volume rm -f $DEV_VOLUME_NAME
+        echo "Building the base docker image"
         build_base
-        if [[ ! -z "$1" ]]; then
-            # $1 contains a variant to build
-            docker build \
-                --build-arg RUNTIMESET=$1 \
-                -f "$SCRIPT_DIR"/Dockerfile.withset \
-                -t "$IMAGE_NAME_DEV:$1-latest" \
-                .
-        fi
+        echo "Installing the required node modules"
+        docker run \
+            --rm \
+            -p 2000:2000 \
+            -it \
+            --name $CONTAINER_NAME \
+            -e PISTON_LOG_LEVEL=DEBUG \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -e PISTON_RUNTIME_SET=none \
+            -v "$SCRIPT_DIR":/piston/src \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            bash -c "cd /piston/src/api && yarn install"
+        echo "Done building"
         ;;
 
     start-dev)
-        build_base
         runtime_set=all
         if [[ ! -z "$1" ]]; then
             runtime_set=$1
@@ -69,23 +90,24 @@ case "$SUBCOMMAND" in
             -it \
             --name $CONTAINER_NAME \
             -e PISTON_LOG_LEVEL=DEBUG \
-            -e PISTON_FLAKE_PATH=/piston/packages \
+            -e PISTON_FLAKE_PATH=/piston/src \
             -e PISTON_RUNTIME_SET=$runtime_set \
-            -v "$SCRIPT_DIR":/piston/packages \
-            -d "$IMAGE_NAME_DEV:$IMAGE_TAG"
-    ;;
+            -v "$SCRIPT_DIR":/piston/src \
+            -v $DEV_VOLUME_NAME:/nix \
+            -d "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            bash -c "cd /piston/src/api && yarn run dev"
+        ;;
 
     test)
-        build_base
         docker run \
             --rm \
             -it \
-            -e PISTON_FLAKE_PATH=/piston/packages \
-            -v "$SCRIPT_DIR":/piston/packages \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -v "$SCRIPT_DIR":/piston/src \
+            -v $DEV_VOLUME_NAME:/nix \
             --name piston_test_runner \
             "$IMAGE_NAME_DEV:$IMAGE_TAG" \
-            piston-test $1
-
+            bash -c "/piston/src/api/src/bin/test.js $1"
         ;;
 
     *)

@@ -42,6 +42,12 @@ with pkgs; rec {
       gnugrep
       rename
       util-linux
+      nodejs-16_x
+      yarn
+      python3
+      gcc
+      gnumake
+      gnused
     ];
 
     extraCommands = ''
@@ -53,6 +59,9 @@ with pkgs; rec {
         echo "nixbld$i:x:$(( $i + 30000 )):30000:Nix build user $i:/var/empty:/run/current-system/sw/bin/nologin" >> etc/passwd
       done
 
+      mkdir -p usr/bin
+      ln -s /bin/env usr/bin/env
+      chmod -R 1777 usr
       chmod 1777 {,var/}tmp/
     '';
 
