@@ -277,13 +277,13 @@ router.post('/execute', async (req, res) => {
 });
 
 router.get('/runtimes', (req, res) => {
-    const runtimes = runtime.map(rt => {
+    const runtimes = runtime.map((rt, index) => {
         return {
             language: rt.language,
             version: rt.version.raw,
             aliases: rt.aliases,
             runtime: rt.runtime,
-            id: rt.id,
+            id: index,
         };
     });
 

@@ -120,9 +120,9 @@ class Runtime {
         logger.debug(`Finished ensuring ${this} is installed`);
     }
 
-    static load_runtime(flake_key) {
-        logger.info(`Loading ${flake_key}`);
-        const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${flake_key}`;
+    static load_runtime(language_name) {
+        logger.info(`Loading ${language_name}`);
+        const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${language_name}`;
         const metadata_command = `nix eval --json ${flake_path}.metadata`;
         const metadata = JSON.parse(cp.execSync(metadata_command));
 
@@ -139,15 +139,11 @@ class Runtime {
 
         runtimes.push(this_runtime);
 
-        logger.debug(`Package ${flake_key} was loaded`);
+        logger.debug(`Package ${language_name} was loaded`);
     }
 
     get compiled() {
         return this.compile !== null;
-    }
-
-    get id() {
-        return runtimes.indexOf(this);
     }
 
     toString() {
