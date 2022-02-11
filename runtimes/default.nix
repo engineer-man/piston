@@ -40,4 +40,5 @@ args: {
     "jvm-kotlin" = import ./jvm-kotlin.nix args;
     "julia" = import ./julia.nix args;
     "jelly" = import ./jelly.nix args;
+    "openjdk-java" = import ./openjdk-java.nix args;
 }
