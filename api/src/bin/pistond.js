@@ -7,7 +7,6 @@ const globals = require('../globals');
 const config = require('../config');
 const cp = require('child_process');
 const path = require('path');
-const fs = require('fs/promises');
 const fss = require('fs');
 const body_parser = require('body-parser');
 const runtime = require('../runtime');
@@ -44,9 +43,18 @@ expressWs(app);
             `nix eval --json ${config.flake_path}#pistonRuntimeSets.${config.runtime_set} --apply builtins.attrNames`
         )
         .toString();
-    const language_names = JSON.parse(runtimes_data);
+    const runtime_names = JSON.parse(runtimes_data);
 
-    language_names.for_each(language_name => runtime.load_runtime(language_name));
+    logger.info('Loading the runtimes from the flakes');
+    const runtimes = runtime_names.map(runtime_name => {
+        logger.info(`Loading ${runtime_name}`);
+        return runtime.get_runtime_from_flakes(runtime_name);
+    });
+    logger.info('Ensuring all of the runtimes are built');
+    runtimes.for_each(r => r.ensure_built());
+
+    Object.freeze(runtimes);
+    app.locals.runtimes = runtimes;
 
     logger.info('Starting API Server');
     logger.debug('Constructing Express App');

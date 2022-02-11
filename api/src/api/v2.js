@@ -48,7 +48,7 @@ const SIGNALS = [
 ];
 // ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
-function get_job(body) {
+function get_job(job_info, available_runtimes) {
     let {
         language,
         args,
@@ -58,7 +58,7 @@ function get_job(body) {
         run_memory_limit,
         run_timeout,
         compile_timeout,
-    } = body;
+    } = job_info;
 
     return new Promise((resolve, reject) => {
         if (!language || typeof language !== 'string') {
@@ -80,7 +80,7 @@ function get_job(body) {
             }
         }
 
-        const rt = runtime.find(rt =>
+        const rt = available_runtimes.find(rt =>
             [...rt.aliases, rt.language].includes(rt.language)
         );
 
@@ -102,7 +102,7 @@ function get_job(body) {
         for (const constraint of ['memory_limit', 'timeout']) {
             for (const type of ['compile', 'run']) {
                 const constraint_name = `${type}_${constraint}`;
-                const constraint_value = body[constraint_name];
+                const constraint_value = job_info[constraint_name];
                 const configured_limit = rt[`${constraint}s`][type];
                 if (!constraint_value) {
                     continue;
@@ -201,7 +201,7 @@ router.ws('/connect', async (ws, req) => {
             switch (msg.type) {
                 case 'init':
                     if (job === null) {
-                        job = await get_job(msg);
+                        job = await get_job(msg, req.app.locals.runtimes);
 
                         await job.prime();
 
@@ -264,7 +264,7 @@ router.ws('/connect', async (ws, req) => {
 
 router.post('/execute', async (req, res) => {
     try {
-        const job = await get_job(req.body);
+        const job = await get_job(req.body, req.app.locals.runtimes);
 
         await job.prime();
 
@@ -279,7 +279,7 @@ router.post('/execute', async (req, res) => {
 });
 
 router.get('/runtimes', (req, res) => {
-    const runtimes = runtime.map(rt => {
+    const runtimes = req.app.locals.runtimes.map(rt => {
         return {
             language: rt.language,
             version: rt.version.raw,
