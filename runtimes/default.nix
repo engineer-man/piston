@@ -43,4 +43,5 @@ args: {
     "openjdk-java" = import ./openjdk-java.nix args;
     "iverilog" = import ./iverilog.nix args;
     "ghc-haskell" = import ./ghc-haskell.nix args;
+    "groovy" = import ./groovy.nix args;
 }
