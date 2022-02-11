@@ -41,4 +41,5 @@ args: {
     "julia" = import ./julia.nix args;
     "jelly" = import ./jelly.nix args;
     "openjdk-java" = import ./openjdk-java.nix args;
+    "iverilog" = import ./iverilog.nix args;
 }
