@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-# Compile haskell file(s)
-rename 's/$/\.hs/' "$@" # Add .hs extension
-ghc -dynamic -v0 -o out *.hs
-chmod +x out
