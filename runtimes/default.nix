@@ -37,4 +37,5 @@ args: {
     "lua" = import ./lua.nix args;
     "lolcode" = import ./lolcode.nix args;
     "sbcl-lisp" = import ./sbcl-lisp.nix args;
+    "jvm-kotlin" = import ./jvm-kotlin.nix args;
 }
