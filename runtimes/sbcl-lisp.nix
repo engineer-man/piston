@@ -7,7 +7,7 @@ in piston.mkRuntime {
     runtime = "sbcl";
 
     aliases = [
-        "lisp"
+        "sbcl"
         "cl"
         "commonlisp"
     ];
