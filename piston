@@ -39,22 +39,23 @@ case "$SUBCOMMAND" in
         ;;
 
     build)
+        build_base
         runtime_set=all
         if [[ ! -z "$1" ]]; then
-            runtime_Set=$1
+            runtime_set=$1
         fi
         # $1 contains a variant to build
         docker build \
-            --build-arg RUNTIMESET=$1 \
+            --build-arg RUNTIMESET=$runtime_set \
             -f "$SCRIPT_DIR"/Dockerfile.withset \
-            -t "$IMAGE_NAME_DEV:$1-latest" \
+            -t "$IMAGE_NAME_DEV:$runtime_set-latest" \
             .
         ;;
 
     # dev commands
 
     scaffold)
-        pushd "$SCRIPT_DIR"/runtimes > /dev/null
+        pushd "$SCRIPT_DIR/runtimes" > /dev/null
         ./scaffold.sh $1 $2
         popd > /dev/null
         ;;
@@ -104,10 +105,21 @@ case "$SUBCOMMAND" in
             -it \
             -e PISTON_FLAKE_PATH=/piston/src \
             -v "$SCRIPT_DIR":/piston/src \
+            --name piston_test_runner \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            piston-test $1
+    ;;
+
+    test-with-cache)
+        docker run \
+            --rm \
+            -it \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -v "$SCRIPT_DIR":/piston/src \
             -v $DEV_VOLUME_NAME:/nix \
             --name piston_test_runner \
             "$IMAGE_NAME_DEV:$IMAGE_TAG" \
-            bash -c "/piston/src/api/src/bin/test.js $1"
+            piston-test $1
         ;;
 
     *)
