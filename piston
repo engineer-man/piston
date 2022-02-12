@@ -12,8 +12,9 @@ IMAGE_NAME_DEV="piston"
 SUBCOMMAND="$1"
 shift
 
-build_base(){
-    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)"
+build_base() {
+    container_flake_key=$([[ $1 == "dev" ]] && echo "devContainer" || echo "prodContainer")
+    CONTAINER_PATH="$(nix build ".#$container_flake_key" --no-link --json | jq '.[0].outputs.out' -r)"
     echo "The image archive was created at: $CONTAINER_PATH"
     docker load -i $CONTAINER_PATH || exit 1
     docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG" || exit 1
@@ -64,7 +65,7 @@ case "$SUBCOMMAND" in
         echo "Removing the Nix volume if it exists"
         docker volume rm -f $DEV_VOLUME_NAME
         echo "Building the base docker image"
-        build_base
+        build_base dev
         echo "Installing the required node modules"
         docker run \
             --rm \
