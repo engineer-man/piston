@@ -50,4 +50,5 @@ args: {
     "gcc-d" = import ./gcc-d.nix args;
     "gcc-fortran" = import ./gcc-fortran.nix args;
     "yabasic" = import ./yabasic.nix args;
+    "emacs" = import ./emacs.nix args;
 }
