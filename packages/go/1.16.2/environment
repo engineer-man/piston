@@ -1,2 +1,0 @@
-export PATH=$PWD/go/bin:$PATH
-export GOPATH=$PWD/gopath

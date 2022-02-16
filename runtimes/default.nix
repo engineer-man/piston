@@ -44,4 +44,5 @@ args: {
     "iverilog" = import ./iverilog.nix args;
     "ghc-haskell" = import ./ghc-haskell.nix args;
     "groovy" = import ./groovy.nix args;
+    "go" = import ./go.nix args;
 }
