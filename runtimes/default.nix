@@ -47,4 +47,5 @@ args: {
     "go" = import ./go.nix args;
     "gcc-c" = import ./gcc-c.nix args;
     "gcc-c++" = import ./gcc-c++.nix args;
+    "gcc-d" = import ./gcc-d.nix args;
 }
