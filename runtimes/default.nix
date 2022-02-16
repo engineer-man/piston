@@ -46,4 +46,5 @@ args: {
     "groovy" = import ./groovy.nix args;
     "go" = import ./go.nix args;
     "gcc-c" = import ./gcc-c.nix args;
+    "gcc-c++" = import ./gcc-c++.nix args;
 }
