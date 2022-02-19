@@ -13,7 +13,7 @@ SUBCOMMAND="$1"
 shift
 
 build_base() {
-    container_flake_key=$([[ $1 == "dev" ]] && echo "devContainer" || echo "prodContainer")
+    container_flake_key=$([[ $1 == "dev" ]] && echo "containers.dev" || echo "containers.prod")
     CONTAINER_PATH="$(nix build ".#$container_flake_key" --no-link --json | jq '.[0].outputs.out' -r)"
     echo "The image archive was created at: $CONTAINER_PATH"
     docker load -i $CONTAINER_PATH || exit 1

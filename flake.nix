@@ -6,17 +6,7 @@
   let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    _nosocket = self.legacyPackages."${system}".nosocket;
-    _devContainer = (import ./api {
-      inherit pkgs _nosocket;
-      nosocket = _nosocket;
-      appEnv = "dev";
-    }).container;
-    _prodContainer = (import ./api {
-      inherit pkgs _nosocket;
-      nosocket = _nosocket;
-      appEnv = "prod";
-    }).container;
+    nosocket = self.legacyPackages."${system}".nosocket;
     args = {
       inherit pkgs;
       piston = {
@@ -81,7 +71,16 @@
       piston = (import ./api { inherit pkgs nosocket; }).package;
     };
 
-    devContainer = _devContainer;
-    prodContainer = _prodContainer;
+    containers = {
+      dev = (import ./api {
+        inherit pkgs nosocket;
+        appEnv = "dev";
+      }).container;
+
+      prod = (import ./api {
+        inherit pkgs nosocket;
+        appEnv = "prod";
+      }).container;
+    };
   };
 }
