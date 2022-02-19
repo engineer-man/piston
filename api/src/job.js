@@ -237,7 +237,7 @@ class Job {
         if (this.runtime.compiled) {
             compile = await this.safe_call(
                 this.runtime.compile,
-                this.files.map(x => x.name),
+                code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
             );
