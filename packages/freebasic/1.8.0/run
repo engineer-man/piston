@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Run output file from compile with arguments
-shift
-./out "$@"

@@ -4,6 +4,7 @@ on:
         branches:
             - master
             - v3
+            - '!nix-packages'
         paths:
             - api/**
 

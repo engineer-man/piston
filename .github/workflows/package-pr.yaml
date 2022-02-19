@@ -2,6 +2,8 @@ name: 'Package Pull Requests'
 
 on:
     pull_request:
+        branches:
+            - '!nix-packages'
         types:
             - opened
             - reopened

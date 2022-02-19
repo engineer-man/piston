@@ -40,6 +40,7 @@ with pkgs; rec {
       gnutar
       gzip
       gnugrep
+      rename
       util-linux
     ];
 
