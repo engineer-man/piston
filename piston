@@ -17,7 +17,6 @@ build_base() {
     CONTAINER_PATH="$(nix build ".#$container_flake_key" --no-link --json | jq '.[0].outputs.out' -r)"
     echo "The image archive was created at: $CONTAINER_PATH"
     docker load -i $CONTAINER_PATH || exit 1
-    docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG" || exit 1
 }
 
 case "$SUBCOMMAND" in
@@ -41,16 +40,15 @@ case "$SUBCOMMAND" in
 
     build)
         build_base
-        runtime_set=all
         if [[ ! -z "$1" ]]; then
+            # $1 contains a variant to build
             runtime_set=$1
+            docker build \
+                --build-arg RUNTIMESET=$runtime_set \
+                -f "$SCRIPT_DIR"/Dockerfile.withset \
+                -t "$IMAGE_NAME_DEV:$runtime_set-latest" \
+                .
         fi
-        # $1 contains a variant to build
-        docker build \
-            --build-arg RUNTIMESET=$runtime_set \
-            -f "$SCRIPT_DIR"/Dockerfile.withset \
-            -t "$IMAGE_NAME_DEV:$runtime_set-latest" \
-            .
         ;;
 
     # dev commands
@@ -107,11 +105,11 @@ case "$SUBCOMMAND" in
             -e PISTON_FLAKE_PATH=/piston/src \
             -v "$SCRIPT_DIR":/piston/src \
             --name piston_test_runner \
-            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            "$IMAGE_NAME:$IMAGE_TAG" \
             piston-test $1
     ;;
 
-    test-with-cache)
+    test-dev)
         docker run \
             --rm \
             -it \
@@ -147,6 +145,7 @@ case "$SUBCOMMAND" in
         echo "                                including the runtime set within it"
         echo " scaffold <language> [runtime]  Initializes a new runtime"
         echo " test <runtime>                 Runs unit tests on the given runtime"
+        echo " test-dev <runtime>             Same as test, but using the development container and volume"
         echo "                                Optionally set runtime to --all to test all"
         echo "                                NOTE: This is only for the runtimes contained"
         echo "                                      within this repo"

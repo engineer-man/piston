@@ -1,4 +1,4 @@
-{pkgs, nosocket, appEnv, ...}:
+{pkgs, nosocket, isDev, ...}:
 with pkgs; rec {
   package = mkYarnPackage {
     name = "piston";
@@ -67,12 +67,12 @@ with pkgs; rec {
   '';
 
   container = pkgs.dockerTools.buildLayeredImageWithNixDb {
-    name = "piston";
+    name = if isDev then "piston" else "ghcr.io/engineer-man/piston";
     tag = "base-latest";
 
-    contents = if appEnv == "dev" then basePackages ++ devPackages else basePackages;
+    contents = if isDev then basePackages ++ devPackages else basePackages;
 
-    extraCommands = if appEnv == "dev" then baseCommands + devCommands else baseCommands;
+    extraCommands = if isDev then baseCommands + devCommands else baseCommands;
 
     config = {
       Cmd = ["${package}/bin/pistond"];

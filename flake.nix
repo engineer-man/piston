@@ -74,12 +74,12 @@
     containers = {
       dev = (import ./api {
         inherit pkgs nosocket;
-        appEnv = "dev";
+        isDev = true;
       }).container;
 
       prod = (import ./api {
         inherit pkgs nosocket;
-        appEnv = "prod";
+        isDev = false;
       }).container;
     };
   };
