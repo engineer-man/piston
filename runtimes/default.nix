@@ -52,4 +52,5 @@ args: {
     "yabasic" = import ./yabasic.nix args;
     "emacs" = import ./emacs.nix args;
     "gnat-ada" = import ./gnat-ada.nix args;
+    "rust" = import ./rust.nix args;
 }
