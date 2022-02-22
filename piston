@@ -61,7 +61,7 @@ case "$SUBCOMMAND" in
 
     build-dev)
         echo "Removing the Nix volume if it exists"
-        docker volume rm -f $DEV_VOLUME_NAME
+        docker volume rm -f $DEV_VOLUME_NAME || exit 1
         echo "Building the base docker image"
         build_base dev
         echo "Installing the required node modules"
@@ -118,7 +118,7 @@ case "$SUBCOMMAND" in
             -v $DEV_VOLUME_NAME:/nix \
             --name piston_test_runner \
             "$IMAGE_NAME_DEV:$IMAGE_TAG" \
-            piston-test $1
+            /piston/src/api/src/bin/test.js $1
         ;;
 
     *)
