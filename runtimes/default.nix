@@ -53,4 +53,5 @@ args: {
     "emacs" = import ./emacs.nix args;
     "gnat-ada" = import ./gnat-ada.nix args;
     "rust" = import ./rust.nix args;
+    "dotnet-sdk-csharp" = import ./dotnet-sdk-csharp.nix args;
 }
