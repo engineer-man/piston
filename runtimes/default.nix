@@ -54,4 +54,5 @@ args: {
     "gnat-ada" = import ./gnat-ada.nix args;
     "rust" = import ./rust.nix args;
     "dotnet-sdk-csharp" = import ./dotnet-sdk-csharp.nix args;
+    "dotnet-sdk-fsharp" = import ./dotnet-sdk-fsharp.nix args;
 }
