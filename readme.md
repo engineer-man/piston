@@ -328,6 +328,7 @@ Content-Type: application/json
 `dragon`,
 `elixir`,
 `emacs`,
+`emojicode`,
 `erlang`,
 `file`,
 `forte`,
