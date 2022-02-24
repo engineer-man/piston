@@ -2,8 +2,6 @@ const logger = require('logplease').create('runtime');
 const cp = require('child_process');
 const config = require('./config');
 
-const runtimes = [];
-
 class Runtime {
     constructor({
         language,
@@ -41,69 +39,6 @@ class Runtime {
         this.package_support = packageSupport;
     }
 
-    static compute_single_limit(
-        language_name,
-        limit_name,
-        language_limit_overrides
-    ) {
-        return (
-            (config.limit_overrides[language_name] &&
-                config.limit_overrides[language_name][limit_name]) ||
-            (language_limit_overrides &&
-                language_limit_overrides[limit_name]) ||
-            config[limit_name]
-        );
-    }
-
-    static compute_all_limits(language_name, language_limit_overrides) {
-        return {
-            timeouts: {
-                compile: this.compute_single_limit(
-                    language_name,
-                    'compile_timeout',
-                    language_limit_overrides
-                ),
-                run: this.compute_single_limit(
-                    language_name,
-                    'run_timeout',
-                    language_limit_overrides
-                ),
-            },
-            memory_limits: {
-                compile: this.compute_single_limit(
-                    language_name,
-                    'compile_memory_limit',
-                    language_limit_overrides
-                ),
-                run: this.compute_single_limit(
-                    language_name,
-                    'run_memory_limit',
-                    language_limit_overrides
-                ),
-            },
-            max_process_count: this.compute_single_limit(
-                language_name,
-                'max_process_count',
-                language_limit_overrides
-            ),
-            max_open_files: this.compute_single_limit(
-                language_name,
-                'max_open_files',
-                language_limit_overrides
-            ),
-            max_file_size: this.compute_single_limit(
-                language_name,
-                'max_file_size',
-                language_limit_overrides
-            ),
-            output_max_size: this.compute_single_limit(
-                language_name,
-                'output_max_size',
-                language_limit_overrides
-            ),
-        };
-    }
-
     ensure_built() {
         logger.info(`Ensuring ${this} is built`);
 
@@ -120,34 +55,8 @@ class Runtime {
         logger.debug(`Finished ensuring ${this} is installed`);
     }
 
-    static load_runtime(flake_key) {
-        logger.info(`Loading ${flake_key}`);
-        const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${flake_key}`;
-        const metadata_command = `nix eval --json ${flake_path}.metadata`;
-        const metadata = JSON.parse(cp.execSync(metadata_command));
-
-        const this_runtime = new Runtime({
-            ...metadata,
-            ...Runtime.compute_all_limits(
-                metadata.language,
-                metadata.limitOverrides
-            ),
-            flake_path,
-        });
-
-        this_runtime.ensure_built();
-
-        runtimes.push(this_runtime);
-
-        logger.debug(`Package ${flake_key} was loaded`);
-    }
-
     get compiled() {
         return this.compile !== null;
-    }
-
-    get id() {
-        return runtimes.indexOf(this);
     }
 
     toString() {
@@ -155,6 +64,85 @@ class Runtime {
     }
 }
 
-module.exports = runtimes;
+function compute_single_limit(
+    language_name,
+    limit_name,
+    language_limit_overrides
+) {
+    return (
+        (config.limit_overrides[language_name] &&
+            config.limit_overrides[language_name][limit_name]) ||
+        (language_limit_overrides &&
+            language_limit_overrides[limit_name]) ||
+        config[limit_name]
+    );
+}
+
+function compute_all_limits(language_name, language_limit_overrides) {
+    return {
+        timeouts: {
+            compile: compute_single_limit(
+                language_name,
+                'compile_timeout',
+                language_limit_overrides
+            ),
+            run: compute_single_limit(
+                language_name,
+                'run_timeout',
+                language_limit_overrides
+            ),
+        },
+        memory_limits: {
+            compile: compute_single_limit(
+                language_name,
+                'compile_memory_limit',
+                language_limit_overrides
+            ),
+            run: compute_single_limit(
+                language_name,
+                'run_memory_limit',
+                language_limit_overrides
+            ),
+        },
+        max_process_count: compute_single_limit(
+            language_name,
+            'max_process_count',
+            language_limit_overrides
+        ),
+        max_open_files: compute_single_limit(
+            language_name,
+            'max_open_files',
+            language_limit_overrides
+        ),
+        max_file_size: compute_single_limit(
+            language_name,
+            'max_file_size',
+            language_limit_overrides
+        ),
+        output_max_size: compute_single_limit(
+            language_name,
+            'output_max_size',
+            language_limit_overrides
+        ),
+    };
+}
+
+function get_runtime_from_flakes(runtime_name) {
+    const flake_path = `${config.flake_path}#pistonRuntimeSets.${config.runtime_set}.${runtime_name}`;
+    const metadata_command = `nix eval --json ${flake_path}.metadata`;
+    const metadata = JSON.parse(cp.execSync(metadata_command));
+
+    const this_runtime = new Runtime({
+        ...metadata,
+        ...compute_all_limits(
+            metadata.language,
+            metadata.limitOverrides
+        ),
+        flake_path,
+    });
+
+    return this_runtime
+}
+
 module.exports.Runtime = Runtime;
-module.exports.load_runtime = Runtime.load_runtime;
+module.exports.get_runtime_from_flakes = get_runtime_from_flakes;

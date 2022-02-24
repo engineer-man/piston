@@ -30,28 +30,16 @@ const { Job } = require('../job');
         const runtime_path = `${config.flake_path}#pistonRuntimes.${runtime_name}`;
         logger.info(`Testing runtime ${runtime_path}`);
 
-        logger.debug(`Loading runtime metadata`);
-        const metadata = JSON.parse(
-            cp.execSync(`nix eval --json ${runtime_path}.metadata --json`)
-        );
+        logger.debug(`Loading runtime`);
+
+        const testable_runtime = runtime.get_runtime_from_flakes(runtime_name);
+
+        testable_runtime.ensure_built();
 
         logger.debug(`Loading runtime tests`);
         const tests = JSON.parse(
             cp.execSync(`nix eval --json ${runtime_path}.tests --json`)
         );
-
-        logger.debug(`Loading runtime`);
-
-        const testable_runtime = new runtime.Runtime({
-            ...metadata,
-            ...runtime.Runtime.compute_all_limits(
-                metadata.language,
-                metadata.limitOverrides
-            ),
-            flake_path: runtime_path,
-        });
-
-        testable_runtime.ensure_built();
 
         logger.info(`Running tests`);
 
