@@ -55,4 +55,5 @@ args: {
     "rust" = import ./rust.nix args;
     "dotnet-sdk-csharp" = import ./dotnet-sdk-csharp.nix args;
     "dotnet-sdk-fsharp" = import ./dotnet-sdk-fsharp.nix args;
+    "dotnet-sdk-fsharp-interactive" = import ./dotnet-sdk-fsharp-interactive.nix args;
 }
