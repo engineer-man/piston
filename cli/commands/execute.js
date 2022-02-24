@@ -246,11 +246,12 @@ async function run_non_interactively(files, argv) {
 exports.handler = async argv => {
     const files = [...(argv.files || []), argv.file].map(file_path => {
         const buffer = fs.readFileSync(file_path);
+        // Checks for � (the replacement character) after encoding the buffer to uf8
         const encoding =
             (buffer
                 .toString()
                 .split('')
-                .some(x => x.charCodeAt(0) >= 128) &&
+                .some(x => x.charCodeAt(0) === 65533) &&
                 'base64') ||
             'utf8';
         return {
