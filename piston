@@ -3,6 +3,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 
 CONTAINER_NAME="piston_api"
+DEV_VOLUME_NAME="piston_nix"
 
 IMAGE_TAG="base-latest"
 IMAGE_NAME="ghcr.io/engineer-man/piston"
@@ -11,10 +12,11 @@ IMAGE_NAME_DEV="piston"
 SUBCOMMAND="$1"
 shift
 
-build_base(){
-    CONTAINER_PATH="$(nix build ".#container" --no-link --json | jq '.[0].outputs.out' -r)" || exit 1
+build_base() {
+    container_flake_key=$([[ $1 == "dev" ]] && echo "containers.dev" || echo "containers.prod")
+    CONTAINER_PATH="$(nix build ".#$container_flake_key" --no-link --json | jq '.[0].outputs.out' -r)"
+    echo "The image archive was created at: $CONTAINER_PATH"
     docker load -i $CONTAINER_PATH || exit 1
-    docker tag "$IMAGE_NAME_DEV:$IMAGE_TAG" "$IMAGE_NAME:$IMAGE_TAG" || exit 1
 }
 
 case "$SUBCOMMAND" in
@@ -36,28 +38,48 @@ case "$SUBCOMMAND" in
         docker pull "$IMAGE_NAME:$IMAGE_TAG"
         ;;
 
-    # dev commands
-
-    scaffold)
-        pushd $SCRIPT_DIR/runtimes > /dev/null
-        ./scaffold.sh $1 $2
-        popd > /dev/null
-        ;;
-
     build)
         build_base
         if [[ ! -z "$1" ]]; then
             # $1 contains a variant to build
+            runtime_set=$1
             docker build \
-                --build-arg RUNTIMESET=$1 \
-                -f $SCRIPT_DIR/Dockerfile.withset \
-                -t "$IMAGE_NAME_DEV:$1-latest" \
+                --build-arg RUNTIMESET=$runtime_set \
+                -f "$SCRIPT_DIR"/Dockerfile.withset \
+                -t "$IMAGE_NAME_DEV:$runtime_set-latest" \
                 .
         fi
         ;;
 
+    # dev commands
+
+    scaffold)
+        pushd "$SCRIPT_DIR/runtimes" > /dev/null
+        ./scaffold.sh $1 $2
+        popd > /dev/null
+        ;;
+
+    build-dev)
+        echo "Removing the Nix volume if it exists"
+        docker volume rm -f $DEV_VOLUME_NAME || exit 1
+        echo "Building the base docker image"
+        build_base dev
+        echo "Installing the required node modules"
+        docker run \
+            --rm \
+            -p 2000:2000 \
+            -it \
+            --name $CONTAINER_NAME \
+            -e PISTON_LOG_LEVEL=DEBUG \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -e PISTON_RUNTIME_SET=none \
+            -v "$SCRIPT_DIR":/piston/src \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            bash -c "cd /piston/src/api && yarn install"
+        echo "Done building"
+        ;;
+
     start-dev)
-        build_base
         runtime_set=all
         if [[ ! -z "$1" ]]; then
             runtime_set=$1
@@ -68,52 +90,66 @@ case "$SUBCOMMAND" in
             -it \
             --name $CONTAINER_NAME \
             -e PISTON_LOG_LEVEL=DEBUG \
-            -e PISTON_FLAKE_PATH=/piston/packages \
+            -e PISTON_FLAKE_PATH=/piston/src \
             -e PISTON_RUNTIME_SET=$runtime_set \
-            -v $PWD:/piston/packages \
-            -d "$IMAGE_NAME_DEV:$IMAGE_TAG"
-    ;;
+            -v "$SCRIPT_DIR":/piston/src \
+            -v $DEV_VOLUME_NAME:/nix \
+            -d "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            bash -c "cd /piston/src/api && yarn run dev"
+        ;;
 
     test)
-        build_base
         docker run \
             --rm \
             -it \
-            -e PISTON_FLAKE_PATH=/piston/packages \
-            -v $PWD:/piston/packages \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -v "$SCRIPT_DIR":/piston/src \
             --name piston_test_runner \
-            -it "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            "$IMAGE_NAME:$IMAGE_TAG" \
             piston-test $1
+    ;;
 
+    test-dev)
+        docker run \
+            --rm \
+            -it \
+            -e PISTON_FLAKE_PATH=/piston/src \
+            -v "$SCRIPT_DIR":/piston/src \
+            -v $DEV_VOLUME_NAME:/nix \
+            --name piston_test_runner \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            /piston/src/api/src/bin/test.js $1
         ;;
 
     *)
         echo "=== Piston Management ==="
         echo
-        echo "Commands:"
-        echo " logs                           Show piston logs"
+        echo "======================"
+        echo "General Commands"
+        echo "======================"
+        echo " logs                    Show Piston logs"
+        echo " start                   Start Piston production container"
+        echo " stop                    Stop Piston"
+        echo " restart                 Restart Piston"
+        echo " shell                   Open a bash shell for the container"
+        echo " update                  Fetch latest updates"
+        echo " exec <language> <file>  Execute the files on Piston with language"
         echo
-        echo " start                          Starts piston"
-        echo " stop                           Stops piston"
-        echo " restart                        Restarts piston"
-        echo " shell                          Opens a bash shell for the api container"
-        echo
-        echo " update                         Fetches latest updates"
-        echo
-        echo " exec <language> <file>         Execute the files on piston with language"
-        echo
-        echo "Development Commands:"
+        echo "======================"
+        echo "Development Commands"
         echo "Running some of these commands require a nix environment setup and on the path"
         echo "See https://nixos.wiki/wiki/Nix_Installation_Guide#Stable_Nix"
-        echo
-        echo " start-dev                      Builds a container locally and starts piston"
-        echo " build [runtime-set]            Builds and loads the API container optionally"
-        echo "                                including the runtime set within it"
-        echo " scaffold <language> [runtime]  Initializes a new runtime"
-        echo " test <runtime>                 Runs unit tests on the given runtime"
-        echo "                                Optionally set runtime to --all to test all"
-        echo "                                NOTE: This is only for the runtimes contained"
-        echo "                                      within this repo"
+        echo "======================"
+        echo " build-dev               Build the development image"
+        echo " build [runtime-set]     Build the production image, and optionally"
+        echo "                         include a specified runtime set"
+        echo " start-dev               Start Piston development container"
+        echo " scaffold <language> [runtime] Initialize a template for a new runtime"
+        echo " test <runtime>          Run unit tests on the given runtime"
+        echo "                         Optionally set runtime to --all to test all"
+        echo "                         NOTE: This is only for the runtimes contained"
+        echo "                               within this repo"
+        echo " test-dev <runtime>      test using the development container and volume"
         echo
         ;;
 esac

@@ -8,18 +8,20 @@
         "express": "^4.17.1",
         "express-ws": "^5.0.2",
         "logplease": "^1.2.15",
+        "nocamel": "git://github.com/HexF/nocamel.git#patch-1",
         "node-fetch": "^2.6.1",
         "uuid": "^8.3.2",
-        "nocamel": "git://github.com/HexF/nocamel.git#patch-1",
         "waitpid": "git://github.com/HexF/node-waitpid.git"
     },
     "license": "MIT",
     "scripts": {
+        "dev": "nodemon .",
         "lint": "prettier . --write",
         "prepack": "yarn2nix > yarn.nix"
     },
     "devDependencies": {
         "node2nix": "^1.6.0",
+        "nodemon": "^2.0.15",
         "prettier": "2.2.1"
     },
     "bin": {

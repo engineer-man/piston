@@ -2,14 +2,11 @@
   description = "Piston packages repo";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
-  outputs = { self, nixpkgs }: 
+  outputs = { self, nixpkgs }:
   let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    baseContainer = (import ./api {
-      inherit pkgs;
-      nosocket = self.legacyPackages."${system}".nosocket;
-    }).container;
+    nosocket = self.legacyPackages."${system}".nosocket;
     args = {
       inherit pkgs;
       piston = {
@@ -66,6 +63,7 @@
     pistonRuntimeSets = {
       "all" = runtimes;
       "bash-only" = runtimeList ["bash"];
+      "none" = { };
     };
 
     legacyPackages."${system}" = rec {
@@ -73,6 +71,16 @@
       piston = (import ./api { inherit pkgs nosocket; }).package;
     };
 
-    container = baseContainer;    
+    containers = {
+      dev = (import ./api {
+        inherit pkgs nosocket;
+        isDev = true;
+      }).container;
+
+      prod = (import ./api {
+        inherit pkgs nosocket;
+        isDev = false;
+      }).container;
+    };
   };
 }
