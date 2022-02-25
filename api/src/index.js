@@ -77,7 +77,6 @@ expressWs(app);
 
     const api_v2 = require('./api/v2');
     app.use('/api/v2', api_v2);
-    app.use('/api/v2', api_v2);
 
     app.use((req, res, next) => {
         return res.status(404).send({ message: 'Not Found' });

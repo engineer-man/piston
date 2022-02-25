@@ -80,7 +80,9 @@ class Package {
         const cs = hash.digest('hex');
 
         if (cs !== this.checksum) {
-            throw new Error(`Checksum miss-match want: ${val} got: ${cs}`);
+            throw new Error(
+                `Checksum miss-match want: ${this.checksum} got: ${cs}`
+            );
         }
 
         logger.debug(
