@@ -1,5 +1,4 @@
 const logplease = require('logplease');
-const logger = logplease.create('job');
 const { v4: uuidv4 } = require('uuid');
 const cp = require('child_process');
 const path = require('path');
@@ -226,9 +225,7 @@ class Job {
 
         this.logger.info(`Executing job runtime=${this.runtime.toString()}`);
 
-        const code_files =
-            (this.runtime.language === 'file' && this.files) ||
-            this.files.filter(file => file.encoding == 'utf8');
+        const code_files = this.files.filter(file => file.encoding == 'utf8');
 
         this.logger.debug('Compiling');
 
@@ -274,9 +271,7 @@ class Job {
             `Interactively executing job runtime=${this.runtime.toString()}`
         );
 
-        const code_files =
-            (this.runtime.language === 'file' && this.files) ||
-            this.files.filter(file => file.encoding == 'utf8');
+        const code_files = this.files.filter(file => file.encoding == 'utf8');
 
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
