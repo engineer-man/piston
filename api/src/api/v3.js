@@ -81,10 +81,7 @@ function get_job(body) {
             });
         }
 
-        if (
-            rt.language !== 'file' &&
-            !files.some(file => !file.encoding || file.encoding === 'utf8')
-        ) {
+        if (!files.some(file => !file.encoding || file.encoding === 'utf8')) {
             return reject({
                 message: 'files must include at least one utf8 encoded file',
             });
