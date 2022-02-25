@@ -124,31 +124,32 @@ case "$SUBCOMMAND" in
     *)
         echo "=== Piston Management ==="
         echo
-        echo "Commands:"
-        echo " logs                           Show piston logs"
+        echo "======================"
+        echo "General Commands"
+        echo "======================"
+        echo " logs                    Show Piston logs"
+        echo " start                   Start Piston production container"
+        echo " stop                    Stop Piston"
+        echo " restart                 Restart Piston"
+        echo " shell                   Open a bash shell for the container"
+        echo " update                  Fetch latest updates"
+        echo " exec <language> <file>  Execute the files on Piston with language"
         echo
-        echo " start                          Starts piston"
-        echo " stop                           Stops piston"
-        echo " restart                        Restarts piston"
-        echo " shell                          Opens a bash shell for the api container"
-        echo
-        echo " update                         Fetches latest updates"
-        echo
-        echo " exec <language> <file>         Execute the files on piston with language"
-        echo
-        echo "Development Commands:"
+        echo "======================"
+        echo "Development Commands"
         echo "Running some of these commands require a nix environment setup and on the path"
         echo "See https://nixos.wiki/wiki/Nix_Installation_Guide#Stable_Nix"
-        echo
-        echo " start-dev                      Builds a container locally and starts piston"
-        echo " build [runtime-set]            Builds and loads the API container optionally"
-        echo "                                including the runtime set within it"
-        echo " scaffold <language> [runtime]  Initializes a new runtime"
-        echo " test <runtime>                 Runs unit tests on the given runtime"
-        echo " test-dev <runtime>             Same as test, but using the development container and volume"
-        echo "                                Optionally set runtime to --all to test all"
-        echo "                                NOTE: This is only for the runtimes contained"
-        echo "                                      within this repo"
+        echo "======================"
+        echo " build-dev               Build the development image"
+        echo " build [runtime-set]     Build the production image, and optionally"
+        echo "                         include a specified runtime set"
+        echo " start-dev               Start Piston development container"
+        echo " scaffold <language> [runtime] Initialize a template for a new runtime"
+        echo " test <runtime>          Run unit tests on the given runtime"
+        echo "                         Optionally set runtime to --all to test all"
+        echo "                         NOTE: This is only for the runtimes contained"
+        echo "                               within this repo"
+        echo " test-dev <runtime>      test using the development container and volume"
         echo
         ;;
 esac
