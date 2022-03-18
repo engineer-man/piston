@@ -59,4 +59,5 @@ args: {
     "dotnet-sdk-visual-basic" = import ./dotnet-sdk-visual-basic.nix args;
     "fpc-pascal" = import ./fpc-pascal.nix args;
     "brainfuck" = import ./brainfuck.nix args;
+    "node-coffeescript" = import ./node-coffeescript.nix args;
 }
