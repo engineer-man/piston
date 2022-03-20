@@ -60,4 +60,5 @@ args: {
     "fpc-pascal" = import ./fpc-pascal.nix args;
     "brainfuck" = import ./brainfuck.nix args;
     "node-coffeescript" = import ./node-coffeescript.nix args;
+    "jvm-scala" = import ./jvm-scala.nix args;
 }
