@@ -62,4 +62,5 @@ args: {
     "node-coffeescript" = import ./node-coffeescript.nix args;
     "jvm-scala" = import ./jvm-scala.nix args;
     "llvm_ir" = import ./llvm_ir.nix args;
+    "mono-basic" = import ./mono-basic.nix args;
 }
