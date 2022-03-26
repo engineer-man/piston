@@ -58,4 +58,9 @@ args: {
     "dotnet-sdk-fsharp-interactive" = import ./dotnet-sdk-fsharp-interactive.nix args;
     "dotnet-sdk-visual-basic" = import ./dotnet-sdk-visual-basic.nix args;
     "fpc-pascal" = import ./fpc-pascal.nix args;
+    "brainfuck" = import ./brainfuck.nix args;
+    "node-coffeescript" = import ./node-coffeescript.nix args;
+    "jvm-scala" = import ./jvm-scala.nix args;
+    "llvm_ir" = import ./llvm_ir.nix args;
+    "mono-basic" = import ./mono-basic.nix args;
 }
