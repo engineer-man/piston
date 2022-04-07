@@ -69,9 +69,9 @@ function get_job(body) {
                 message: 'language is required as a string',
             });
         }
-        if (!version || typeof version !== 'string') {
+        if (version && typeof version !== 'string') {
             return reject({
-                message: 'version is required as a string',
+                message: 'version should be a string',
             });
         }
         if (!files || !Array.isArray(files)) {
@@ -93,7 +93,9 @@ function get_job(body) {
         );
         if (rt === undefined) {
             return reject({
-                message: `${language}-${version} runtime is unknown`,
+                message: `${language}${
+                    version ? `-${version}` : ''
+                } runtime is unknown`,
             });
         }
 

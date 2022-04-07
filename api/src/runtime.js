@@ -194,7 +194,7 @@ module.exports.get_runtimes_matching_language_version = function (lang, ver) {
     return runtimes.filter(
         rt =>
             (rt.language == lang || rt.aliases.includes(lang)) &&
-            semver.satisfies(rt.version, ver)
+            (typeof ver !== 'string' || semver.satisfies(rt.version, ver))
     );
 };
 module.exports.get_latest_runtime_matching_language_version = function (
@@ -211,7 +211,7 @@ module.exports.get_runtime_by_name_and_version = function (runtime, ver) {
         rt =>
             (rt.runtime == runtime ||
                 (rt.runtime === undefined && rt.language == runtime)) &&
-            semver.satisfies(rt.version, ver)
+            (typeof ver !== 'string' || semver.satisfies(rt.version, ver))
     );
 };
 

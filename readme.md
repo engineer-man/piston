@@ -238,8 +238,8 @@ Content-Type: application/json
 This endpoint requests execution of some arbitrary code.
 
 -   `language` (**required**) The language to use for execution, must be a string and must be installed.
--   `version` (**required**) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use.
 -   `files` (**required**) An array of files containing code or other data that should be used for execution. The first file in this array is considered the main file.
+-   `version` (_optional_) The version of the language to use for execution, must be a string containing a SemVer selector for the version or the specific version number to use. Latest version will be used if not specified.
 -   `files[].name` (_optional_) The name of the file to upload, must be a string containing no path or left out.
 -   `files[].content` (**required**) The content of the files to upload, must be a string containing text to write.
 -   `files[].encoding` (_optional_) The encoding scheme used for the file content. One of `base64`, `hex` or `utf8`. Defaults to `utf8`.
