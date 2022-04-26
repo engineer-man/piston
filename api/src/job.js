@@ -120,13 +120,18 @@ class Job {
                 '--nofile=' + this.runtime.max_open_files,
                 '--fsize=' + this.runtime.max_file_size,
             ];
+            
+            const timeout_call = [
+                'timeout', '-s', '9', Math.ceil(timeout / 1000),
+            ];
 
             if (memory_limit >= 0) {
                 prlimit.push('--as=' + memory_limit);
             }
 
-            const proc_call = [
+            const proc_call = [ 
                 'nice',
+                ...timeout_call,
                 ...prlimit,
                 ...nonetwork,
                 'bash',
