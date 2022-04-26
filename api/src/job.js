@@ -336,14 +336,20 @@ class Job {
                     const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
 
                     const [_1, state, user_friendly] = state_line.split(/\s+/);
+                    
+                    const proc_id_int = parse_int(proc_id);
 
-                    if (state == 'Z')
-                        // Zombie process, just needs to be waited
+                    if (state == 'Z'){
+                        // Zombie process, just needs to be waited, regardless of the user id
+                        if(!to_wait.includes(proc_id_int))
+                            to_wait.push(proc_id_int);
+                        
                         return -1;
+                    }
                     // We should kill in all other state (Sleep, Stopped & Running)
 
                     if (ruid == this.uid || euid == this.uid)
-                        return parse_int(proc_id);
+                        return proc_id_int;
                 } catch {
                     return -1;
                 }
