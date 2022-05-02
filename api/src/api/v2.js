@@ -264,7 +264,11 @@ router.post('/execute', async (req, res) => {
 
         await job.prime();
 
-        const result = await job.execute();
+        let result = await job.execute();
+        // Backward compatibility when the run stage is not started
+        if (result.run === undefined) {
+            result.run = result.compile;
+        }
 
         await job.cleanup();
 
