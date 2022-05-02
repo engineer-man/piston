@@ -44,6 +44,10 @@ class Job {
 
         this.args = args;
         this.stdin = stdin;
+        // Add a trailing newline if it doesn't exist
+        if (this.stdin.slice(-1) !== '\n') {
+            this.stdin += '\n';
+        }
 
         this.timeouts = timeouts;
         this.memory_limits = memory_limits;
