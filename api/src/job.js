@@ -195,6 +195,10 @@ class Job {
                 clear_timeout(kill_timeout);
 
                 proc.stderr.destroy();
+                if (!proc.stdin.destroyed) {
+                    proc.stdin.end();
+                    proc.stdin.destroy();
+                }
                 proc.stdout.destroy();
 
                 this.cleanup_processes();
