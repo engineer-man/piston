@@ -28,6 +28,9 @@ setInterval(() => {
 }, 10);
 
 class Job {
+    #active_timeouts;
+    #active_parent_processes;
+
     constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid = uuidv4();
 
@@ -44,6 +47,9 @@ class Job {
 
         this.args = args;
         this.stdin = stdin;
+
+        this.#active_timeouts = [];
+        this.#active_parent_processes = [];
 
         this.timeouts = timeouts;
         this.memory_limits = memory_limits;
@@ -109,6 +115,28 @@ class Job {
         this.logger.debug('Primed job');
     }
 
+    exit_cleanup() {
+        for (const timeout of this.#active_timeouts) {
+            clear_timeout(timeout);
+        }
+        this.#active_timeouts = [];
+        this.logger.debug('Cleared the active timeouts');
+
+        for (const proc of this.#active_parent_processes) {
+            proc.stderr.destroy();
+            if (!proc.stdin.destroyed) {
+                proc.stdin.end();
+                proc.stdin.destroy();
+            }
+            proc.stdout.destroy();
+        }
+        this.#active_parent_processes = [];
+        this.logger.debug('Destroyed parent processes writables');
+
+        this.cleanup_processes();
+        this.logger.debug(`Finished exit cleanup`);
+    }
+
     async safe_call(file, args, timeout, memory_limit, eventBus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
@@ -145,6 +173,8 @@ class Job {
                 detached: true, //give this process its own process group
             });
 
+            this.#active_parent_processes.push(proc);
+
             if (eventBus === null) {
                 proc.stdin.write(this.stdin);
                 proc.stdin.end();
@@ -166,6 +196,7 @@ class Job {
                         process.kill(proc.pid, 'SIGKILL');
                     }, timeout)) ||
                 null;
+            this.#active_timeouts.push(kill_timeout);
 
             proc.stderr.on('data', async data => {
                 if (eventBus !== null) {
@@ -191,28 +222,14 @@ class Job {
                 }
             });
 
-            const exit_cleanup = () => {
-                clear_timeout(kill_timeout);
-
-                proc.stderr.destroy();
-                if (!proc.stdin.destroyed) {
-                    proc.stdin.end();
-                    proc.stdin.destroy();
-                }
-                proc.stdout.destroy();
-
-                this.cleanup_processes();
-                this.logger.debug(`Finished exit cleanup`);
-            };
-
             proc.on('exit', (code, signal) => {
-                exit_cleanup();
+                this.exit_cleanup();
 
                 resolve({ stdout, stderr, code, signal, output });
             });
 
             proc.on('error', err => {
-                exit_cleanup();
+                this.exit_cleanup();
 
                 reject({ error: err, stdout, stderr, output });
             });
@@ -422,7 +439,7 @@ class Job {
     async cleanup() {
         this.logger.info(`Cleaning up job`);
 
-        this.cleanup_processes(); // Run process janitor, just incase there are any residual processes somehow
+        this.exit_cleanup(); // Run process janitor, just incase there are any residual processes somehow
         await this.cleanup_filesystem();
 
         remaining_job_spaces++;
