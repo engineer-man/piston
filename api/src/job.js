@@ -234,6 +234,7 @@ class Job {
         this.logger.debug('Compiling');
 
         let compile;
+        let compile_errored = false;
 
         if (this.runtime.compiled) {
             compile = await this.safe_call(
@@ -242,16 +243,20 @@ class Job {
                 this.timeouts.compile,
                 this.memory_limits.compile
             );
+            compile_errored = compile.code !== 0;
         }
 
-        this.logger.debug('Running');
+        let run;
+        if (!compile_errored) {
+            this.logger.debug('Running');
 
-        const run = await this.safe_call(
-            this.runtime.run,
-            [code_files[0].name, ...this.args],
-            this.timeouts.run,
-            this.memory_limits.run
-        );
+            run = await this.safe_call(
+                this.runtime.run,
+                [code_files[0].name, ...this.args],
+                this.timeouts.run,
+                this.memory_limits.run
+            );
+        }
 
         this.state = job_states.EXECUTED;
 
@@ -277,6 +282,7 @@ class Job {
 
         const code_files = this.files.filter(file => file.encoding == 'utf8');
 
+        let compile_errored = false;
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
@@ -288,19 +294,22 @@ class Job {
             );
 
             eventBus.emit('exit', 'compile', { error, code, signal });
+            compile_errored = code !== 0;
         }
 
-        this.logger.debug('Running');
-        eventBus.emit('stage', 'run');
-        const { error, code, signal } = await this.safe_call(
-            this.runtime.run,
-            [code_files[0].name, ...this.args],
-            this.timeouts.run,
-            this.memory_limits.run,
-            eventBus
-        );
+        if (!compile_errored) {
+            this.logger.debug('Running');
+            eventBus.emit('stage', 'run');
+            const { error, code, signal } = await this.safe_call(
+                this.runtime.run,
+                [code_files[0].name, ...this.args],
+                this.timeouts.run,
+                this.memory_limits.run,
+                eventBus
+            );
 
-        eventBus.emit('exit', 'run', { error, code, signal });
+            eventBus.emit('exit', 'run', { error, code, signal });
+        }
 
         this.state = job_states.EXECUTED;
     }
