@@ -205,7 +205,7 @@ router.ws('/connect', async (ws, req) => {
                             JSON.stringify({
                                 type: 'runtime',
                                 language: job.runtime.language,
-                                version: job.runtime.version.raw,
+                                version: job.runtime.version,
                             })
                         );
 
@@ -282,7 +282,7 @@ router.get('/runtimes', (req, res) => {
     const runtimes = req.app.locals.runtimes.map(rt => {
         return {
             language: rt.language,
-            version: rt.version.raw,
+            version: rt.version,
             aliases: rt.aliases,
             runtime: rt.runtime,
         };
