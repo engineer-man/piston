@@ -378,6 +378,7 @@ Content-Type: application/json
 `ruby`,
 `rust`,
 `scala`,
+`smalltalk`,
 `sqlite3`,
 `swift`,
 `typescript`,
