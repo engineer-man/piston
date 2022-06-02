@@ -340,6 +340,7 @@ Content-Type: application/json
 `haskell`,
 `husk`,
 `iverilog`,
+`j`,
 `japt`,
 `java`,
 `javascript`,
