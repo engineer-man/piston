@@ -32,7 +32,11 @@ else
         .scaffold.nix > $NAME.nix
     echo "}" >> default.nix
 
-    git add $NAME.nix default.nix
+    sed -i '$d' ./priorities/default.nix
+    echo "    \"$NAME\"" >> ./priorities/default.nix
+    echo "]" >> ./priorities/default.nix
+
+    git add $NAME.nix default.nix ./priorities
 
     echo "Scaffolded $NAME"
     echo "Edit $NAME.nix to get started"
