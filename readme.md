@@ -330,6 +330,7 @@ Content-Type: application/json
 `erlang`,
 `file`,
 `forte`,
+`forth`,
 `fortran`,
 `freebasic`,
 `fsharp.net`,
