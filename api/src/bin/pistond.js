@@ -43,7 +43,22 @@ expressWs(app);
             `nix eval --json ${config.flake_path}#pistonRuntimeSets.${config.runtime_set} --apply builtins.attrNames`
         )
         .toString();
-    const runtime_names = JSON.parse(runtimes_data);
+    const runtime_names_unordered = JSON.parse(runtimes_data);
+
+    const priorities_data = cp
+        .execSync(
+            `nix eval --json ${config.flake_path}#pistonRuntimePriorities`
+        )
+        .toString();
+    const priorities = JSON.parse(priorities_data).filter(runtime =>
+        runtime_names_unordered.includes(runtime)
+    );
+    const runtime_names = [
+        ...priorities,
+        ...runtime_names_unordered.filter(
+            runtime => !priorities.includes(runtime)
+        ),
+    ];
 
     logger.info('Loading the runtimes from the flakes');
     const runtimes = runtime_names.map(runtime_name => {

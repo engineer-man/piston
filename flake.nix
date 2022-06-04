@@ -65,6 +65,7 @@
       "bash-only" = runtimeList ["bash"];
       "none" = { };
     };
+    pistonRuntimePriorities = import ./runtimes/priorities;
 
     legacyPackages."${system}" = rec {
       nosocket = (import ./nosocket { inherit pkgs; }).package;

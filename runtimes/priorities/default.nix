@@ -1,7 +1,7 @@
 [
     "node-javascript"
-    "python2"
     "python3"
+    "python2"
     "bash"
     "clojure"
     "cobol-gnu-cobol"
