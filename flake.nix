@@ -65,17 +65,12 @@
       "bash-only" = runtimeList ["bash"];
       "none" = { };
     };
-    pistonRuntimePriorities = [
+    pistonMainstreamRuntimes = [
       "mono-csharp"
-      "dotnet-sdk-csharp"
       "python3"
-      "python2"
       "node-javascript"
       "node-typescript"
-      "deno-javascript"
-      "deno-typescript"
       "mono-basic"
-      "dotnet-sdk-visual-basic"
     ];
 
     legacyPackages."${system}" = rec {

@@ -45,18 +45,18 @@ expressWs(app);
         .toString();
     const runtime_names_unordered = JSON.parse(runtimes_data);
 
-    const priorities_data = cp
+    const mainstream_runtimes_data = cp
         .execSync(
-            `nix eval --json ${config.flake_path}#pistonRuntimePriorities`
+            `nix eval --json ${config.flake_path}#pistonMainstreamRuntimes`
         )
         .toString();
-    const priorities = JSON.parse(priorities_data).filter(runtime =>
+    const mainstream_runtimes = JSON.parse(mainstream_runtimes_data).filter(runtime =>
         runtime_names_unordered.includes(runtime)
     );
     const runtime_names = [
-        ...priorities,
+        ...mainstream_runtimes,
         ...runtime_names_unordered.filter(
-            runtime => !priorities.includes(runtime)
+            runtime => !mainstream_runtimes.includes(runtime)
         ),
     ];
 
