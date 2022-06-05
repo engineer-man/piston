@@ -7,6 +7,8 @@ in piston.mkRuntime {
 
     aliases = [
         "py2"
+        "python"
+        "py"
     ];
 
     run = ''
