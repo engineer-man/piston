@@ -65,7 +65,12 @@
       "bash-only" = runtimeList ["bash"];
       "none" = { };
     };
-    pistonRuntimePriorities = import ./runtimes/priorities;
+    pistonRuntimePriorities = [
+      "mono-csharp"
+      "dotnet-sdk-csharp"
+      "python3"
+      "python2"
+    ];
 
     legacyPackages."${system}" = rec {
       nosocket = (import ./nosocket { inherit pkgs; }).package;
