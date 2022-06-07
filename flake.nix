@@ -65,6 +65,13 @@
       "bash-only" = runtimeList ["bash"];
       "none" = { };
     };
+    pistonMainstreamRuntimes = [
+      "mono-csharp"
+      "python3"
+      "node-javascript"
+      "node-typescript"
+      "mono-basic"
+    ];
 
     legacyPackages."${system}" = rec {
       nosocket = (import ./nosocket { inherit pkgs; }).package;

@@ -50,6 +50,7 @@ const SIGNALS = [
 function get_job(job_info, available_runtimes) {
     let {
         language,
+        version,
         args,
         stdin,
         files,
@@ -79,8 +80,10 @@ function get_job(job_info, available_runtimes) {
             }
         }
 
-        const rt = available_runtimes.find(rt =>
-            [...rt.aliases, rt.language].includes(rt.language)
+        const rt = available_runtimes.find(
+            rt =>
+                [...rt.aliases, rt.language].includes(language) &&
+                (version === rt.version || version === '*')
         );
 
         if (rt === undefined) {
