@@ -10,5 +10,5 @@ services:
         volumes:
             - ./data/piston:/piston
         tmpfs:
-            - /piston/jobs:exec
+            - /piston/jobs:exec,uid=1000,gid=1000,mode=700
             - /tmp:exec
