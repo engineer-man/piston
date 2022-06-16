@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Compile pascal files
-fpc -oout -v0 "$@"
-chmod +x out
