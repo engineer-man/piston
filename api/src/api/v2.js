@@ -51,6 +51,7 @@ function get_job(job_info, available_runtimes) {
     let {
         language,
         version,
+        runtime,
         args,
         stdin,
         files,
@@ -80,15 +81,20 @@ function get_job(job_info, available_runtimes) {
             }
         }
 
+        const has_runtime =
+            job_info.has_own_property('runtime') && job_info.runtime !== null;
+
         const rt = available_runtimes.find(
             rt =>
                 [...rt.aliases, rt.language].includes(language) &&
-                (version === rt.version || version === '*')
+                (version === rt.version || version === '*') &&
+                (!has_runtime || runtime === rt.runtime)
         );
 
         if (rt === undefined) {
+            const runtime_str = has_runtime ? `${runtime}-` : '';
             return reject({
-                message: `${language}-${version} runtime is unknown`,
+                message: `${runtime_str}${language}-${version} runtime is unknown`,
             });
         }
 
