@@ -14,7 +14,7 @@ services:
         environment:
             - PISTON_REPO_URL=http://repo:8000/index
         tmpfs:
-            - /piston/jobs:exec,uid=1000,gid=1000,mode=700
+            - /piston/jobs:exec,uid=1000,gid=1000,mode=711
 
     repo: # Local testing of packages
         build: repo
