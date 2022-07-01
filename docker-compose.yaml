@@ -8,7 +8,7 @@ services:
         ports:
             - 2000:2000
         volumes:
-            - ./data/piston:/piston
+            - ./data/piston/packages:/piston/packages
         tmpfs:
-            - /piston/jobs:exec,uid=1000,gid=1000,mode=700
+            - /piston/jobs:exec,uid=1000,gid=1000,mode=711
             - /tmp:exec

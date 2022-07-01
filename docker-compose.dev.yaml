@@ -10,11 +10,11 @@ services:
         ports:
             - 2000:2000
         volumes:
-            - ./data/piston:/piston
+            - ./data/piston/packages:/piston/packages
         environment:
             - PISTON_REPO_URL=http://repo:8000/index
         tmpfs:
-            - /piston/jobs:exec
+            - /piston/jobs:exec,uid=1000,gid=1000,mode=711
 
     repo: # Local testing of packages
         build: repo
