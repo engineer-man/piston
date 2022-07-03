@@ -1,0 +1,19 @@
+#!/bin/bash
+
+code=`cat "$1"`
+
+shift
+
+argv_text=""
+
+for arg in "$@"
+do
+    argv_text+='insert into argv (arg) values ("'"`echo "$arg" | sed 's/"/""/g'`"'");
+'
+done
+
+
+sqlite3 <<< "create table argv (arg text); 
+$argv_text
+$code"
+

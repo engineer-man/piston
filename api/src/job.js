@@ -152,12 +152,17 @@ class Job {
                 '--fsize=' + this.runtime.max_file_size,
             ];
 
+            const timeout_call = [
+                'timeout', '-s', '9', Math.ceil(timeout / 1000),
+            ];
+
             if (memory_limit >= 0) {
                 prlimit.push('--as=' + memory_limit);
             }
 
             const proc_call = [
                 'nice',
+                ...timeout_call,
                 ...prlimit,
                 ...nonetwork,
                 'bash',
@@ -362,13 +367,21 @@ class Job {
 
                     const [_1, state, user_friendly] = state_line.split(/\s+/);
 
-                    if (state == 'Z')
-                        // Zombie process, just needs to be waited
+                    const proc_id_int = parse_int(proc_id);
+
+                    // Skip over any processes that aren't ours.
+                    if(ruid != this.uid && euid != this.uid) return -1;
+
+                    if (state == 'Z'){
+                        // Zombie process, just needs to be waited, regardless of the user id
+                        if(!to_wait.includes(proc_id_int))
+                            to_wait.push(proc_id_int);
+
                         return -1;
+                    }
                     // We should kill in all other state (Sleep, Stopped & Running)
 
-                    if (ruid == this.uid || euid == this.uid)
-                        return parse_int(proc_id);
+                    return proc_id_int;
                 } catch {
                     return -1;
                 }
