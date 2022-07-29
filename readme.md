@@ -313,6 +313,7 @@ Content-Type: application/json
 `befunge93`,
 `brachylog`,
 `brainfuck`,
+`bqn`,
 `c`,
 `c++`,
 `cjam`,
