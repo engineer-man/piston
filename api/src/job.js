@@ -386,7 +386,7 @@ class Job {
                 // Then clear them out of the process tree
                 try {
                     process.kill(proc, 'SIGKILL');
-                } catch {
+                } catch(e) {
                     // Could already be dead and just needs to be waited on
                     this.logger.debug(
                         `Got error while SIGKILLing process ${proc}:`,
