@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+code_file=`pwd`/"$1"
+shift
+
+cd $SMALLTALK_PATH
+$SMALLTALK_PATH/gst "$code_file" -a "$@"
+

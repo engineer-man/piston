@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Python and Vyxal path
+export PATH=$PWD/bin:$PATH
+export BQN_PATH=$PWD/bqn
