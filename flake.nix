@@ -10,32 +10,27 @@
     args = {
       inherit pkgs;
       piston = {
-        mkRuntime = {
-            language,
-            version,
-            runtime? null,
-            run,
-            compile? null,
-            packages? null,
-            aliases? [],
-            limitOverrides? {},
-            tests
-        }: let
-          compileFile = if compile != null then
-            pkgs.writeShellScript "compile" compile
+        mkRuntime = builderFn: let
+          languagePackagesFn = packages: with packages; [ ];
+          buildRes = builderFn languagePackagesFn;
+          compileFile = if builtins.hasAttr "compile" buildRes then
+            pkgs.writeShellScript "compile" buildRes.compile
             else null;
-          runFile = pkgs.writeShellScript "run" run;
+          runFile = pkgs.writeShellScript "run" buildRes.run;
           metadata = {
-            inherit language version runtime aliases limitOverrides;
+            language = buildRes.language;
+            version = buildRes.version;
+            runtime = buildRes.runtime or null;
+            aliases = buildRes.aliases or [];
+            limitOverrides = buildRes.limitOverrides or {};
             run = runFile;
             compile = compileFile;
-            packageSupport = packages != null;
           };
+          tests = if (builtins.length buildRes.tests) > 0 then
+            buildRes.tests
+            else abort "Language ${buildRes.language} doesn't provide any tests";
         in {
-          inherit packages metadata;
-          tests = if (builtins.length tests) > 0 then
-            tests
-            else abort "Language ${language} doesn't provide any tests";
+          inherit metadata tests;
         };
         mkTest = {
           files,

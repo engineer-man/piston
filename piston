@@ -94,7 +94,7 @@ case "$SUBCOMMAND" in
             -e PISTON_RUNTIME_SET=$runtime_set \
             -v "$SCRIPT_DIR":/piston/src \
             -v $DEV_VOLUME_NAME:/nix \
-            -d "$IMAGE_NAME_DEV:$IMAGE_TAG" \
+            "$IMAGE_NAME_DEV:$IMAGE_TAG" \
             bash -c "cd /piston/src/api && yarn run dev"
         ;;
 

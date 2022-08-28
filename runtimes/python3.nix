@@ -1,27 +1,24 @@
-{pkgs, piston, ...}:
-let
-    pkg = pkgs.python3;
-in piston.mkRuntime {
+{ pkgs, piston, ... }:
+let basePkg = pkgs.python3;
+in piston.mkRuntime (libraries:
+  let pkg = basePkg.withPackages libraries;
+  in {
     language = "python3";
-    version = pkg.version;
+    version = basePkg.version;
 
-    aliases = [
-        "py3"
-        "py"
-        "python"
-    ];
+    aliases = [ "py3" "py" "python" ];
 
     run = ''
-    ${pkg}/bin/python3 "$@"
+      ${pkg}/bin/python3 "$@"
     '';
 
     tests = [
-        (piston.mkTest {
-            files = {
-                "test.py" = ''
-                    print("OK")
-                '';
-            };
-        })
+      (piston.mkTest {
+        files = {
+          "test.py" = ''
+            print("OK")
+          '';
+        };
+      })
     ];
-}
+  })
