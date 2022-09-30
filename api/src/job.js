@@ -20,13 +20,6 @@ let gid = 0;
 let remaining_job_spaces = config.max_concurrent_jobs;
 let jobQueue = [];
 
-setInterval(() => {
-    // Every 10ms try resolve a new job, if there is an available slot
-    if (jobQueue.length > 0 && remaining_job_spaces > 0) {
-        jobQueue.shift()();
-    }
-}, 10);
-
 class Job {
     #active_timeouts;
     #active_parent_processes;
@@ -84,7 +77,6 @@ class Job {
                 jobQueue.push(resolve);
             });
         }
-
         this.logger.info(`Priming job`);
         remaining_job_spaces--;
         this.logger.debug('Writing files to job cache');
@@ -478,6 +470,9 @@ class Job {
         await this.cleanup_filesystem();
 
         remaining_job_spaces++;
+        if (jobQueue.length > 0) {
+            jobQueue.shift()();
+        }
     }
 }
 
