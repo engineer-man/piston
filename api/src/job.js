@@ -18,7 +18,7 @@ let uid = 0;
 let gid = 0;
 
 let remaining_job_spaces = config.max_concurrent_jobs;
-let jobQueue = [];
+let job_queue = [];
 
 class Job {
     #active_timeouts;
@@ -74,7 +74,7 @@ class Job {
         if (remaining_job_spaces < 1) {
             this.logger.info(`Awaiting job slot`);
             await new Promise(resolve => {
-                jobQueue.push(resolve);
+                job_queue.push(resolve);
             });
         }
         this.logger.info(`Priming job`);
@@ -135,7 +135,7 @@ class Job {
         this.logger.debug('Destroyed processes writables');
     }
 
-    async safe_call(file, args, timeout, memory_limit, eventBus = null) {
+    async safe_call(file, args, timeout, memory_limit, event_bus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
@@ -181,16 +181,16 @@ class Job {
 
             this.#active_parent_processes.push(proc);
 
-            if (eventBus === null) {
+            if (event_bus === null) {
                 proc.stdin.write(this.stdin);
                 proc.stdin.end();
                 proc.stdin.destroy();
             } else {
-                eventBus.on('stdin', data => {
+                event_bus.on('stdin', data => {
                     proc.stdin.write(data);
                 });
 
-                eventBus.on('kill', signal => {
+                event_bus.on('kill', signal => {
                     proc.kill(signal);
                 });
             }
@@ -205,8 +205,8 @@ class Job {
             this.#active_timeouts.push(kill_timeout);
 
             proc.stderr.on('data', async data => {
-                if (eventBus !== null) {
-                    eventBus.emit('stderr', data);
+                if (event_bus !== null) {
+                    event_bus.emit('stderr', data);
                 } else if (stderr.length > this.runtime.output_max_size) {
                     this.logger.info(`stderr length exceeded`);
                     process.kill(proc.pid, 'SIGKILL');
@@ -217,8 +217,8 @@ class Job {
             });
 
             proc.stdout.on('data', async data => {
-                if (eventBus !== null) {
-                    eventBus.emit('stdout', data);
+                if (event_bus !== null) {
+                    event_bus.emit('stdout', data);
                 } else if (stdout.length > this.runtime.output_max_size) {
                     this.logger.info(`stdout length exceeded`);
                     process.kill(proc.pid, 'SIGKILL');
@@ -294,7 +294,7 @@ class Job {
         };
     }
 
-    async execute_interactive(eventBus) {
+    async execute_interactive(event_bus) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -310,31 +310,31 @@ class Job {
 
         let compile_errored = false;
         if (this.runtime.compiled) {
-            eventBus.emit('stage', 'compile');
+            event_bus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
                 this.runtime.compile,
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
-                eventBus
+                event_bus
             );
 
-            eventBus.emit('exit', 'compile', { error, code, signal });
+            event_bus.emit('exit', 'compile', { error, code, signal });
             compile_errored = code !== 0;
         }
 
         if (!compile_errored) {
             this.logger.debug('Running');
-            eventBus.emit('stage', 'run');
+            event_bus.emit('stage', 'run');
             const { error, code, signal } = await this.safe_call(
                 this.runtime.run,
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
                 this.memory_limits.run,
-                eventBus
+                event_bus
             );
 
-            eventBus.emit('exit', 'run', { error, code, signal });
+            event_bus.emit('exit', 'run', { error, code, signal });
         }
 
         this.state = job_states.EXECUTED;
@@ -470,8 +470,8 @@ class Job {
         await this.cleanup_filesystem();
 
         remaining_job_spaces++;
-        if (jobQueue.length > 0) {
-            jobQueue.shift()();
+        if (job_queue.length > 0) {
+            job_queue.shift()();
         }
     }
 }
