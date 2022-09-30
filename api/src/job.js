@@ -245,7 +245,7 @@ class Job {
         });
     }
 
-    async execute() {
+    async execute(event_bus = null) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -256,32 +256,54 @@ class Job {
         this.logger.info(`Executing job runtime=${this.runtime.toString()}`);
 
         const code_files = this.files.filter(file => file.encoding == 'utf8');
-
-        this.logger.debug('Compiling');
-
         let compile;
         let compile_errored = false;
+        const { emit_event_bus_result, emit_event_bus_stage } =
+            event_bus === null
+                ? {
+                      emit_event_bus_result: () => {},
+                      emit_event_bus_stage: () => {},
+                  }
+                : {
+                      emit_event_bus_result: (stage, result, event_bus) => {
+                          const { error, code, signal } = result;
+                          event_bus.emit('exit', stage, {
+                              error,
+                              code,
+                              signal,
+                          });
+                      },
+                      emit_event_bus_stage: (stage, event_bus) => {
+                          event_bus.emit('stage', stage);
+                      },
+                  };
 
         if (this.runtime.compiled) {
+            this.logger.debug('Compiling');
+            emit_event_bus_stage('compile', event_bus);
             compile = await this.safe_call(
                 this.runtime.compile,
                 code_files.map(x => x.name),
                 this.timeouts.compile,
-                this.memory_limits.compile
+                this.memory_limits.compile,
+                event_bus
             );
+            emit_event_bus_result('compile', compile, event_bus);
             compile_errored = compile.code !== 0;
         }
 
         let run;
         if (!compile_errored) {
             this.logger.debug('Running');
-
+            emit_event_bus_stage('run', event_bus);
             run = await this.safe_call(
                 this.runtime.run,
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
-                this.memory_limits.run
+                this.memory_limits.run,
+                event_bus
             );
+            emit_event_bus_result('run', run, event_bus);
         }
 
         this.state = job_states.EXECUTED;
@@ -292,52 +314,6 @@ class Job {
             language: this.runtime.language,
             version: this.runtime.version,
         };
-    }
-
-    async execute_interactive(event_bus) {
-        if (this.state !== job_states.PRIMED) {
-            throw new Error(
-                'Job must be in primed state, current state: ' +
-                    this.state.toString()
-            );
-        }
-
-        this.logger.info(
-            `Interactively executing job runtime=${this.runtime.toString()}`
-        );
-
-        const code_files = this.files.filter(file => file.encoding == 'utf8');
-
-        let compile_errored = false;
-        if (this.runtime.compiled) {
-            event_bus.emit('stage', 'compile');
-            const { error, code, signal } = await this.safe_call(
-                this.runtime.compile,
-                code_files.map(x => x.name),
-                this.timeouts.compile,
-                this.memory_limits.compile,
-                event_bus
-            );
-
-            event_bus.emit('exit', 'compile', { error, code, signal });
-            compile_errored = code !== 0;
-        }
-
-        if (!compile_errored) {
-            this.logger.debug('Running');
-            event_bus.emit('stage', 'run');
-            const { error, code, signal } = await this.safe_call(
-                this.runtime.run,
-                [code_files[0].name, ...this.args],
-                this.timeouts.run,
-                this.memory_limits.run,
-                event_bus
-            );
-
-            event_bus.emit('exit', 'run', { error, code, signal });
-        }
-
-        this.state = job_states.EXECUTED;
     }
 
     cleanup_processes(dont_wait = []) {

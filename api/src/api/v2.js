@@ -218,7 +218,7 @@ router.ws('/connect', async (ws, req) => {
                             })
                         );
 
-                        await job.execute_interactive(event_bus);
+                        await job.execute(event_bus);
                         await job.cleanup();
 
                         ws.close(4999, 'Job Completed');
