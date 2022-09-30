@@ -219,6 +219,7 @@ router.ws('/connect', async (ws, req) => {
                         );
 
                         await job.execute_interactive(eventBus);
+                        await job.cleanup();
 
                         ws.close(4999, 'Job Completed');
                     } else {
@@ -252,12 +253,6 @@ router.ws('/connect', async (ws, req) => {
             ws.send(JSON.stringify({ type: 'error', message: error.message }));
             ws.close(4002, 'Notified Error');
             // ws.close message is limited to 123 characters, so we notify over WS then close.
-        }
-    });
-
-    ws.on('close', async () => {
-        if (job !== null) {
-            await job.cleanup();
         }
     });
 
