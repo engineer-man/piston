@@ -126,6 +126,11 @@ class Job {
         this.#active_timeouts = [];
         this.logger.debug('Cleared the active timeouts');
 
+        this.cleanup_processes();
+        this.logger.debug(`Finished exit cleanup`);
+    }
+
+    close_cleanup() {
         for (const proc of this.#active_parent_processes) {
             proc.stderr.destroy();
             if (!proc.stdin.destroyed) {
@@ -135,10 +140,7 @@ class Job {
             proc.stdout.destroy();
         }
         this.#active_parent_processes = [];
-        this.logger.debug('Destroyed parent processes writables');
-
-        this.cleanup_processes();
-        this.logger.debug(`Finished exit cleanup`);
+        this.logger.debug('Destroyed processes writables');
     }
 
     async safe_call(file, args, timeout, memory_limit, eventBus = null) {
@@ -153,7 +155,10 @@ class Job {
             ];
 
             const timeout_call = [
-                'timeout', '-s', '9', Math.ceil(timeout / 1000),
+                'timeout',
+                '-s',
+                '9',
+                Math.ceil(timeout / 1000),
             ];
 
             if (memory_limit >= 0) {
@@ -231,14 +236,17 @@ class Job {
                 }
             });
 
-            proc.on('exit', (code, signal) => {
-                this.exit_cleanup();
+            proc.on('exit', () => this.exit_cleanup());
+
+            proc.on('close', (code, signal) => {
+                this.close_cleanup();
 
                 resolve({ stdout, stderr, code, signal, output });
             });
 
             proc.on('error', err => {
                 this.exit_cleanup();
+                this.close_cleanup();
 
                 reject({ error: err, stdout, stderr, output });
             });
@@ -370,11 +378,11 @@ class Job {
                     const proc_id_int = parse_int(proc_id);
 
                     // Skip over any processes that aren't ours.
-                    if(ruid != this.uid && euid != this.uid) return -1;
+                    if (ruid != this.uid && euid != this.uid) return -1;
 
-                    if (state == 'Z'){
+                    if (state == 'Z') {
                         // Zombie process, just needs to be waited, regardless of the user id
-                        if(!to_wait.includes(proc_id_int))
+                        if (!to_wait.includes(proc_id_int))
                             to_wait.push(proc_id_int);
 
                         return -1;
@@ -466,6 +474,7 @@ class Job {
         this.logger.info(`Cleaning up job`);
 
         this.exit_cleanup(); // Run process janitor, just incase there are any residual processes somehow
+        this.close_cleanup();
         await this.cleanup_filesystem();
 
         remaining_job_spaces++;
