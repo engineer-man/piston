@@ -172,9 +172,9 @@ router.use((req, res, next) => {
 
 router.ws('/connect', async (ws, req) => {
     let job = null;
-    let eventBus = new events.EventEmitter();
+    let event_bus = new events.EventEmitter();
 
-    eventBus.on('stdout', data =>
+    event_bus.on('stdout', data =>
         ws.send(
             JSON.stringify({
                 type: 'data',
@@ -183,7 +183,7 @@ router.ws('/connect', async (ws, req) => {
             })
         )
     );
-    eventBus.on('stderr', data =>
+    event_bus.on('stderr', data =>
         ws.send(
             JSON.stringify({
                 type: 'data',
@@ -192,10 +192,10 @@ router.ws('/connect', async (ws, req) => {
             })
         )
     );
-    eventBus.on('stage', stage =>
+    event_bus.on('stage', stage =>
         ws.send(JSON.stringify({ type: 'stage', stage }))
     );
-    eventBus.on('exit', (stage, status) =>
+    event_bus.on('exit', (stage, status) =>
         ws.send(JSON.stringify({ type: 'exit', stage, ...status }))
     );
 
@@ -218,7 +218,8 @@ router.ws('/connect', async (ws, req) => {
                             })
                         );
 
-                        await job.execute_interactive(eventBus);
+                        await job.execute(event_bus);
+                        await job.cleanup();
 
                         ws.close(4999, 'Job Completed');
                     } else {
@@ -228,7 +229,7 @@ router.ws('/connect', async (ws, req) => {
                 case 'data':
                     if (job !== null) {
                         if (msg.stream === 'stdin') {
-                            eventBus.emit('stdin', msg.data);
+                            event_bus.emit('stdin', msg.data);
                         } else {
                             ws.close(4004, 'Can only write to stdin');
                         }
@@ -239,7 +240,7 @@ router.ws('/connect', async (ws, req) => {
                 case 'signal':
                     if (job !== null) {
                         if (SIGNALS.includes(msg.signal)) {
-                            eventBus.emit('signal', msg.signal);
+                            event_bus.emit('signal', msg.signal);
                         } else {
                             ws.close(4005, 'Invalid signal');
                         }
@@ -252,12 +253,6 @@ router.ws('/connect', async (ws, req) => {
             ws.send(JSON.stringify({ type: 'error', message: error.message }));
             ws.close(4002, 'Notified Error');
             // ws.close message is limited to 123 characters, so we notify over WS then close.
-        }
-    });
-
-    ws.on('close', async () => {
-        if (job !== null) {
-            await job.cleanup();
         }
     });
 
