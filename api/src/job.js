@@ -343,6 +343,9 @@ class Job {
                     const [_1, state, user_friendly] = state_line.split(/\s+/);
                     
                     const proc_id_int = parse_int(proc_id);
+                    
+                    // Skip over any processes that aren't ours.
+                    if(ruid != this.uid && euid != this.uid) return -1; 
 
                     if (state == 'Z'){
                         // Zombie process, just needs to be waited, regardless of the user id
@@ -353,8 +356,7 @@ class Job {
                     }
                     // We should kill in all other state (Sleep, Stopped & Running)
 
-                    if (ruid == this.uid || euid == this.uid)
-                        return proc_id_int;
+                    return proc_id_int;
                 } catch {
                     return -1;
                 }
@@ -384,7 +386,7 @@ class Job {
                 // Then clear them out of the process tree
                 try {
                     process.kill(proc, 'SIGKILL');
-                } catch {
+                } catch(e) {
                     // Could already be dead and just needs to be waited on
                     this.logger.debug(
                         `Got error while SIGKILLing process ${proc}:`,
