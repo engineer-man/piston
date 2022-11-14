@@ -380,6 +380,7 @@ Content-Type: application/json
 `rscript`,
 `ruby`,
 `rust`,
+`samarium`,
 `scala`,
 `smalltalk`,
 `sqlite3`,
