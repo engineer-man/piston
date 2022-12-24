@@ -350,6 +350,7 @@ Content-Type: application/json
 `javascript`,
 `jelly`,
 `julia`,
+`k`,
 `kotlin`,
 `lisp`,
 `llvm_ir`,
