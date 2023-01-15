@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Add java and kotlinc to path
+export PATH=$PWD/bin:$PATH
