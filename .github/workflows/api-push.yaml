@@ -33,5 +33,5 @@ jobs:
                   push: true
                   pull: true
                   tags: |
-                      docker.pkg.github.com/Endercheif/piston/api
-                      ghcr.io/Endercheif/piston
+                      docker.pkg.github.com/endercheif/piston/api
+                      ghcr.io/endercheif/piston

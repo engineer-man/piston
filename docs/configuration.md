@@ -156,7 +156,7 @@ Useful for running memory-limited contests.
 
 ```yaml
 key: PISTON_REPO_URL
-default: https://github.com/Endercheif/piston/releases/download/pkgs/index
+default: https://github.com/endercheif/piston/releases/download/pkgs/index
 ```
 
 URL for repository index, where packages will be downloaded from.

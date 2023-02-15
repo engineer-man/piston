@@ -28,4 +28,4 @@ jobs:
                   pull: true
                   push: true
                   tags: |
-                      docker.pkg.github.com/Endercheif/piston/repo-builder
+                      docker.pkg.github.com/endercheif/piston/repo-builder

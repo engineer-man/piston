@@ -1,6 +1,6 @@
 <h1 align="center">
-    <a href="https://github.com/Endercheif/piston">
-        <img src="var/docs/images/piston.svg" valign="middle" width="58" height="58" alt="Endercheif piston" />
+    <a href="https://github.com/endercheif/piston">
+        <img src="var/docs/images/piston.svg" valign="middle" width="58" height="58" alt="endercheif piston" />
     </a>
     <span valign="middle">
         Piston
@@ -12,14 +12,14 @@
 <br>
 
 <p align="center">
-    <a href="https://github.com/Endercheif/piston/commits/master">
-    <img src="https://img.shields.io/github/last-commit/Endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+    <a href="https://github.com/endercheif/piston/commits/master">
+    <img src="https://img.shields.io/github/last-commit/endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
          alt="GitHub last commit">
-    <a href="https://github.com/Endercheif/piston/issues">
-    <img src="https://img.shields.io/github/issues/Endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+    <a href="https://github.com/endercheif/piston/issues">
+    <img src="https://img.shields.io/github/issues/endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
          alt="GitHub issues">
-    <a href="https://github.com/Endercheif/piston/pulls">
-    <img src="https://img.shields.io/github/issues-pr-raw/Endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
+    <a href="https://github.com/endercheif/piston/pulls">
+    <img src="https://img.shields.io/github/issues-pr-raw/endercheif/piston.svg?style=for-the-badge&logo=github&logoColor=white"
          alt="GitHub pull requests">
 </p>
 
@@ -64,7 +64,7 @@ It's used in numerous places including:
 
 The following are approved and endorsed extensions/utilities to the core Piston offering.
 
--   [I Run Code](https://github.com/Endercheif/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
+-   [I Run Code](https://github.com/endercheif/piston-bot), a Discord bot used in 4100+ servers to handle arbitrary code evaluation in Discord. To get this bot in your own server, go here: https://emkc.org/run.
 -   [Piston CLI](https://github.com/Shivansh-007/piston-cli), a universal shell supporting code highlighting, files, and interpretation without the need to download a language.
 -   [Node Piston Client](https://github.com/dthree/node-piston), a Node.js wrapper for accessing the Piston API.
 -   [Piston4J](https://github.com/the-codeboy/Piston4J), a Java wrapper for accessing the Piston API.
@@ -111,7 +111,7 @@ POST https://emkc.org/api/v2/piston/execute
 
 ```sh
 # clone and enter repo
-git clone https://github.com/Endercheif/piston
+git clone https://github.com/endercheif/piston
 ```
 
 ### Installation
@@ -141,7 +141,7 @@ docker run \
     -dit \
     -p 2000:2000 \
     --name piston_api \
-    ghcr.io/Endercheif/piston
+    ghcr.io/endercheif/piston
 ```
 
 ## Piston for testing packages locally
