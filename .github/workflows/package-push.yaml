@@ -31,7 +31,8 @@ jobs:
 
             - name: Build Packages
               run: |
-                  PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
+                  # PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
+                  PACKAGES="CONTRIBUTING.MD MATL Makefile README.MD bash befunge93 bqn brachylog brainfuck cjam clojure cobol coffeescript cow crystal dart dash deno dotnet dragon elixir emacs emojicode erlang file forte forth freebasic gawk gcc go golfscript groovy haskell husk init iverilog japt java jelly julia kotlin lisp llvm_ir lolcode lua mono nasm nim node ocaml octave osabie paradoc pascal perl php ponylang prolog pure pwsh pyth python racket raku retina rockstar rscript ruby rust samarium scala smalltalk sqlite3 swift test.sh typescript vlang vyxal yeethon zig"
                   echo "Packages: $PACKAGES"
                   docker pull docker.pkg.github.com/endercheif/piston/repo-builder:latest
                   docker build -t repo-builder repo
