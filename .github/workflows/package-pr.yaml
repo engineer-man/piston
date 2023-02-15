@@ -8,6 +8,7 @@ on:
             - synchronize
         paths:
             - 'packages/**'
+    workflow_dispatch:
 
 jobs:
     check-pkg:

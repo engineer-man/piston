@@ -6,6 +6,7 @@ on:
             - v3
         paths:
             - repo/**
+    workflow_dispatch:
 
 jobs:
     push_to_registry:
