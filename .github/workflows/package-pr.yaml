@@ -54,7 +54,7 @@ jobs:
               run: |
                   PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
                   echo "Packages: $PACKAGES"
-                  docker pull docker.pkg.github.com/engineer-man/piston/repo-builder:latest
+                  docker pull docker.pkg.github.com/Endercheif/piston/repo-builder:latest
                   docker build -t repo-builder repo
                   docker run -v "${{ github.workspace }}:/piston" repo-builder --no-server $PACKAGES
                   ls -la packages
@@ -89,8 +89,8 @@ jobs:
             - name: Run tests
               run: |
                   ls -la
-                  docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
-                  docker pull docker.pkg.github.com/engineer-man/piston/api
+                  docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/Endercheif/piston/repo-builder --no-build
+                  docker pull docker.pkg.github.com/Endercheif/piston/api
                   docker build -t piston-api api
                   docker run --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api piston-api
                   echo Waiting for API to start..

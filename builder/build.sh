@@ -28,7 +28,7 @@ fetch_packages(){
         -dit \
         -p $port:2000 \
         --name builder_piston_instance \
-        ghcr.io/engineer-man/piston
+        ghcr.io/Endercheif/piston
     
     # Ensure the CLI is installed
     cd ../cli
