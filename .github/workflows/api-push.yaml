@@ -1,6 +1,7 @@
 name: Publish API image
 on:
-    push:
+    - workflow_dispatch
+    - push:
         branches:
             - production
         paths:
