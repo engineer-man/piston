@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+gleam new project
+cat $1 > project/project.gleam
+cd project
+gleam run
