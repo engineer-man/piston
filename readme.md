@@ -339,6 +339,7 @@ Content-Type: application/json
 `freebasic`,
 `fsharp.net`,
 `fsi`,
+`gleam`,
 `go`,
 `golfscript`,
 `groovy`,
