@@ -78,7 +78,7 @@ case $1 in
     clean-pkgs) git clean -fqXd packages ;;
     clean-repo) git clean -fqXd repo ;;
 
-    list-pkgs) find packages -depth 2 | awk -F/ '$2 && $3{ print $2 "-" $3 }' | column ;;
+    list-pkgs) find packages -maxdepth 2 | awk -F/ '$2 && $3{ print $2 "-" $3 }' | column ;;
 
     build-pkg)
         PKGSLUG="$2-$3"
