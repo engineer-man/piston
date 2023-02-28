@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "resolveJsonModule": true,
+        "target": "ES2022",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        // we dont have any thing to compile just yet
+        "noEmit": true 
+    }   
+}

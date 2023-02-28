@@ -1,5 +1,12 @@
 {
     "devDependencies": {
+        "@types/chownr": "^1.0.0",
+        "@types/express-ws": "^3.0.1",
+        "@types/node-fetch": "^2.6.2",
+        "@types/uuid": "^9.0.1",
         "prettier": "2.4.1"
+    },
+    "dependencies": {
+        "logplease": "github:Endercheif/logplease#feature/quality"
     }
 }

@@ -1,12 +1,14 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
 
-const events = require('events');
+import { EventEmitter } from 'events';
 
-const runtime = require('../runtime');
-const { Job } = require('../job');
-const package = require('../package');
-const logger = require('logplease').create('api/v2');
+import { get_latest_runtime_matching_language_version, runtimes as _runtimes } from '../runtime';
+import Job from '../job';
+import package_ from '../package';
+import { create } from 'logplease'
+
+const logger = create('api/v2', {});
+const router = Router();
 
 const SIGNALS = [
     'SIGABRT',
@@ -87,7 +89,7 @@ function get_job(body) {
             }
         }
 
-        const rt = runtime.get_latest_runtime_matching_language_version(
+        const rt = get_latest_runtime_matching_language_version(
             language,
             version
         );
@@ -174,7 +176,7 @@ router.use((req, res, next) => {
 
 router.ws('/connect', async (ws, req) => {
     let job = null;
-    let eventBus = new events.EventEmitter();
+    let eventBus = new EventEmitter();
 
     eventBus.on('stdout', data =>
         ws.send(
@@ -203,6 +205,7 @@ router.ws('/connect', async (ws, req) => {
 
     ws.on('message', async data => {
         try {
+            // @ts-ignore
             const msg = JSON.parse(data);
 
             switch (msg.type) {
@@ -286,7 +289,7 @@ router.post('/execute', async (req, res) => {
 });
 
 router.get('/runtimes', (req, res) => {
-    const runtimes = runtime.map(rt => {
+    const runtimes = _runtimes.map(rt => {
         return {
             language: rt.language,
             version: rt.version.raw,
@@ -300,9 +303,9 @@ router.get('/runtimes', (req, res) => {
 
 router.get('/packages', async (req, res) => {
     logger.debug('Request to list packages');
-    let packages = await package.get_package_list();
+    let packages = await package_.get_package_list();
 
-    packages = packages.map(pkg => {
+    const pkgs = packages.map(pkg => {
         return {
             language: pkg.language,
             language_version: pkg.version.raw,
@@ -310,7 +313,7 @@ router.get('/packages', async (req, res) => {
         };
     });
 
-    return res.status(200).send(packages);
+    return res.status(200).send(pkgs);
 });
 
 router.post('/packages', async (req, res) => {
@@ -318,7 +321,7 @@ router.post('/packages', async (req, res) => {
 
     const { language, version } = req.body;
 
-    const pkg = await package.get_package(language, version);
+    const pkg = await package_.get_package(language, version);
 
     if (pkg == null) {
         return res.status(404).send({
@@ -347,7 +350,7 @@ router.delete('/packages', async (req, res) => {
 
     const { language, version } = req.body;
 
-    const pkg = await package.get_package(language, version);
+    const pkg = await package_.get_package(language, version);
 
     if (pkg == null) {
         return res.status(404).send({
@@ -371,4 +374,4 @@ router.delete('/packages', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -1,13 +1,14 @@
-const logplease = require('logplease');
-const logger = logplease.create('job');
-const { v4: uuidv4 } = require('uuid');
-const cp = require('child_process');
-const path = require('path');
-const config = require('./config');
-const globals = require('./globals');
-const fs = require('fs/promises');
-const fss = require('fs');
-const wait_pid = require('waitpid');
+import { create } from 'logplease';
+// @ts-ignore
+const logger = create('job');
+import { v4 as uuidv4 } from 'uuid';
+import { spawn } from 'child_process';
+import { join, relative, dirname } from 'path';
+import config from './config';
+import * as globals from './globals';
+import { mkdir, chown, writeFile, readdir, stat as _stat, rm } from 'fs/promises';
+import { readdirSync, readFileSync } from 'fs';
+import wait_pid from 'waitpid';
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -28,11 +29,11 @@ setInterval(() => {
     }
 }, 10);
 
-class Job {
+export default class Job {
     constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid = uuidv4();
 
-        this.logger = logplease.create(`job/${this.uuid}`);
+        this.logger = create(`job/${this.uuid}`, {});
 
         this.runtime = runtime;
         this.files = files.map((file, i) => ({
@@ -61,7 +62,7 @@ class Job {
         this.logger.debug(`Assigned uid=${this.uid} gid=${this.gid}`);
 
         this.state = job_states.READY;
-        this.dir = path.join(
+        this.dir = join(
             config.data_directory,
             globals.data_directories.jobs,
             this.uuid
@@ -82,12 +83,12 @@ class Job {
 
         this.logger.debug(`Transfering ownership`);
 
-        await fs.mkdir(this.dir, { mode: 0o700 });
-        await fs.chown(this.dir, this.uid, this.gid);
+        await mkdir(this.dir, { mode: 0o700 });
+        await chown(this.dir, this.uid, this.gid);
 
         for (const file of this.files) {
-            const file_path = path.join(this.dir, file.name);
-            const rel = path.relative(this.dir, file_path);
+            const file_path = join(this.dir, file.name);
+            const rel = relative(this.dir, file_path);
             const file_content = Buffer.from(file.content, file.encoding);
 
             if (rel.startsWith('..'))
@@ -95,14 +96,14 @@ class Job {
                     `File path "${file.name}" tries to escape parent directory: ${rel}`
                 );
 
-            await fs.mkdir(path.dirname(file_path), {
+            await mkdir(dirname(file_path), {
                 recursive: true,
                 mode: 0o700,
             });
-            await fs.chown(path.dirname(file_path), this.uid, this.gid);
+            await chown(dirname(file_path), this.uid, this.gid);
 
-            await fs.write_file(file_path, file_content);
-            await fs.chown(file_path, this.uid, this.gid);
+            await writeFile(file_path, file_content);
+            await chown(file_path, this.uid, this.gid);
         }
 
         this.state = job_states.PRIMED;
@@ -120,16 +121,19 @@ class Job {
                 '--nofile=' + this.runtime.max_open_files,
                 '--fsize=' + this.runtime.max_file_size,
             ];
-            
+
             const timeout_call = [
-                'timeout', '-s', '9', Math.ceil(timeout / 1000),
+                'timeout',
+                '-s',
+                '9',
+                Math.ceil(timeout / 1000),
             ];
 
             if (memory_limit >= 0) {
                 prlimit.push('--as=' + memory_limit);
             }
 
-            const proc_call = [ 
+            const proc_call = [
                 'nice',
                 ...timeout_call,
                 ...prlimit,
@@ -143,7 +147,7 @@ class Job {
             var stderr = '';
             var output = '';
 
-            const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
+            const proc = spawn(proc_call[0], proc_call.splice(1), {
                 env: {
                     ...this.runtime.env_vars,
                     PISTON_LANGUAGE: this.runtime.language,
@@ -171,7 +175,7 @@ class Job {
 
             const kill_timeout =
                 (timeout >= 0 &&
-                    set_timeout(async _ => {
+                    setTimeout(async _ => {
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         process.kill(proc.pid, 'SIGKILL');
                     }, timeout)) ||
@@ -202,7 +206,7 @@ class Job {
             });
 
             const exit_cleanup = () => {
-                clear_timeout(kill_timeout);
+                clearTimeout(kill_timeout);
 
                 proc.stderr.destroy();
                 proc.stdout.destroy();
@@ -245,7 +249,7 @@ class Job {
 
         if (this.runtime.compiled) {
             compile = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                join(this.runtime.pkgdir, 'compile'),
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
@@ -255,7 +259,7 @@ class Job {
         this.logger.debug('Running');
 
         const run = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            join(this.runtime.pkgdir, 'run'),
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run
@@ -290,7 +294,7 @@ class Job {
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                join(this.runtime.pkgdir, 'compile'),
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
@@ -303,7 +307,7 @@ class Job {
         this.logger.debug('Running');
         eventBus.emit('stage', 'run');
         const { error, code, signal } = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            join(this.runtime.pkgdir, 'run'),
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run,
@@ -323,35 +327,36 @@ class Job {
         while (processes.length > 0) {
             processes = [];
 
-            const proc_ids = fss.readdir_sync('/proc');
+            const proc_ids = readdirSync('/proc');
 
             processes = proc_ids.map(proc_id => {
-                if (isNaN(proc_id)) return -1;
+                if (isNaN(+proc_id)) return -1;
                 try {
-                    const proc_status = fss.read_file_sync(
-                        path.join('/proc', proc_id, 'status')
+                    const proc_status = readFileSync(
+                        join('/proc', proc_id, 'status')
                     );
-                    const proc_lines = proc_status.to_string().split('\n');
+                    const proc_lines = proc_status.toString().split('\n');
                     const state_line = proc_lines.find(line =>
-                        line.starts_with('State:')
+                        line.startsWith('State:')
                     );
                     const uid_line = proc_lines.find(line =>
-                        line.starts_with('Uid:')
+                        line.startsWith('Uid:')
                     );
                     const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
 
                     const [_1, state, user_friendly] = state_line.split(/\s+/);
-                    
-                    const proc_id_int = parse_int(proc_id);
-                    
-                    // Skip over any processes that aren't ours.
-                    if(ruid != this.uid && euid != this.uid) return -1; 
 
-                    if (state == 'Z'){
+                    const proc_id_int = parseInt(proc_id);
+
+                    // Skip over any processes that aren't ours.
+                    // @ts-ignore: dont want to risk fixing this
+                    if (ruid != this.uid && euid != this.uid) return -1;
+
+                    if (state == 'Z') {
                         // Zombie process, just needs to be waited, regardless of the user id
-                        if(!to_wait.includes(proc_id_int))
+                        if (!to_wait.includes(proc_id_int))
                             to_wait.push(proc_id_int);
-                        
+
                         return -1;
                     }
                     // We should kill in all other state (Sleep, Stopped & Running)
@@ -386,7 +391,7 @@ class Job {
                 // Then clear them out of the process tree
                 try {
                     process.kill(proc, 'SIGKILL');
-                } catch(e) {
+                } catch (e) {
                     // Could already be dead and just needs to be waited on
                     this.logger.debug(
                         `Got error while SIGKILLing process ${proc}:`,
@@ -413,16 +418,16 @@ class Job {
 
     async cleanup_filesystem() {
         for (const clean_path of globals.clean_directories) {
-            const contents = await fs.readdir(clean_path);
+            const contents = await readdir(clean_path);
 
             for (const file of contents) {
-                const file_path = path.join(clean_path, file);
+                const file_path = join(clean_path, file);
 
                 try {
-                    const stat = await fs.stat(file_path);
+                    const stat = await _stat(file_path);
 
                     if (stat.uid === this.uid) {
-                        await fs.rm(file_path, {
+                        await rm(file_path, {
                             recursive: true,
                             force: true,
                         });
@@ -434,7 +439,7 @@ class Job {
             }
         }
 
-        await fs.rm(this.dir, { recursive: true, force: true });
+        await rm(this.dir, { recursive: true, force: true });
     }
 
     async cleanup() {
@@ -446,7 +451,3 @@ class Job {
         remaining_job_spaces++;
     }
 }
-
-module.exports = {
-    Job,
-};
