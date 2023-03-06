@@ -4,7 +4,7 @@
         "checkJs": true,
         "resolveJsonModule": true,
         "target": "ES2022",
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "allowSyntheticDefaultImports": true,
         // we dont have any thing to compile just yet
         "noEmit": true 

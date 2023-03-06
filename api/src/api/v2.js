@@ -3,8 +3,8 @@ import { Router } from 'express';
 import { EventEmitter } from 'events';
 
 import { get_latest_runtime_matching_language_version, runtimes as _runtimes } from '../runtime';
-import Job from '../job';
-import package_ from '../package';
+import Job from '../job.js';
+import package_ from '../package.js';
 import { create } from 'logplease'
 
 const logger = create('api/v2', {});

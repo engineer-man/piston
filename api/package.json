@@ -2,7 +2,8 @@
     "name": "piston-api",
     "version": "3.2.0",
     "description": "API for piston - a high performance code execution engine",
-    "main": "src/index.js",
+    "module": "src/index.js",
+    "type": "module",
     "scripts": {
         "run": "node src/index.js"
     },

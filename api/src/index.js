@@ -2,13 +2,13 @@
 import { create, setLogLevel } from 'logplease';
 import express from 'express';
 import expressWs from 'express-ws';
-import * as globals from './globals';
-import config from './config';
+import * as globals from './globals.js';
+import config from './config.js';
 import { join } from 'path';
 import { readdir } from 'fs/promises';
 import { existsSync, mkdirSync, chmodSync } from 'fs';
 import { urlencoded, json } from 'body-parser';
-import { load_package } from './runtime';
+import { load_package } from './runtime.js';
 
 const logger = create('index', {});
 const app = express();

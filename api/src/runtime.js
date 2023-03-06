@@ -1,7 +1,7 @@
 import { create } from 'logplease';
 import { parse, satisfies, rcompare } from 'semver';
-import config from './config';
-import { platform } from './globals';
+import config from './config.js';
+import { platform } from './globals.js';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
