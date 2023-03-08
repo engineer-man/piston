@@ -7,6 +7,7 @@ on:
             - v3
         paths:
             - packages/**
+    workflow_dispatch:
 
 jobs:
     build-pkg:
@@ -32,7 +33,7 @@ jobs:
               run: |
                   PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
                   echo "Packages: $PACKAGES"
-                  docker pull docker.pkg.github.com/engineer-man/piston/repo-builder:latest
+                  docker pull docker.pkg.github.com/endercheif/piston/repo-builder:latest
                   docker build -t repo-builder repo
                   docker run -v "${{ github.workspace }}:/piston" repo-builder --no-server $PACKAGES
                   ls -la packages
@@ -51,11 +52,11 @@ jobs:
         needs: build-pkg
         steps:
             - name: 'Download all release assets'
-              run: curl -s https://api.github.com/repos/engineer-man/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs -L 1 curl -sLO
+              run: curl -s https://api.github.com/repos/endercheif/piston/releases/latest | jq '.assets[].browser_download_url' -r | xargs -L 1 curl -sLO
             - name: 'Generate index file'
               run: |
                   echo "" > index
-                  BASEURL=https://github.com/engineer-man/piston/releases/download/pkgs/
+                  BASEURL=https://github.com/endercheif/piston/releases/download/pkgs/
                   for pkg in *.pkg.tar.gz
                   do
                     PKGFILE=$(basename $pkg)

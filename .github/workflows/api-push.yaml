@@ -1,9 +1,9 @@
 name: Publish API image
 on:
+    workflow_dispatch:
     push:
         branches:
-            - master
-            - v3
+            - production
         paths:
             - api/**
 
@@ -34,5 +34,5 @@ jobs:
                   push: true
                   pull: true
                   tags: |
-                      docker.pkg.github.com/engineer-man/piston/api
-                      ghcr.io/engineer-man/piston
+                      docker.pkg.github.com/endercheif/piston/api
+                      ghcr.io/endercheif/piston
