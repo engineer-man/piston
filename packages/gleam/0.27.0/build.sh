@@ -14,4 +14,4 @@ source ./environment
 # Install the standard library
 gleam new project --skip-git
 cd project
-gleam build
+gleam update
