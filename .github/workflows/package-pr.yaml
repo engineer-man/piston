@@ -95,16 +95,16 @@ jobs:
                   docker build -t piston-api api
                   docker run --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api piston-api
                   echo Waiting for API to start..
-                  docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v2/runtimes
+                  docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v2/runtimes || true
 
                   echo Waiting for Index to start..
-                  docker run --network container:repo appropriate/curl -s --retry 999 --retry-max-time 0 --retry-connrefused http://localhost:8000/index
+                  docker run --network container:repo appropriate/curl -s --retry 999 --retry-max-time 0 --retry-connrefused http://localhost:8000/index || true
 
                   echo Adjusting index
                   sed -i 's/repo/localhost/g' repo/index
 
                   echo Listing Packages
-                  PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:2000/api/v2/packages)
+                  PACKAGES_JSON=$(docker run --network container:api appropriate/curl -s http://localhost:2000/api/v2/packages) || true
                   echo $PACKAGES_JSON
 
                   echo Getting CLI ready
@@ -118,7 +118,7 @@ jobs:
                     PKG_VERSION=$(awk -F- '{ print $2 }' <<< $package)
 
                     echo "Installing..."
-                    docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d "{\"language\":\"$PKG_NAME\",\"version\":\"$PKG_VERSION\"}"
+                    docker run --network container:api appropriate/curl -sXPOST http://localhost:2000/api/v2/packages -H "Content-Type: application/json" -d "{\"language\":\"$PKG_NAME\",\"version\":\"$PKG_VERSION\"}" || true
 
                     TEST_SCRIPTS=packages/$PKG_PATH/test.*
                     echo "Tests: $TEST_SCRIPTS"

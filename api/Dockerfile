@@ -8,7 +8,7 @@ RUN for i in $(seq 1001 1500); do \
         useradd -M runner$i -g $i -u $i ; \
     done
 RUN apt-get update && \
-    apt-get install -y libxml2 gnupg tar coreutils util-linux libc6-dev \
+    apt-get install -y git libxml2 gnupg tar coreutils util-linux libc6-dev \
     binutils build-essential locales libpcre3-dev libevent-dev libgmp3-dev \
     libncurses6 libncurses5 libedit-dev libseccomp-dev rename procps python3 \
     libreadline-dev libblas-dev liblapack-dev libpcre3-dev libarpack2-dev \
