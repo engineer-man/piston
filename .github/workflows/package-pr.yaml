@@ -126,7 +126,7 @@ jobs:
                     do
                       TEST_RUNTIME=$(awk -F. '{print $2}' <<< $(basename $tscript))
                       echo Running $tscript with runtime=$TEST_RUNTIME
-                      docker run --network container:api -v "$PWD/cli:/app" -v "$PWD/$(dirname $tscript):/pkg" node:15 /app/src/index.js run $TEST_RUNTIME -l $PKG_VERSION /pkg/$(basename $tscript) > test_output
+                      docker run --network container:api -v "$PWD/cli:/app" -v "$PWD/$(dirname $tscript):/pkg" node:15 /app/dist/index.js run $TEST_RUNTIME -l $PKG_VERSION /pkg/$(basename $tscript) > test_output
                       cat test_output
                       grep "OK" test_output
                     done
