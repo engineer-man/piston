@@ -3,5 +3,5 @@
 ls -R
 
 shift
-cd gleam_project
+cd project
 gleam run -- "$@"

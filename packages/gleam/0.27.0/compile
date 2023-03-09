@@ -2,14 +2,15 @@
 
 ls -R
 
-chmod -r /piston/packages/gleam/0.27.0/template_project
+gleam new project
+# cp /piston/packages/gleam/0.27.0/template_project/* project -r
+template_project/* project -r
 
-mkdir gleam_project
-cp /piston/packages/gleam/0.27.0/template_project/* gleam_project -r
+rm project/src/template_project.gleam
+cat $1 > project/src/project.gleam
 
-rm gleam_project/src/template_project.gleam
-touch gleam_project/src/gleam_project.gleam
-cat $1 > gleam_project/src/gleam_project.gleam
-
-cd gleam_project
+cd project
 gleam build
+
+cd /piston/packages/gleam/0.27.0/
+ls -R
