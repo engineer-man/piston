@@ -15,3 +15,4 @@ source ./environment
 gleam new project --skip-git
 cd project
 gleam update
+cd ..
