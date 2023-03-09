@@ -11,9 +11,6 @@
         "rootDir": "src",
         // "declaration": true
     },
-    "ts-node": {
-        "esm": true
-    },
     "include": ["src"],
     "exclude": ["dist", "node_modules"]
 }
