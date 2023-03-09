@@ -1,12 +1,18 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
 
-const events = require('events');
+import { EventEmitter } from 'node:events';
 
-const runtime = require('../runtime');
-const { Job } = require('../job');
-const package = require('../package');
-const logger = require('logplease').create('api/v2');
+import {
+    get_latest_runtime_matching_language_version,
+    runtimes as _runtimes,
+} from '../runtime.js';
+import Job from '../job.js';
+import package_ from '../package.js';
+import { create } from 'logplease';
+import { RequestBody } from '../types.js';
+
+const logger = create('api/v2', {});
+const router = Router();
 
 const SIGNALS = [
     'SIGABRT',
@@ -47,10 +53,10 @@ const SIGNALS = [
     'SIGXCPU',
     'SIGXFSZ',
     'SIGWINCH',
-];
+] as const;
 // ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
-function get_job(body) {
+function get_job(body: RequestBody): Promise<Job> {
     let {
         language,
         version,
@@ -63,7 +69,7 @@ function get_job(body) {
         compile_timeout,
     } = body;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Job>((resolve, reject) => {
         if (!language || typeof language !== 'string') {
             return reject({
                 message: 'language is required as a string',
@@ -87,7 +93,7 @@ function get_job(body) {
             }
         }
 
-        const rt = runtime.get_latest_runtime_matching_language_version(
+        const rt = get_latest_runtime_matching_language_version(
             language,
             version
         );
@@ -163,7 +169,7 @@ router.use((req, res, next) => {
         return next();
     }
 
-    if (!req.headers['content-type'].startsWith('application/json')) {
+    if (!req.headers['content-type']?.startsWith('application/json')) {
         return res.status(415).send({
             message: 'requests must be of type application/json',
         });
@@ -171,10 +177,10 @@ router.use((req, res, next) => {
 
     next();
 });
-
+// @ts-ignore
 router.ws('/connect', async (ws, req) => {
     let job = null;
-    let eventBus = new events.EventEmitter();
+    let eventBus = new EventEmitter();
 
     eventBus.on('stdout', data =>
         ws.send(
@@ -203,7 +209,7 @@ router.ws('/connect', async (ws, req) => {
 
     ws.on('message', async data => {
         try {
-            const msg = JSON.parse(data);
+            const msg = JSON.parse(data.toString());
 
             switch (msg.type) {
                 case 'init':
@@ -286,7 +292,7 @@ router.post('/execute', async (req, res) => {
 });
 
 router.get('/runtimes', (req, res) => {
-    const runtimes = runtime.map(rt => {
+    const runtimes = _runtimes.map(rt => {
         return {
             language: rt.language,
             version: rt.version.raw,
@@ -299,10 +305,12 @@ router.get('/runtimes', (req, res) => {
 });
 
 router.get('/packages', async (req, res) => {
+    console.log({req, res});
+    
     logger.debug('Request to list packages');
-    let packages = await package.get_package_list();
+    let packages = await package_.get_package_list();
 
-    packages = packages.map(pkg => {
+    const pkgs = packages.map(pkg => {
         return {
             language: pkg.language,
             language_version: pkg.version.raw,
@@ -310,7 +318,7 @@ router.get('/packages', async (req, res) => {
         };
     });
 
-    return res.status(200).send(packages);
+    return res.status(200).send(pkgs);
 });
 
 router.post('/packages', async (req, res) => {
@@ -318,7 +326,7 @@ router.post('/packages', async (req, res) => {
 
     const { language, version } = req.body;
 
-    const pkg = await package.get_package(language, version);
+    const pkg = await package_.get_package(language, version);
 
     if (pkg == null) {
         return res.status(404).send({
@@ -347,7 +355,7 @@ router.delete('/packages', async (req, res) => {
 
     const { language, version } = req.body;
 
-    const pkg = await package.get_package(language, version);
+    const pkg = await package_.get_package(language, version);
 
     if (pkg == null) {
         return res.status(404).send({
@@ -371,4 +379,4 @@ router.delete('/packages', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

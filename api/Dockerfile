@@ -18,12 +18,19 @@ RUN apt-get update && \
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 
+RUN npm install --global pnpm
+
 WORKDIR /piston_api
-COPY ["package.json", "package-lock.json", "./"]
-RUN npm install
+COPY ["package.json", "pnpm-lock.yaml", "tsconfig.json", "./"]
 COPY ./src ./src
 
-RUN make -C ./src/nosocket/ all && make -C ./src/nosocket/ install
+RUN pnpm install
+RUN pnpm build
 
-CMD [ "node", "src"]
+COPY ./src/nosocket ./dist/nosocket
+
+RUN make -C ./dist/nosocket/ all && make -C ./dist/nosocket/ install
+
+
+CMD [ "pnpm", "api"]
 EXPOSE 2000/tcp

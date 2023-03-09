@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "resolveJsonModule": true,
+        "target": "ES2022",
+        "module": "ES2022",
+        "moduleResolution": "nodenext",
+        "allowSyntheticDefaultImports": true,
+        "outDir": "./dist",
+        "rootDir": "src",
+        // "declaration": true
+    },
+    "include": ["src"],
+    "exclude": ["dist", "node_modules"]
+}

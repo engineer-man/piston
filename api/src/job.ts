@@ -1,19 +1,30 @@
-const logplease = require('logplease');
-const logger = logplease.create('job');
-const { v4: uuidv4 } = require('uuid');
-const cp = require('child_process');
-const path = require('path');
-const config = require('./config');
-const globals = require('./globals');
-const fs = require('fs/promises');
-const fss = require('fs');
-const wait_pid = require('waitpid');
+import { create, type Logger } from 'logplease';
+
+const logger = create('job');
+import { v4 as uuidv4 } from 'uuid';
+import { spawn } from 'child_process';
+import { join, relative, dirname } from 'node:path';
+import config from './config.js';
+import * as globals from './globals.js';
+import {
+    mkdir,
+    chown,
+    writeFile,
+    readdir,
+    stat as _stat,
+    rm,
+} from 'node:fs/promises';
+import { readdirSync, readFileSync } from 'node:fs';
+import wait_pid from 'waitpid';
+import EventEmitter from 'events';
+
+import { File, ResponseBody } from './types.js';
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
     PRIMED: Symbol('Primed and ready for execution'),
     EXECUTED: Symbol('Executed and ready for cleanup'),
-};
+} as const;
 
 let uid = 0;
 let gid = 0;
@@ -28,14 +39,40 @@ setInterval(() => {
     }
 }, 10);
 
-class Job {
-    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
+export default class Job {
+    uuid: string;
+    logger: Logger;
+    runtime: any;
+    files: File[];
+    args: string[];
+    stdin: string;
+    timeouts: { compile: number; run: number };
+    memory_limits: { compile: number; run: number };
+    uid: number;
+    gid: number;
+    state: symbol;
+    dir: string;
+    constructor({
+        runtime,
+        files,
+        args,
+        stdin,
+        timeouts,
+        memory_limits,
+    }: {
+        runtime: unknown;
+        files: File[];
+        args: string[];
+        stdin: string;
+        timeouts: { compile: number; run: number };
+        memory_limits: { compile: number; run: number };
+    }) {
         this.uuid = uuidv4();
 
-        this.logger = logplease.create(`job/${this.uuid}`);
+        this.logger = create(`job/${this.uuid}`, {});
 
         this.runtime = runtime;
-        this.files = files.map((file, i) => ({
+        this.files = files.map((file: File, i: number) => ({
             name: file.name || `file${i}.code`,
             content: file.content,
             encoding: ['base64', 'hex', 'utf8'].includes(file.encoding)
@@ -61,7 +98,7 @@ class Job {
         this.logger.debug(`Assigned uid=${this.uid} gid=${this.gid}`);
 
         this.state = job_states.READY;
-        this.dir = path.join(
+        this.dir = join(
             config.data_directory,
             globals.data_directories.jobs,
             this.uuid
@@ -82,12 +119,12 @@ class Job {
 
         this.logger.debug(`Transfering ownership`);
 
-        await fs.mkdir(this.dir, { mode: 0o700 });
-        await fs.chown(this.dir, this.uid, this.gid);
+        await mkdir(this.dir, { mode: 0o700 });
+        await chown(this.dir, this.uid, this.gid);
 
         for (const file of this.files) {
-            const file_path = path.join(this.dir, file.name);
-            const rel = path.relative(this.dir, file_path);
+            const file_path = join(this.dir, file.name);
+            const rel = relative(this.dir, file_path);
             const file_content = Buffer.from(file.content, file.encoding);
 
             if (rel.startsWith('..'))
@@ -95,14 +132,14 @@ class Job {
                     `File path "${file.name}" tries to escape parent directory: ${rel}`
                 );
 
-            await fs.mkdir(path.dirname(file_path), {
+            await mkdir(dirname(file_path), {
                 recursive: true,
                 mode: 0o700,
             });
-            await fs.chown(path.dirname(file_path), this.uid, this.gid);
+            await chown(dirname(file_path), this.uid, this.gid);
 
-            await fs.write_file(file_path, file_content);
-            await fs.chown(file_path, this.uid, this.gid);
+            await writeFile(file_path, file_content);
+            await chown(file_path, this.uid, this.gid);
         }
 
         this.state = job_states.PRIMED;
@@ -110,7 +147,13 @@ class Job {
         this.logger.debug('Primed job');
     }
 
-    async safe_call(file, args, timeout, memory_limit, eventBus = null) {
+    async safe_call(
+        file: string,
+        args: string[],
+        timeout: number,
+        memory_limit: string | number,
+        eventBus: EventEmitter = null
+    ): Promise<ResponseBody['run'] & { error?: Error }> {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
@@ -120,16 +163,19 @@ class Job {
                 '--nofile=' + this.runtime.max_open_files,
                 '--fsize=' + this.runtime.max_file_size,
             ];
-            
+
             const timeout_call = [
-                'timeout', '-s', '9', Math.ceil(timeout / 1000),
+                'timeout',
+                '-s',
+                '9',
+                Math.ceil(timeout / 1000),
             ];
 
             if (memory_limit >= 0) {
                 prlimit.push('--as=' + memory_limit);
             }
 
-            const proc_call = [ 
+            const proc_call = [
                 'nice',
                 ...timeout_call,
                 ...prlimit,
@@ -137,13 +183,13 @@ class Job {
                 'bash',
                 file,
                 ...args,
-            ];
+            ] as Array<string>;
 
             var stdout = '';
             var stderr = '';
             var output = '';
 
-            const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
+            const proc = spawn(proc_call[0], proc_call.splice(1), {
                 env: {
                     ...this.runtime.env_vars,
                     PISTON_LANGUAGE: this.runtime.language,
@@ -160,18 +206,18 @@ class Job {
                 proc.stdin.end();
                 proc.stdin.destroy();
             } else {
-                eventBus.on('stdin', data => {
+                eventBus.on('stdin', (data: any) => {
                     proc.stdin.write(data);
                 });
 
-                eventBus.on('kill', signal => {
+                eventBus.on('kill', (signal: NodeJS.Signals | number) => {
                     proc.kill(signal);
                 });
             }
 
             const kill_timeout =
                 (timeout >= 0 &&
-                    set_timeout(async _ => {
+                    setTimeout(async _ => {
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         process.kill(proc.pid, 'SIGKILL');
                     }, timeout)) ||
@@ -202,7 +248,7 @@ class Job {
             });
 
             const exit_cleanup = () => {
-                clear_timeout(kill_timeout);
+                clearTimeout(kill_timeout);
 
                 proc.stderr.destroy();
                 proc.stdout.destroy();
@@ -237,15 +283,15 @@ class Job {
 
         const code_files =
             (this.runtime.language === 'file' && this.files) ||
-            this.files.filter(file => file.encoding == 'utf8');
+            this.files.filter((file: File) => file.encoding == 'utf8');
 
         this.logger.debug('Compiling');
 
-        let compile;
+        let compile: unknown;
 
         if (this.runtime.compiled) {
             compile = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                join(this.runtime.pkgdir, 'compile'),
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile
@@ -255,7 +301,7 @@ class Job {
         this.logger.debug('Running');
 
         const run = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            join(this.runtime.pkgdir, 'run'),
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run
@@ -271,7 +317,7 @@ class Job {
         };
     }
 
-    async execute_interactive(eventBus) {
+    async execute_interactive(eventBus: EventEmitter) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -290,7 +336,7 @@ class Job {
         if (this.runtime.compiled) {
             eventBus.emit('stage', 'compile');
             const { error, code, signal } = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                join(this.runtime.pkgdir, 'compile'),
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.memory_limits.compile,
@@ -303,7 +349,7 @@ class Job {
         this.logger.debug('Running');
         eventBus.emit('stage', 'run');
         const { error, code, signal } = await this.safe_call(
-            path.join(this.runtime.pkgdir, 'run'),
+            join(this.runtime.pkgdir, 'run'),
             [code_files[0].name, ...this.args],
             this.timeouts.run,
             this.memory_limits.run,
@@ -316,42 +362,43 @@ class Job {
     }
 
     cleanup_processes(dont_wait = []) {
-        let processes = [1];
+        let processes: number[] = [1];
         const to_wait = [];
         this.logger.debug(`Cleaning up processes`);
 
         while (processes.length > 0) {
             processes = [];
 
-            const proc_ids = fss.readdir_sync('/proc');
+            const proc_ids = readdirSync('/proc');
 
             processes = proc_ids.map(proc_id => {
-                if (isNaN(proc_id)) return -1;
+                if (isNaN(+proc_id)) return -1;
                 try {
-                    const proc_status = fss.read_file_sync(
-                        path.join('/proc', proc_id, 'status')
+                    const proc_status = readFileSync(
+                        join('/proc', proc_id, 'status')
                     );
-                    const proc_lines = proc_status.to_string().split('\n');
+                    const proc_lines = proc_status.toString().split('\n');
                     const state_line = proc_lines.find(line =>
-                        line.starts_with('State:')
+                        line.startsWith('State:')
                     );
                     const uid_line = proc_lines.find(line =>
-                        line.starts_with('Uid:')
+                        line.startsWith('Uid:')
                     );
                     const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
 
                     const [_1, state, user_friendly] = state_line.split(/\s+/);
-                    
-                    const proc_id_int = parse_int(proc_id);
-                    
-                    // Skip over any processes that aren't ours.
-                    if(ruid != this.uid && euid != this.uid) return -1; 
 
-                    if (state == 'Z'){
+                    const proc_id_int = parseInt(proc_id);
+
+                    // Skip over any processes that aren't ours.
+                    // @ts-ignore: dont want to risk fixing this
+                    if (ruid != this.uid && euid != this.uid) return -1;
+
+                    if (state == 'Z') {
                         // Zombie process, just needs to be waited, regardless of the user id
-                        if(!to_wait.includes(proc_id_int))
+                        if (!to_wait.includes(proc_id_int))
                             to_wait.push(proc_id_int);
-                        
+
                         return -1;
                     }
                     // We should kill in all other state (Sleep, Stopped & Running)
@@ -386,7 +433,7 @@ class Job {
                 // Then clear them out of the process tree
                 try {
                     process.kill(proc, 'SIGKILL');
-                } catch(e) {
+                } catch (e) {
                     // Could already be dead and just needs to be waited on
                     this.logger.debug(
                         `Got error while SIGKILLing process ${proc}:`,
@@ -413,16 +460,16 @@ class Job {
 
     async cleanup_filesystem() {
         for (const clean_path of globals.clean_directories) {
-            const contents = await fs.readdir(clean_path);
+            const contents = await readdir(clean_path);
 
             for (const file of contents) {
-                const file_path = path.join(clean_path, file);
+                const file_path = join(clean_path, file);
 
                 try {
-                    const stat = await fs.stat(file_path);
+                    const stat = await _stat(file_path);
 
                     if (stat.uid === this.uid) {
-                        await fs.rm(file_path, {
+                        await rm(file_path, {
                             recursive: true,
                             force: true,
                         });
@@ -434,7 +481,7 @@ class Job {
             }
         }
 
-        await fs.rm(this.dir, { recursive: true, force: true });
+        await rm(this.dir, { recursive: true, force: true });
     }
 
     async cleanup() {
@@ -446,7 +493,3 @@ class Job {
         remaining_job_spaces++;
     }
 }
-
-module.exports = {
-    Job,
-};

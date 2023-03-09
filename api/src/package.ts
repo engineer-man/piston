@@ -1,33 +1,46 @@
-const logger = require('logplease').create('package');
-const semver = require('semver');
-const config = require('./config');
-const globals = require('./globals');
-const fetch = require('node-fetch');
-const path = require('path');
-const fs = require('fs/promises');
-const fss = require('fs');
-const cp = require('child_process');
-const crypto = require('crypto');
-const runtime = require('./runtime');
-const chownr = require('chownr');
-const util = require('util');
+import { create } from 'logplease';
+import { parse, satisfies, rcompare, type SemVer } from 'semver';
+import config from './config.js';
+import * as globals from './globals.js';
+import fetch from 'node-fetch';
+import { join } from 'path';
+import { rm, mkdir, writeFile, rmdir } from 'fs/promises';
+import { existsSync, createWriteStream, createReadStream } from 'fs';
+import { exec, spawn } from 'child_process';
+import { createHash } from 'crypto';
+import { load_package, get_runtime_by_name_and_version } from './runtime.js';
+import chownr from 'chownr';
+import { promisify } from 'util';
 
+const logger = create('package', {});
 class Package {
-    constructor({ language, version, download, checksum }) {
+    language: string;
+    version: SemVer;
+    checksum: string;
+    download: string;
+    constructor({
+        language,
+        version,
+        download,
+        checksum,
+    }: {
+        language: string;
+        version: string;
+        checksum: string;
+        download: string;
+    }) {
         this.language = language;
-        this.version = semver.parse(version);
+        this.version = parse(version);
         this.checksum = checksum;
         this.download = download;
     }
 
     get installed() {
-        return fss.exists_sync(
-            path.join(this.install_path, globals.pkg_installed_file)
-        );
+        return existsSync(join(this.install_path, globals.pkg_installed_file));
     }
 
     get install_path() {
-        return path.join(
+        return join(
             config.data_directory,
             globals.data_directories.packages,
             this.language,
@@ -42,23 +55,24 @@ class Package {
 
         logger.info(`Installing ${this.language}-${this.version.raw}`);
 
-        if (fss.exists_sync(this.install_path)) {
+        if (existsSync(this.install_path)) {
             logger.warn(
                 `${this.language}-${this.version.raw} has residual files. Removing them.`
             );
-            await fs.rm(this.install_path, { recursive: true, force: true });
+            await rm(this.install_path, { recursive: true, force: true });
         }
 
         logger.debug(`Making directory ${this.install_path}`);
-        await fs.mkdir(this.install_path, { recursive: true });
+        await mkdir(this.install_path, { recursive: true });
 
         logger.debug(
             `Downloading package from ${this.download} in to ${this.install_path}`
         );
-        const pkgpath = path.join(this.install_path, 'pkg.tar.gz');
-        const download = await fetch(this.download);
+        const pkgpath = join(this.install_path, 'pkg.tar.gz');
+        // @ts-ignore
+        const download = (await fetch(this.download)) as fetch.Response;
 
-        const file_stream = fss.create_write_stream(pkgpath);
+        const file_stream = createWriteStream(pkgpath);
         await new Promise((resolve, reject) => {
             download.body.pipe(file_stream);
             download.body.on('error', reject);
@@ -68,10 +82,10 @@ class Package {
 
         logger.debug('Validating checksums');
         logger.debug(`Assert sha256(pkg.tar.gz) == ${this.checksum}`);
-        const hash = crypto.create_hash('sha256');
+        const hash = createHash('sha256');
 
-        const read_stream = fss.create_read_stream(pkgpath);
-        await new Promise((resolve, reject) => {
+        const read_stream = createReadStream(pkgpath);
+        await new Promise<void>((resolve, reject) => {
             read_stream.on('data', chunk => hash.update(chunk));
             read_stream.on('end', () => resolve());
             read_stream.on('error', error => reject(error));
@@ -89,8 +103,8 @@ class Package {
             `Extracting package files from archive ${pkgpath} in to ${this.install_path}`
         );
 
-        await new Promise((resolve, reject) => {
-            const proc = cp.exec(
+        await new Promise<void>((resolve, reject) => {
+            const proc = exec(
                 `bash -c 'cd "${this.install_path}" && tar xzf ${pkgpath}'`
             );
 
@@ -105,15 +119,15 @@ class Package {
         });
 
         logger.debug('Registering runtime');
-        runtime.load_package(this.install_path);
+        load_package(this.install_path);
 
         logger.debug('Caching environment');
         const get_env_command = `cd ${this.install_path}; source environment; env`;
 
-        const envout = await new Promise((resolve, reject) => {
+        const envout = await new Promise<string>((resolve, reject) => {
             let stdout = '';
 
-            const proc = cp.spawn(
+            const proc = spawn(
                 'env',
                 ['-i', 'bash', '-c', `${get_env_command}`],
                 {
@@ -142,14 +156,14 @@ class Package {
             )
             .join('\n');
 
-        await fs.write_file(path.join(this.install_path, '.env'), filtered_env);
+        await writeFile(join(this.install_path, '.env'), filtered_env);
 
         logger.debug('Changing Ownership of package directory');
-        await util.promisify(chownr)(this.install_path, 0, 0);
+        await promisify(chownr)(this.install_path, 0, 0);
 
         logger.debug('Writing installed state to disk');
-        await fs.write_file(
-            path.join(this.install_path, globals.pkg_installed_file),
+        await writeFile(
+            join(this.install_path, globals.pkg_installed_file),
             Date.now().toString()
         );
 
@@ -161,11 +175,11 @@ class Package {
         };
     }
 
-    async uninstall() {
+    async uninstall(): Promise<{ language: string; version: string }> {
         logger.info(`Uninstalling ${this.language}-${this.version.raw}`);
 
         logger.debug('Finding runtime');
-        const found_runtime = runtime.get_runtime_by_name_and_version(
+        const found_runtime = get_runtime_by_name_and_version(
             this.language,
             this.version.raw
         );
@@ -183,7 +197,7 @@ class Package {
         found_runtime.unregister();
 
         logger.debug('Cleaning files from disk');
-        await fs.rmdir(this.install_path, { recursive: true });
+        await rmdir(this.install_path, { recursive: true });
 
         logger.info(`Uninstalled ${this.language}-${this.version.raw}`);
 
@@ -194,7 +208,10 @@ class Package {
     }
 
     static async get_package_list() {
-        const repo_content = await fetch(config.repo_url).then(x => x.text());
+        // @ts-ignore
+        const repo_content: string = await fetch(config.repo_url).then(
+            (x: fetch.Response) => x.text()
+        );
 
         const entries = repo_content.split('\n').filter(x => x.length > 0);
 
@@ -210,19 +227,17 @@ class Package {
         });
     }
 
-    static async get_package(lang, version) {
+    static async get_package(lang: string, version: string) {
         const packages = await Package.get_package_list();
 
         const candidates = packages.filter(pkg => {
-            return (
-                pkg.language == lang && semver.satisfies(pkg.version, version)
-            );
+            return pkg.language == lang && satisfies(pkg.version, version);
         });
 
-        candidates.sort((a, b) => semver.rcompare(a.version, b.version));
+        candidates.sort((a, b) => rcompare(a.version, b.version));
 
         return candidates[0] || null;
     }
 }
 
-module.exports = Package;
+export default Package;
