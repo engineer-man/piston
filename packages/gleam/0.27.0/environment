@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+export PATH=$PWD:$PATH
 export PATH=$PWD/gleam:$PATH
 export PATH=$PWD/bin:$PATH
