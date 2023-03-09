@@ -1,6 +1,7 @@
 name: 'Package Pull Requests'
 
 on:
+    workflow_dispatch:
     pull_request:
         types:
             - opened
