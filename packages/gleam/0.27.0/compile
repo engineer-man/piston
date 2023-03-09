@@ -2,11 +2,14 @@
 
 ls -R
 
-gleam new project
-# cp /piston/packages/gleam/0.27.0/template_project/* project -r
-template_project/* project -r
+gleam new project --skip-git
+mkdir project/build
+cp /piston/packages/gleam/0.27.0/template_project/build* project -r
+cp /piston/packages/gleam/0.27.0/template_project/manifest.toml project/manifest.toml
 
-rm project/src/template_project.gleam
+# cp template_project/build* project -r
+# cp template_project/manifest.toml project/manifest.toml
+
 cat $1 > project/src/project.gleam
 
 cd project
