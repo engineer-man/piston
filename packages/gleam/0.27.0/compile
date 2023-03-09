@@ -2,6 +2,12 @@
 
 ls -R
 
-cat $1 > project/src/project.gleam
-cd project
+mkdir gleam_project
+cp $PWD/template_project/* gleam_project -r
+
+rm gleam_project/src/template_project.gleam
+touch gleam_project/src/gleam_project.gleam
+cat $1 > gleam_project/src/gleam_project.gleam
+
+cd gleam_project
 gleam build
