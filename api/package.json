@@ -2,10 +2,11 @@
     "name": "piston-api",
     "version": "3.2.0",
     "description": "API for piston - a high performance code execution engine",
-    "module": "src/index.js",
+    "module": "./dist/index.js",
     "type": "module",
     "scripts": {
-        "run": "node src/index.js"
+        "api": "node ./dist/index.js",
+        "build": "npx tsc"
     },
     "dependencies": {
         "body-parser": "^1.19.0",
@@ -21,6 +22,8 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@types/express": "^4.17.17"
+        "@types/express": "^4.17.17",
+        "@types/node-fetch": "^2.6.2",
+        "typescript": "^4.9.5"
     }
 }

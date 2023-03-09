@@ -1,11 +1,15 @@
 import { Router } from 'express';
 
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
-import { get_latest_runtime_matching_language_version, runtimes as _runtimes } from '../runtime';
+import {
+    get_latest_runtime_matching_language_version,
+    runtimes as _runtimes,
+} from '../runtime.js';
 import Job from '../job.js';
 import package_ from '../package.js';
-import { create } from 'logplease'
+import { create } from 'logplease';
+import { RequestBody } from '../types.js';
 
 const logger = create('api/v2', {});
 const router = Router();
@@ -49,10 +53,10 @@ const SIGNALS = [
     'SIGXCPU',
     'SIGXFSZ',
     'SIGWINCH',
-];
+] as const;
 // ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
-function get_job(body) {
+function get_job(body: RequestBody): Promise<Job> {
     let {
         language,
         version,
@@ -65,7 +69,7 @@ function get_job(body) {
         compile_timeout,
     } = body;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Job>((resolve, reject) => {
         if (!language || typeof language !== 'string') {
             return reject({
                 message: 'language is required as a string',
@@ -173,7 +177,7 @@ router.use((req, res, next) => {
 
     next();
 });
-
+// @ts-ignore
 router.ws('/connect', async (ws, req) => {
     let job = null;
     let eventBus = new EventEmitter();
@@ -205,8 +209,7 @@ router.ws('/connect', async (ws, req) => {
 
     ws.on('message', async data => {
         try {
-            // @ts-ignore
-            const msg = JSON.parse(data);
+            const msg = JSON.parse(data.toString());
 
             switch (msg.type) {
                 case 'init':
@@ -302,6 +305,8 @@ router.get('/runtimes', (req, res) => {
 });
 
 router.get('/packages', async (req, res) => {
+    console.log({req, res});
+    
     logger.debug('Request to list packages');
     let packages = await package_.get_package_list();
 

@@ -1,20 +1,30 @@
-import { create } from 'logplease';
-// @ts-ignore
+import { create, type Logger } from 'logplease';
+
 const logger = create('job');
 import { v4 as uuidv4 } from 'uuid';
 import { spawn } from 'child_process';
-import { join, relative, dirname } from 'path';
+import { join, relative, dirname } from 'node:path';
 import config from './config.js';
 import * as globals from './globals.js';
-import { mkdir, chown, writeFile, readdir, stat as _stat, rm } from 'fs/promises';
-import { readdirSync, readFileSync } from 'fs';
+import {
+    mkdir,
+    chown,
+    writeFile,
+    readdir,
+    stat as _stat,
+    rm,
+} from 'node:fs/promises';
+import { readdirSync, readFileSync } from 'node:fs';
 import wait_pid from 'waitpid';
+import EventEmitter from 'events';
+
+import { File, ResponseBody } from './types.js';
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
     PRIMED: Symbol('Primed and ready for execution'),
     EXECUTED: Symbol('Executed and ready for cleanup'),
-};
+} as const;
 
 let uid = 0;
 let gid = 0;
@@ -30,13 +40,39 @@ setInterval(() => {
 }, 10);
 
 export default class Job {
-    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
+    uuid: string;
+    logger: Logger;
+    runtime: any;
+    files: File[];
+    args: string[];
+    stdin: string;
+    timeouts: { compile: number; run: number };
+    memory_limits: { compile: number; run: number };
+    uid: number;
+    gid: number;
+    state: symbol;
+    dir: string;
+    constructor({
+        runtime,
+        files,
+        args,
+        stdin,
+        timeouts,
+        memory_limits,
+    }: {
+        runtime: unknown;
+        files: File[];
+        args: string[];
+        stdin: string;
+        timeouts: { compile: number; run: number };
+        memory_limits: { compile: number; run: number };
+    }) {
         this.uuid = uuidv4();
 
         this.logger = create(`job/${this.uuid}`, {});
 
         this.runtime = runtime;
-        this.files = files.map((file, i) => ({
+        this.files = files.map((file: File, i: number) => ({
             name: file.name || `file${i}.code`,
             content: file.content,
             encoding: ['base64', 'hex', 'utf8'].includes(file.encoding)
@@ -111,7 +147,13 @@ export default class Job {
         this.logger.debug('Primed job');
     }
 
-    async safe_call(file, args, timeout, memory_limit, eventBus = null) {
+    async safe_call(
+        file: string,
+        args: string[],
+        timeout: number,
+        memory_limit: string | number,
+        eventBus: EventEmitter = null
+    ): Promise<ResponseBody['run'] & { error?: Error }> {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
@@ -141,7 +183,7 @@ export default class Job {
                 'bash',
                 file,
                 ...args,
-            ];
+            ] as Array<string>;
 
             var stdout = '';
             var stderr = '';
@@ -164,11 +206,11 @@ export default class Job {
                 proc.stdin.end();
                 proc.stdin.destroy();
             } else {
-                eventBus.on('stdin', data => {
+                eventBus.on('stdin', (data: any) => {
                     proc.stdin.write(data);
                 });
 
-                eventBus.on('kill', signal => {
+                eventBus.on('kill', (signal: NodeJS.Signals | number) => {
                     proc.kill(signal);
                 });
             }
@@ -241,11 +283,11 @@ export default class Job {
 
         const code_files =
             (this.runtime.language === 'file' && this.files) ||
-            this.files.filter(file => file.encoding == 'utf8');
+            this.files.filter((file: File) => file.encoding == 'utf8');
 
         this.logger.debug('Compiling');
 
-        let compile;
+        let compile: unknown;
 
         if (this.runtime.compiled) {
             compile = await this.safe_call(
@@ -275,7 +317,7 @@ export default class Job {
         };
     }
 
-    async execute_interactive(eventBus) {
+    async execute_interactive(eventBus: EventEmitter) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -320,7 +362,7 @@ export default class Job {
     }
 
     cleanup_processes(dont_wait = []) {
-        let processes = [1];
+        let processes: number[] = [1];
         const to_wait = [];
         this.logger.debug(`Cleaning up processes`);
 

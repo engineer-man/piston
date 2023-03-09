@@ -27,7 +27,7 @@ const msg_format = {
 
 exports.handler = async ({ axios, packages }) => {
     const requests = packages.map(package => split_package(package));
-    for (request of requests) {
+    for (const request of requests) {
         try {
             const install = await axios.post(`/api/v2/packages`, request);
 

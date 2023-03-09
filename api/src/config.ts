@@ -1,11 +1,12 @@
 import { existsSync } from 'fs';
-import { create, LogLevels } from 'logplease';
+import { create, type LogLevel, LogLevels } from 'logplease';
+import { Limit, Limits, ObjectType } from './types.js';
 const logger = create('config', {});
 
 const options = {
     log_level: {
         desc: 'Level of data to log',
-        default: 'INFO',
+        default: 'INFO' as LogLevel,
         validators: [
             x =>
                 Object.values(LogLevels).includes(x) ||
@@ -116,7 +117,7 @@ const options = {
         desc: 'Per-language exceptions in JSON format for each of:\
         max_process_count, max_open_files, max_file_size, compile_memory_limit,\
         run_memory_limit, compile_timeout, run_timeout, output_max_size',
-        default: {},
+        default: {} as Record<string, Limits>,
         parser: parse_overrides,
         validators: [
             x => !!x || `Failed to parse the overrides\n${x}`,
@@ -127,7 +128,7 @@ const options = {
 
 Object.freeze(options);
 
-function apply_validators(validators, validator_parameters) {
+function apply_validators(validators: Array<(...args: unknown[]) => true | string>, validator_parameters: unknown[]) {
     for (const validator of validators) {
         const validation_response = validator(...validator_parameters);
         if (validation_response !== true) {
@@ -137,8 +138,8 @@ function apply_validators(validators, validator_parameters) {
     return true;
 }
 
-function parse_overrides(overrides_string) {
-    function get_parsed_json_or_null(overrides) {
+function parse_overrides(overrides_string: string): Record<string, Limits> {
+    function get_parsed_json_or_null(overrides: string): Record<string, Partial<Limits>> | null {
         try {
             return JSON.parse(overrides);
         } catch (e) {
@@ -150,7 +151,7 @@ function parse_overrides(overrides_string) {
     if (overrides === null) {
         return null;
     }
-    const parsed_overrides = {};
+    const parsed_overrides: Record<string, Partial<Limits>> = {};
     for (const language in overrides) {
         parsed_overrides[language] = {};
         for (const key in overrides[language]) {
@@ -169,21 +170,22 @@ function parse_overrides(overrides_string) {
                 return null;
             }
             // Find the option for the override
-            const option = options[key];
+            const option = options[key as Limit];
             const parser = option.parser;
-            const raw_value = overrides[language][key];
+            const raw_value = overrides[language][key as Limit];
+            // @ts-ignore: lgtm
             const parsed_value = parser(raw_value);
             parsed_overrides[language][key] = parsed_value;
         }
     }
-    return parsed_overrides;
+    return parsed_overrides as Record<string, Limits>;
 }
 
-function validate_overrides(overrides) {
+function validate_overrides(overrides: Record<string, Limits>) {
     for (const language in overrides) {
         for (const key in overrides[language]) {
-            const value = overrides[language][key];
-            const option = options[key];
+            const value = overrides[language][key as Limit];
+            const option = options[key as Limit];
             const validators = option.validators;
             const validation_response = apply_validators(validators, [
                 value,
@@ -199,14 +201,12 @@ function validate_overrides(overrides) {
 
 logger.info(`Loading Configuration from environment`);
 
-/** @type {import('./types').ObjectType<typeof options, "default">} */
-// @ts-ignore
-let config = {};
+let config = {} as ObjectType<typeof options, "default">;
 
 for (const option_name in options) {
     const env_key = 'PISTON_' + option_name.toUpperCase();
     const option = options[option_name];
-    const parser = option.parser || ((/** @type {any} */ x) => x);
+    const parser = option.parser || ((x: unknown) => x);
     const env_val = process.env[env_key];
     const parsed_val = parser(env_val);
     const value = env_val === undefined ? option.default : parsed_val;

@@ -1,20 +1,34 @@
-import { create } from 'logplease'
-import { parse, satisfies, rcompare } from 'semver';
-import config from './config';
-import * as globals from './globals';
+import { create } from 'logplease';
+import { parse, satisfies, rcompare, type SemVer } from 'semver';
+import config from './config.js';
+import * as globals from './globals.js';
 import fetch from 'node-fetch';
 import { join } from 'path';
 import { rm, mkdir, writeFile, rmdir } from 'fs/promises';
 import { existsSync, createWriteStream, createReadStream } from 'fs';
 import { exec, spawn } from 'child_process';
 import { createHash } from 'crypto';
-import { load_package, get_runtime_by_name_and_version } from './runtime';
+import { load_package, get_runtime_by_name_and_version } from './runtime.js';
 import chownr from 'chownr';
 import { promisify } from 'util';
 
 const logger = create('package', {});
 class Package {
-    constructor({ language, version, download, checksum }) {
+    language: string;
+    version: SemVer;
+    checksum: string;
+    download: string;
+    constructor({
+        language,
+        version,
+        download,
+        checksum,
+    }: {
+        language: string;
+        version: string;
+        checksum: string;
+        download: string;
+    }) {
         this.language = language;
         this.version = parse(version);
         this.checksum = checksum;
@@ -22,9 +36,7 @@ class Package {
     }
 
     get installed() {
-        return existsSync(
-            join(this.install_path, globals.pkg_installed_file)
-        );
+        return existsSync(join(this.install_path, globals.pkg_installed_file));
     }
 
     get install_path() {
@@ -57,7 +69,8 @@ class Package {
             `Downloading package from ${this.download} in to ${this.install_path}`
         );
         const pkgpath = join(this.install_path, 'pkg.tar.gz');
-        const download = await fetch(this.download);
+        // @ts-ignore
+        const download = (await fetch(this.download)) as fetch.Response;
 
         const file_stream = createWriteStream(pkgpath);
         await new Promise((resolve, reject) => {
@@ -72,7 +85,7 @@ class Package {
         const hash = createHash('sha256');
 
         const read_stream = createReadStream(pkgpath);
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             read_stream.on('data', chunk => hash.update(chunk));
             read_stream.on('end', () => resolve());
             read_stream.on('error', error => reject(error));
@@ -90,7 +103,7 @@ class Package {
             `Extracting package files from archive ${pkgpath} in to ${this.install_path}`
         );
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             const proc = exec(
                 `bash -c 'cd "${this.install_path}" && tar xzf ${pkgpath}'`
             );
@@ -111,7 +124,7 @@ class Package {
         logger.debug('Caching environment');
         const get_env_command = `cd ${this.install_path}; source environment; env`;
 
-        const envout = await new Promise((resolve, reject) => {
+        const envout = await new Promise<string>((resolve, reject) => {
             let stdout = '';
 
             const proc = spawn(
@@ -162,7 +175,7 @@ class Package {
         };
     }
 
-    async uninstall() {
+    async uninstall(): Promise<{ language: string; version: string }> {
         logger.info(`Uninstalling ${this.language}-${this.version.raw}`);
 
         logger.debug('Finding runtime');
@@ -195,7 +208,10 @@ class Package {
     }
 
     static async get_package_list() {
-        const repo_content = await fetch(config.repo_url).then(x => x.text());
+        // @ts-ignore
+        const repo_content: string = await fetch(config.repo_url).then(
+            (x: fetch.Response) => x.text()
+        );
 
         const entries = repo_content.split('\n').filter(x => x.length > 0);
 
@@ -211,13 +227,11 @@ class Package {
         });
     }
 
-    static async get_package(lang, version) {
+    static async get_package(lang: string, version: string) {
         const packages = await Package.get_package_list();
 
         const candidates = packages.filter(pkg => {
-            return (
-                pkg.language == lang && satisfies(pkg.version, version)
-            );
+            return pkg.language == lang && satisfies(pkg.version, version);
         });
 
         candidates.sort((a, b) => rcompare(a.version, b.version));

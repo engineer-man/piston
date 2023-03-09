@@ -5,9 +5,9 @@ import expressWs from 'express-ws';
 import * as globals from './globals.js';
 import config from './config.js';
 import { join } from 'path';
-import { readdir } from 'fs/promises';
-import { existsSync, mkdirSync, chmodSync } from 'fs';
-import { urlencoded, json } from 'body-parser';
+import { readdir } from 'node:fs/promises';
+import { existsSync, mkdirSync, chmodSync } from 'node:fs';
+import bodyParser from 'body-parser';
 import { load_package } from './runtime.js';
 
 const logger = create('index', {});
@@ -16,7 +16,6 @@ expressWs(app);
 
 (async () => {
     logger.info('Setting loglevel to');
-    // @ts-ignore
     setLogLevel(config.log_level);
     logger.debug('Ensuring data directories exist');
 
@@ -35,7 +34,10 @@ expressWs(app);
             }
         }
     });
-    chmodSync(join(config.data_directory, globals.data_directories.jobs), 0o711)
+    chmodSync(
+        join(config.data_directory, globals.data_directories.jobs),
+        0o711
+    );
 
     logger.info('Loading packages');
     const pkgdir = join(
@@ -54,9 +56,7 @@ expressWs(app);
 
     const installed_languages = languages
         .flat()
-        .filter(pkg =>
-            existsSync(join(pkg, globals.pkg_installed_file))
-        );
+        .filter(pkg => existsSync(join(pkg, globals.pkg_installed_file)));
 
     installed_languages.forEach(pkg => load_package(pkg));
 
@@ -64,18 +64,25 @@ expressWs(app);
     logger.debug('Constructing Express App');
     logger.debug('Registering middleware');
 
-    app.use(urlencoded({ extended: true }));
-    app.use(json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
 
-    app.use((err, req, res, next) => {
-        return res.status(400).send({
-            stack: err.stack,
-        });
-    });
+    app.use(
+        (
+            err: Error,
+            req: express.Request,
+            res: express.Response,
+            next: express.NextFunction
+        ) => {
+            return res.status(400).send({
+                stack: err.stack,
+            });
+        }
+    );
 
     logger.debug('Registering Routes');
 
-    const api_v2 = require('./api/v2').default;
+    const api_v2 = (await import('./api/v2.js')).default;
     app.use('/api/v2', api_v2);
 
     app.use((req, res, next) => {

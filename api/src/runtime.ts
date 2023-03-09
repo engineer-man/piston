@@ -1,47 +1,60 @@
 import { create } from 'logplease';
-import { parse, satisfies, rcompare } from 'semver';
+import { parse, satisfies, rcompare, type SemVer } from 'semver';
 import config from './config.js';
 import { platform } from './globals.js';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { Limit, Limits, PackageInfo } from './types.js';
 
 const logger = create('runtime', {});
 
-/** @type {Array<Runtime>} */
-const runtimes = [];
+export const runtimes: Runtime[] = [];
 
-class Runtime {
-    constructor({
-        language,
-        version,
-        aliases,
-        pkgdir,
-        runtime,
-        timeouts,
-        memory_limits,
-        max_process_count,
-        max_open_files,
-        max_file_size,
-        output_max_size,
+export class Runtime {
+    language: string;
+    version: SemVer;
+    aliases: string[];
+    pkgdir: string;
+    runtime?: any;
+    timeouts: { run: number; compile: number };
+    memory_limits: { run: number; compile: number };
+    max_process_count: number;
+    max_open_files: number;
+    max_file_size: number;
+    output_max_size: number;
+    _compiled?: boolean;
+    _env_vars?: Record<string, any>;
+    constructor(o: {
+        language: string;
+        version: SemVer;
+        aliases: string[];
+        pkgdir: string;
+        runtime?: any;
+        timeouts: { run: number; compile: number };
+        memory_limits: { run: number; compile: number };
+        max_process_count: number;
+        max_open_files: number;
+        max_file_size: number;
+        output_max_size: number;
     }) {
-        this.language = language;
-        this.version = version;
-        this.aliases = aliases || [];
-        this.pkgdir = pkgdir;
-        this.runtime = runtime;
-        this.timeouts = timeouts;
-        this.memory_limits = memory_limits;
-        this.max_process_count = max_process_count;
-        this.max_open_files = max_open_files;
-        this.max_file_size = max_file_size;
-        this.output_max_size = output_max_size;
+        this.language = o.language;
+        this.version = o.version;
+        this.aliases = o.aliases || [];
+        this.pkgdir = o.pkgdir;
+        this.runtime = o.runtime;
+        this.timeouts = o.timeouts;
+        this.memory_limits = o.memory_limits;
+        this.max_process_count = o.max_process_count;
+        this.max_open_files = o.max_open_files;
+        this.max_file_size = o.max_file_size;
+        this.output_max_size = o.output_max_size;
     }
 
     static compute_single_limit(
-        language_name,
-        limit_name,
-        language_limit_overrides
-    ) {
+        language_name: string,
+        limit_name: Limit,
+        language_limit_overrides: Limits
+    ): number {
         return (
             (config.limit_overrides[language_name] &&
                 config.limit_overrides[language_name][limit_name]) ||
@@ -51,7 +64,10 @@ class Runtime {
         );
     }
 
-    static compute_all_limits(language_name, language_limit_overrides) {
+    static compute_all_limits(
+        language_name: string,
+        language_limit_overrides: Limits
+    ) {
         return {
             timeouts: {
                 compile: this.compute_single_limit(
@@ -100,26 +116,25 @@ class Runtime {
         };
     }
 
-    static load_package(package_dir) {
+    static load_package(package_dir: string) {
         let info = JSON.parse(
-            // @ts-ignore
-            readFileSync(join(package_dir, 'pkg-info.json'))
-        );
+            readFileSync(join(package_dir, 'pkg-info.json'), 'utf8')
+        ) as PackageInfo;
 
         let {
             language,
-            version,
+            version: _version,
             build_platform,
             aliases,
             provides,
             limit_overrides,
         } = info;
-        version = parse(version);
+        const version = parse(_version);
 
         if (build_platform !== platform) {
             logger.warn(
                 `Package ${language}-${version} was built for platform ${build_platform}, ` +
-                `but our platform is ${platform}`
+                    `but our platform is ${platform}`
             );
         }
 
@@ -142,7 +157,6 @@ class Runtime {
             });
         } else {
             runtimes.push(
-                // @ts-ignore
                 new Runtime({
                     language,
                     version,
@@ -193,11 +207,10 @@ class Runtime {
     }
 }
 
-const _runtimes = runtimes;
-export { _runtimes as runtimes };
-const _Runtime = Runtime;
-export { _Runtime as Runtime };
-export function get_runtimes_matching_language_version(lang, ver) {
+export function get_runtimes_matching_language_version(
+    lang: string,
+    ver: string | import('semver/classes/range.js')
+) {
     return runtimes.filter(
         rt =>
             (rt.language == lang || rt.aliases.includes(lang)) &&
@@ -205,14 +218,15 @@ export function get_runtimes_matching_language_version(lang, ver) {
     );
 }
 export function get_latest_runtime_matching_language_version(
-    lang,
-    ver
+    lang: string,
+    ver: string
 ) {
-    return get_runtimes_matching_language_version(lang, ver)
-        .sort((a, b) => rcompare(a.version, b.version))[0];
+    return get_runtimes_matching_language_version(lang, ver).sort((a, b) =>
+        rcompare(a.version, b.version)
+    )[0];
 }
 
-export function get_runtime_by_name_and_version(runtime, ver) {
+export function get_runtime_by_name_and_version(runtime: string, ver: string) {
     return runtimes.find(
         rt =>
             (rt.runtime == runtime ||
