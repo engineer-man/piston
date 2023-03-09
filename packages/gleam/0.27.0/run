@@ -2,5 +2,6 @@
 
 gleam new project
 cat $1 > project/src/project.gleam
+shift
 cd project
-gleam run
+gleam run -- "$@"
