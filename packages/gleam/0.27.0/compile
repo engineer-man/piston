@@ -2,6 +2,8 @@
 
 ls -R
 
+chmod -r /piston/packages/gleam/0.27.0/template_project
+
 mkdir gleam_project
 cp /piston/packages/gleam/0.27.0/template_project/* gleam_project -r
 
