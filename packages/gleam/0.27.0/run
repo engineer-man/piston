@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ls -R
+
 shift
 cd project
 gleam run -- "$@"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ls -R
+
 cat $1 > project/src/project.gleam
 cd project
 gleam build
