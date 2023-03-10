@@ -2,4 +2,4 @@
 
 shift
 cd project
-gleam run $(cat ../compile_args 2> /dev/null) -- "$@"
+gleam run $(cat ../compile_args 2> /dev/null) -- "$@" | awk "NR>=3"
