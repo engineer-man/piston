@@ -15,3 +15,4 @@ source ./environment
 gleam new template_project --skip-git
 cd template_project
 gleam update
+gleam build
