@@ -17,5 +17,4 @@ source ./environment
 # Install the standard library
 gleam new template_project --skip-git
 cd template_project
-gleam update
 gleam build --target=javascript
