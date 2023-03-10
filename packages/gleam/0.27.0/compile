@@ -10,15 +10,11 @@
 
 gleam new project --skip-git
 mkdir project/build
-cp /piston/packages/gleam/0.27.0/project/manifest.toml project/manifest.toml
-cp /piston/packages/gleam/0.27.0/project/build/packages* project/build -r || true
+rsync /piston/packages/gleam/0.27.0/project/manifest.toml project/manifest.toml
+rsync /piston/packages/gleam/0.27.0/project/build/packages* project/build -r
 
-# cp project/build* project -r
-# cp project/manifest.toml project/manifest.toml
-
-echo "surviving sigkill"
-
-echo $(cat $1)
+# rsync template_project/build/packages* project/build -r
+# rsync template_project/manifest.toml project/manifest.toml
 
 cat $1 > project/src/project.gleam
 
