@@ -11,9 +11,6 @@ curl -L "https://github.com/gleam-lang/gleam/releases/download/v0.27.0/gleam-v0.
 mkdir gleam
 tar -xf gleam.tar.gz -C gleam
 
-# Install rsync for copying gleam dependencies
-apt-get install rsync -y
-
 # Update path
 source ./environment
 
