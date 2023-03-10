@@ -4,16 +4,16 @@ ls -R
 
 gleam new project --skip-git
 mkdir project/build
-# cp /piston/packages/gleam/0.27.0/template_project/build project -r
-# cp /piston/packages/gleam/0.27.0/template_project/manifest.toml project/manifest.toml
+cp /piston/packages/gleam/0.27.0/template_project/build project -r
+cp /piston/packages/gleam/0.27.0/template_project/manifest.toml project/manifest.toml
 
-cp template_project/build project -r
-cp template_project/manifest.toml project/manifest.toml
+# cp template_project/build project -r
+# cp template_project/manifest.toml project/manifest.toml
 
 cat $1 > project/src/project.gleam
 
 cd project
-gleam build
+gleam build --target=javascript
 
 cd /piston/packages/gleam/0.27.0/
 ls -R
