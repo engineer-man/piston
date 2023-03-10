@@ -3,7 +3,8 @@
     "version": "0.27.0",
     "aliases": ["gleam"],
     "limit_overrides": {
-        "max_open_files": 4096,
+        "max_open_files": 8192,
+        "output_max_size": 8192,
         "max_process_count": 256
     }
 }
