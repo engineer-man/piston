@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-echo "Printing Empty Directory"
-ls -R -a
+# echo "Printing Empty Directory"
+# ls -R -a
 
-echo "Printing piston files"
+# echo "Printing piston files"
 cd /piston/packages/gleam/0.27.0/
-ls -R -a
+# ls -R -a
 
 
 gleam new project --skip-git
@@ -19,7 +19,7 @@ cp /piston/packages/gleam/0.27.0/template_project/manifest.toml project/manifest
 cat $1 > project/src/project.gleam
 
 cd project
-echo "Printing Copied Files"
-ls -R -a
+# echo "Printing Copied Files"
+# ls -R -a
 gleam build
 
