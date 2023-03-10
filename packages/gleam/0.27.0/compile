@@ -8,7 +8,7 @@ cp /piston/packages/gleam/0.27.0/project/build/packages* project/build -r || tru
 cat $1 > project/src/project.gleam
 
 # Compile args need to be read by run
-printf "$@" > compile_args
+echo "$@" > compile_args
 
 cd project
 ls -R -a
