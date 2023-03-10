@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ls -R
+# ls -R
 
 shift
 cd project
