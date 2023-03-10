@@ -10,11 +10,13 @@
 
 gleam new project --skip-git
 mkdir project/build
-cp /piston/packages/gleam/0.27.0/project/build* project -r
 cp /piston/packages/gleam/0.27.0/project/manifest.toml project/manifest.toml
+cp /piston/packages/gleam/0.27.0/project/build* project -r || true
 
 # cp project/build* project -r
 # cp project/manifest.toml project/manifest.toml
+
+echo "surviving sigkill"
 
 cat $1 > project/src/project.gleam
 
@@ -22,4 +24,3 @@ cd project
 # echo "Printing Copied Files"
 ls -R -a
 gleam build --target=javascript
-
