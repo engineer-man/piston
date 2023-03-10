@@ -1,4 +1,4 @@
-FROM node:15.10.0-buster-slim
+FROM node:node:18.15.0-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
