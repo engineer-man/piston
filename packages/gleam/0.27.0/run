@@ -2,4 +2,4 @@
 
 shift
 cd project
-gleam run $(cat compile_args) -- "$@"
+gleam run $(cat ../compile_args 2> /dev/null) -- "$@"
