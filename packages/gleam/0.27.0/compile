@@ -12,5 +12,4 @@ shift
 echo "$@" > compile_args
 
 cd project
-ls -R -a
 gleam build "$@"
