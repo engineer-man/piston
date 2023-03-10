@@ -55,25 +55,25 @@ const options = {
     },
     output_max_size: {
         desc: 'Max size of each stdio buffer',
-        default: -1,
+        default: 100240,
         parser: parseInt,
         validators: [(x, raw) => !isNaN(x) || `${raw} is not a number`],
     },
     max_process_count: {
         desc: 'Max number of processes per job',
-        default: -1,
+        default: 100240,
         parser: parseInt,
         validators: [(x, raw) => !isNaN(x) || `${raw} is not a number`],
     },
     max_open_files: {
         desc: 'Max number of open files per job',
-        default: -1,
+        default: 100240,
         parser: parseInt,
         validators: [(x, raw) => !isNaN(x) || `${raw} is not a number`],
     },
     max_file_size: {
         desc: 'Max file size in bytes for a file',
-        default: -1, //10MB
+        default: 10000000, //10MB
         parser: parseInt,
         validators: [(x, raw) => !isNaN(x) || `${raw} is not a number`],
     },
