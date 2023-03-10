@@ -4,4 +4,4 @@
 
 shift
 cd project
-gleam run --target=javascript -- "$@"
+gleam run -- "$@"
