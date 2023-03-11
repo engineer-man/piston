@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Install Erlang
-# source ../../erlang/23.0.0/build.sh
+source ../../erlang/23.0.0/build.sh
 
 # Install Node
 source ../../node/16.3.0/build.sh
