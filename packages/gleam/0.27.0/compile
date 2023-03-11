@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-gleam new project --skip-git
+gleam new project --skip-git > /dev/null
 mkdir project/build
 cp /piston/packages/gleam/0.27.0/project/manifest.toml project/manifest.toml
 cp /piston/packages/gleam/0.27.0/project/build/packages* project/build -r 2> /dev/null
