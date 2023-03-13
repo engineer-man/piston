@@ -12,4 +12,5 @@ shift
 echo "$@" > compile_args
 
 cd project
-gleam build "$@"
+# Awk is used to remove lines from the output that don't help for the piston output.
+gleam build "$@" | awk "NR>=4"
