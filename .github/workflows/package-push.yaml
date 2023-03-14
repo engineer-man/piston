@@ -7,6 +7,12 @@ on:
             - v3
         paths:
             - packages/**
+    workflow_dispatch:
+        inputs:
+            language:
+                description: 'Language to build (LANG-x.y.z)'
+                required: true
+                type: string
 
 jobs:
     build-pkg:
@@ -28,9 +34,20 @@ jobs:
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Build Packages
+            - name: Build Packages (push)
+              if: github.event.push
               run: |
                   PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
+                  echo "Packages: $PACKAGES"
+                  docker pull docker.pkg.github.com/endercheif/piston/repo-builder:latest
+                  docker build -t repo-builder repo
+                  docker run -v "${{ github.workspace }}:/piston" repo-builder --no-server $PACKAGES
+                  ls -la packages
+                  
+            - name: Build Packages (manual)
+              if: ${{ inputs.language }}
+              run: |
+                  PACKAGES=${{ inputs.language }}
                   echo "Packages: $PACKAGES"
                   docker pull docker.pkg.github.com/endercheif/piston/repo-builder:latest
                   docker build -t repo-builder repo
