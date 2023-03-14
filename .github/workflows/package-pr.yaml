@@ -95,6 +95,7 @@ jobs:
                   docker build -t piston-api api
                   docker run --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api piston-api
                   echo Waiting for API to start..
+                  docker pull appropriate/curl
                   docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v2/runtimes
 
                   echo Waiting for Index to start..

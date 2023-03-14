@@ -2,4 +2,5 @@
 
 shift
 cd project
-gleam run $(cat ../compile_args 2> /dev/null) -- "$@"
+# Awk is used to remove lines from the output that don't help for the piston output.
+gleam run $(cat ../compile_args 2> /dev/null) -- "$@" | awk "NR>=4"
