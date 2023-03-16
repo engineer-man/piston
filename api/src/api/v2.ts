@@ -59,6 +59,7 @@ const SIGNALS = [
 function get_job(body: RequestBody): Promise<Job> {
     let {
         language,
+        tool,
         version,
         args,
         stdin,
@@ -159,6 +160,7 @@ function get_job(body: RequestBody): Promise<Job> {
                     run: run_memory_limit,
                     compile: compile_memory_limit,
                 },
+                tool
             })
         );
     });
@@ -291,6 +293,22 @@ router.post('/execute', async (req, res) => {
     }
 });
 
+router.post('/tooling',async (req, res) => {
+    try {
+        const job = await get_job(req.body);
+
+        await job.prime();
+
+        const result = await job.analysis();
+
+        await job.cleanup();
+
+        return res.status(200).send(result);
+    } catch (error) {
+        return res.status(400).json(error)
+    }
+})
+
 router.get('/runtimes', (req, res) => {
     const runtimes = _runtimes.map(rt => {
         return {
@@ -298,6 +316,7 @@ router.get('/runtimes', (req, res) => {
             version: rt.version.raw,
             aliases: rt.aliases,
             runtime: rt.runtime,
+            tooling: rt.tooling
         };
     });
 

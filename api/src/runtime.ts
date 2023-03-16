@@ -12,6 +12,7 @@ export const runtimes: Runtime[] = [];
 
 export class Runtime {
     language: string;
+    tooling: string[];
     version: SemVer;
     aliases: string[];
     pkgdir: string;
@@ -26,10 +27,11 @@ export class Runtime {
     _env_vars?: Record<string, any>;
     constructor(o: {
         language: string;
+        tooling?: string[];
         version: SemVer;
         aliases: string[];
         pkgdir: string;
-        runtime?: any;
+        runtime?: string;
         timeouts: { run: number; compile: number };
         memory_limits: { run: number; compile: number };
         max_process_count: number;
@@ -38,6 +40,7 @@ export class Runtime {
         output_max_size: number;
     }) {
         this.language = o.language;
+        this.tooling = o.tooling;
         this.version = o.version;
         this.aliases = o.aliases || [];
         this.pkgdir = o.pkgdir;
@@ -128,6 +131,7 @@ export class Runtime {
             aliases,
             provides,
             limit_overrides,
+            tooling
         } = info;
         const version = parse(_version);
 
@@ -145,6 +149,7 @@ export class Runtime {
                     new Runtime({
                         language: lang.language,
                         aliases: lang.aliases,
+                        tooling,
                         version,
                         pkgdir: package_dir,
                         runtime: language,
@@ -160,6 +165,7 @@ export class Runtime {
                 new Runtime({
                     language,
                     version,
+                    tooling,
                     aliases,
                     pkgdir: package_dir,
                     ...Runtime.compute_all_limits(language, limit_overrides),

@@ -6,6 +6,7 @@ import { spawn } from 'child_process';
 import { join, relative, dirname } from 'node:path';
 import config from './config.js';
 import * as globals from './globals.js';
+import { type Runtime } from './runtime.js';
 import {
     mkdir,
     chown,
@@ -18,7 +19,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import wait_pid from 'waitpid';
 import EventEmitter from 'events';
 
-import { File, ResponseBody } from './types.js';
+import { File, LimitObject, ResponseBody } from './types.js';
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -42,35 +43,40 @@ setInterval(() => {
 export default class Job {
     uuid: string;
     logger: Logger;
-    runtime: any;
+    runtime: Runtime;
+    tool?: string;
     files: File[];
     args: string[];
     stdin: string;
-    timeouts: { compile: number; run: number };
-    memory_limits: { compile: number; run: number };
+    timeouts: LimitObject;
+    memory_limits: LimitObject;
     uid: number;
     gid: number;
     state: symbol;
     dir: string;
     constructor({
         runtime,
+        tool,
         files,
         args,
         stdin,
         timeouts,
         memory_limits,
     }: {
-        runtime: unknown;
+        runtime: Runtime;
+        tool?: string;
         files: File[];
         args: string[];
         stdin: string;
-        timeouts: { compile: number; run: number };
-        memory_limits: { compile: number; run: number };
+        timeouts: LimitObject;
+        memory_limits: LimitObject;
     }) {
         this.uuid = uuidv4();
 
         this.logger = create(`job/${this.uuid}`, {});
-
+        
+        this.tool = tool;
+        
         this.runtime = runtime;
         this.files = files.map((file: File, i: number) => ({
             name: file.name || `file${i}.code`,
@@ -79,6 +85,7 @@ export default class Job {
                 ? file.encoding
                 : 'utf8',
         }));
+
 
         this.args = args;
         this.stdin = stdin;
@@ -193,6 +200,7 @@ export default class Job {
                 env: {
                     ...this.runtime.env_vars,
                     PISTON_LANGUAGE: this.runtime.language,
+                    PISTON_TOOLING: this.tool
                 },
                 stdio: 'pipe',
                 cwd: this.dir,
@@ -269,6 +277,45 @@ export default class Job {
                 reject({ error: err, stdout, stderr, output });
             });
         });
+    }
+
+    async analysis() {
+        if (this.state !== job_states.PRIMED) {
+            throw new Error(
+                'Job must be in primed state, current state: ' +
+                    this.state.toString()
+            );
+        }
+
+        if (!this.runtime.tooling.includes(this.tool)) {
+            throw new Error(
+                `Tool ${this.tool} does not exist on ${this.runtime.toString()}`
+            )
+        }
+
+        this.logger.info(`Tooling job runtime=${this.runtime.toString()}; tooling=${this.tool}`);
+
+        const code_files =
+            (this.runtime.language === 'file' && this.files) ||
+            this.files.filter((file: File) => file.encoding == 'utf8');
+
+
+        const output = await this.safe_call(
+            join(this.runtime.pkgdir, 'tooling'),
+            code_files.map(x => x.name),
+            this.timeouts.run,
+            this.memory_limits.run
+        );
+
+        this.logger.debug('Analyzing')
+
+
+        return {
+            output,
+            language: this.runtime.language,
+            tool: this.tool,
+            version: this.runtime.version.raw
+        }
     }
 
     async execute() {
