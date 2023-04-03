@@ -15,7 +15,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Get list of changed files
               uses: lots0logs/gh-action-get-changed-files@2.1.4
               with:
@@ -36,10 +36,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Login to GitHub registry
-              uses: docker/login-action@v1
+              uses: docker/login-action@v2
               with:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
@@ -60,7 +60,7 @@ jobs:
                   ls -la packages
 
             - name: Upload package as artifact
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: packages
                   path: packages/*.pkg.tar.gz
@@ -70,9 +70,9 @@ jobs:
         runs-on: ubuntu-latest
         needs: build-pkg
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
-            - uses: actions/download-artifact@v2
+            - uses: actions/download-artifact@v3
               with:
                   name: packages
 
@@ -80,7 +80,7 @@ jobs:
               run: mv *.pkg.tar.gz packages/
 
             - name: Login to GitHub registry
-              uses: docker/login-action@v1
+              uses: docker/login-action@v2
               with:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
