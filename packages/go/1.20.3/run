@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+mv $1 $1.go
+#filename=$1.go
+filename=*.go
+shift
+GOCACHE=$PWD go run $filename "$@"
