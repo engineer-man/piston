@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# https://stackoverflow.com/questions/38041331/rust-compiler-cant-find-crate-for-std
+# Rust compiler needs to find the stdlib to link against
+rustc -o binary -L ${RUST_INSTALL_LOC}/rustc/lib -L ${RUST_INSTALL_LOC}/rust-std-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib "$@"
+chmod +x binary
