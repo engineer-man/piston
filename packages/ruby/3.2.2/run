@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Run ruby script with args
+ruby "$@"
