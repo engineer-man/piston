@@ -1,0 +1,22 @@
+{
+    "language": "gcc",
+    "version": "12.2.0",
+    "provides": [
+        {
+            "language": "c",
+            "aliases": ["gcc"]
+        },
+        {
+            "language": "c++",
+            "aliases": ["cpp", "g++"]
+        },
+        {
+            "language": "d",
+            "aliases": ["gdc"]
+        },
+        {
+            "language": "fortran",
+            "aliases": ["fortran", "f90"]
+        }
+    ]
+}

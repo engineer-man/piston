@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# Put instructions to compile source code, remove this file if the language does not require this stage
+
+
+case "${PISTON_LANGUAGE}" in
+    c)
+        rename 's/$/\.c/' "$@" # Add .c extension
+        gcc -std=c11 *.c -lm
+        ;;
+    c++)
+        rename 's/$/\.cpp/' "$@" # Add .cpp extension
+        g++ -std=c++17 *.cpp
+        ;;
+    d)
+        rename 's/.code$/\.d/' "$@" # Add .d extension
+        gdc *.d
+        ;;
+    fortran)
+        rename 's/.code$/\.f90/' "$@" # Add .f90 extension
+        gfortran *.f90
+        ;;
+    *)
+        echo "How did you get here? (${PISTON_LANGUAGE})"
+        exit 1
+        ;;
+esac
+
+chmod +x a.out
