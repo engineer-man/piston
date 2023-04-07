@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Setting clang cache to current dir to avoid permission error on /tmp
+swift -module-cache-path . "$@"
