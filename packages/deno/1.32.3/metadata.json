@@ -1,0 +1,20 @@
+{
+    "language": "deno",
+    "version": "1.32.3",
+    "dependencies": {},
+    "provides": [
+        {
+            "language": "typescript",
+            "aliases": [
+                "deno",
+                "deno-ts"
+            ]
+        },
+        {
+            "language": "javascript",
+            "aliases": [
+                "deno-js"
+            ]
+        }
+    ]
+}
