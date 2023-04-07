@@ -1,0 +1,3 @@
+#!/bin/bash
+
+DENO_DIR=$PWD NO_COLOR=true deno run $@
