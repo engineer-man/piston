@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Download and extract JDK8
-curl -L "https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9_openj9-0.26.0/OpenJDK16U-jdk_x64_linux_openj9_16.0.1_9_openj9-0.26.0.tar.gz" -o jdk.tar.gz
+curl -L "https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_x64_linux_hotspot_8u292b10.tar.gz" -o jdk.tar.gz
 tar xzf jdk.tar.gz --strip-components=1
 rm jdk.tar.gz
 
