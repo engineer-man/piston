@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run without startup or history file
+julia --startup-file=no --history-file=no "$@"

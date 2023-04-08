@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Add Julia binary to path
+export PATH=$PWD/bin:$PATH
