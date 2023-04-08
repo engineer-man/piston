@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run octave scripts without gui, history, init scripts and initial message
+octave --no-gui --no-window-system --no-history --no-init-file --no-site-file --norc --quiet "$@"
