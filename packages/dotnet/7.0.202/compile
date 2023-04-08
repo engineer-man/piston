@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+[ "${PISTON_LANGUAGE}" == "fsi" ] && exit 0
+
+export DOTNET_CLI_HOME=$PWD
+export HOME=$PWD
+
+dotnet build --help > /dev/null # Shut the thing up
+
+case "${PISTON_LANGUAGE}" in
+    basic.net)
+        rename 's/$/\.vb/' "$@" # Add .vb extension
+        dotnet new console -lang VB -o . --no-restore
+        rm Program.vb
+        ;;
+    fsharp.net)
+        first_file=$1
+        shift
+        rename 's/$/\.fs/' "$@" # Add .fs extension
+        dotnet new console -lang F# -o . --no-restore
+        mv $first_file Program.fs  # For some reason F#.net doesn't work unless the file name is Program.fs
+        ;;
+    csharp.net)
+        rename 's/$/\.cs/' "$@" # Add .cs extension
+        dotnet new console -o . --no-restore
+        rm Program.cs
+        ;;
+    *)
+        echo "How did you get here? (${PISTON_LANGUAGE})"
+        exit 1
+        ;;
+
+esac
+
+dotnet restore --source $DOTNET_ROOT/.nuget/packages
+dotnet build --no-restore

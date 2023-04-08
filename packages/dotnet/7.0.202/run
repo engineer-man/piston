@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Put instructions to run the runtime
+export DOTNET_CLI_HOME=$PWD
+
+case "${PISTON_LANGUAGE}" in
+    basic.net)
+        ;&
+    fsharp.net)
+        ;&
+    csharp.net)
+        shift
+        dotnet bin/Debug/net5.0/$(basename $(realpath .)).dll "$@"
+        ;;
+    fsi)
+        FILENAME=$1
+        rename 's/$/\.fsx/' $FILENAME # Add .fsx extension
+        shift
+        dotnet $FSI_PATH $FILENAME.fsx "$@"
+        ;;
+    *)
+        echo "How did you get here? (${PISTON_LANGUAGE})"
+        exit 1
+        ;;
+esac

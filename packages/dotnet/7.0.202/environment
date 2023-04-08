@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Put 'export' statements here for environment variables
+export DOTNET_ROOT=$PWD
+export PATH=$DOTNET_ROOT:$PATH
+export FSI_PATH=$(find $(pwd) -name fsi.dll)
