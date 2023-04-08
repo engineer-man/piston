@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Compile scala classes into a jar file
+scalac "$@" -d out.jar
+
+# Create the Manifest and include scala lib jars:
+# NOTE: - entry point will only consider @main and App traits from the main file
+#       - scala lib jars will be added to the class path in order to run the jar properly
+echo "Main-Class: $(grep -oP '\@main\s+def\s+\K[a-zA-Z][a-zA-Z0-9]*|object\s+\K[a-zA-Z][a-zA-Z0-9]*(?=\s+extends\s+App)' $1)
+Class-Path:  $(echo $JAVA_HOME/lib/*.jar | sed 's/\s/\n  /g')
+
+" > manifest.txt
+
+# Update the jar with the manifest
+jar ufm out.jar manifest.txt
