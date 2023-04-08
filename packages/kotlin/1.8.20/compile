@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+rename 's/$/\.kt/' "$@" # Add .kt extension
+
+# Compile Kotlin code to a jar file
+kotlinc *.kt -include-runtime -d code.jar
