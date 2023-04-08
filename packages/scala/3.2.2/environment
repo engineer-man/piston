@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Scala requires JAVA_HOME to be set
+export JAVA_HOME=$PWD
+export PATH=$PWD/bin:$PATH
