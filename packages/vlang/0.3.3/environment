@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Put 'export' statements here for environment variables
+export PATH="$PWD/v:$PATH"
