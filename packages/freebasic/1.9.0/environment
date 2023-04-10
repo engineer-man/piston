@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Path to fbc compiler
+export PATH=$PWD/bin:$PATH
