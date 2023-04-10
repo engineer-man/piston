@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Path to octave binary
+export PATH=$PWD/bin:$PATH
