@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Run jar file
+shift
+java -jar out.jar "$@"
