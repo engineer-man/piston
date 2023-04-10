@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Put 'export' statements here for environment variables
+export PATH="$PWD/lua-5.4.4/src:$PATH"
