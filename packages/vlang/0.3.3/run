@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Export environment variables
+export VMODULES="$PWD"
+export TMPDIR="$PWD"
+
+# Put instructions to run the runtime
+
+filename=$1
+
+rename 's/$/\.v/' $filename # Add .v extension
+
+shift
+v run $filename.v "$@"
