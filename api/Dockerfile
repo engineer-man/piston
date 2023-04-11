@@ -1,7 +1,7 @@
-FROM node:15.10.0-buster-slim
+FROM node:18.15.0-buster-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-
+RUN npm i -g npm@latest
 RUN dpkg-reconfigure -p critical dash
 RUN for i in $(seq 1001 1500); do \
         groupadd -g $i runner$i && \
