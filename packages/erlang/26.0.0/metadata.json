@@ -1,0 +1,5 @@
+{
+    "language": "erlang",
+    "version": "26.0.0",
+    "aliases": ["erl", "escript"]
+}
