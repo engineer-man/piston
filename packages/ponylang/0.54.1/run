@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# removes the first arg from $@, which is always the filename
+shift
+# runs the <outfile> executable with whatever args are left in $@
+./out "$@"

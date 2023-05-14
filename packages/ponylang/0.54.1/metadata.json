@@ -1,0 +1,5 @@
+{
+    "language": "ponylang",
+    "version": "0.54.1",
+    "aliases": ["pony", "ponyc"]
+}
