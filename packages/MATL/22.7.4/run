@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# get file as first argument
+file="$1"
+
+# remove the file from $@
+shift
+
+# use the rest of the arguments as stdin
+stdin=`printf "%s\n" "$@"`
+
+# pass stdin into octave which will run MATL
+echo "$stdin" | octave -W -p "$MATL_PATH" --eval "matl -of '$file'"
