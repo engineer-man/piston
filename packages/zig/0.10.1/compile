@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# optimizing for small programs
+rename 's/$/\.zig/' "$@" # Add .zig extension
+
+zig build-exe -O ReleaseSafe --color off --cache-dir . --global-cache-dir . --name out *.zig
