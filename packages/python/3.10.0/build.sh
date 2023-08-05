@@ -18,4 +18,4 @@ cd ..
 
 rm -rf build
 
-bin/pip3 install numpy scipy pandas pycrypto whoosh bcrypt passlib sympy
+bin/pip3 install numpy scipy pandas pycrypto whoosh bcrypt passlib sympy xxhash base58 cryptography PyNaCl
