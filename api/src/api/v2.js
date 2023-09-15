@@ -265,9 +265,13 @@ router.ws('/connect', async (ws, req) => {
 });
 
 router.post('/execute', async (req, res) => {
+    let job;
     try {
-        const job = await get_job(req.body);
-
+        job = await get_job(req.body);
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+    try {
         await job.prime();
 
         let result = await job.execute();
@@ -276,11 +280,17 @@ router.post('/execute', async (req, res) => {
             result.run = result.compile;
         }
 
-        await job.cleanup();
-
         return res.status(200).send(result);
     } catch (error) {
-        return res.status(400).json(error);
+        logger.error(`Error executing job: ${job.uuid}:\n${error}`);
+        return res.status(500).send();
+    } finally {
+        try {
+            await job.cleanup();
+        } catch (error) {
+            logger.error(`Error cleaning up job: ${job.uuid}:\n${error}`);
+            return res.status(500).send();
+        }
     }
 });
 
