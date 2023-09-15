@@ -210,19 +210,26 @@ router.ws('/connect', async (ws, req) => {
                     if (job === null) {
                         job = await get_job(msg);
 
-                        await job.prime();
+                        try {
+                            await job.prime();
 
-                        ws.send(
-                            JSON.stringify({
-                                type: 'runtime',
-                                language: job.runtime.language,
-                                version: job.runtime.version.raw,
-                            })
-                        );
+                            ws.send(
+                                JSON.stringify({
+                                    type: 'runtime',
+                                    language: job.runtime.language,
+                                    version: job.runtime.version.raw,
+                                })
+                            );
 
-                        await job.execute(event_bus);
-                        await job.cleanup();
-
+                            await job.execute(event_bus);
+                        } catch (error) {
+                            logger.error(
+                                `Error cleaning up job: ${job.uuid}:\n${error}`
+                            );
+                            throw error;
+                        } finally {
+                            await job.cleanup();
+                        }
                         ws.close(4999, 'Job Completed');
                     } else {
                         ws.close(4000, 'Already Initialized');
