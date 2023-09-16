@@ -230,7 +230,7 @@ router.ws('/connect', async (ws, req) => {
                         } finally {
                             await job.cleanup();
                         }
-                        ws.close(4999, 'Job Completed');
+                        ws.close(4999, 'Job Completed'); // Will not execute if an error is thrown above
                     } else {
                         ws.close(4000, 'Already Initialized');
                     }
@@ -293,10 +293,10 @@ router.post('/execute', async (req, res) => {
         return res.status(500).send();
     } finally {
         try {
-            await job.cleanup();
+            await job.cleanup(); // This gets executed before the returns in try/catch
         } catch (error) {
             logger.error(`Error cleaning up job: ${job.uuid}:\n${error}`);
-            return res.status(500).send();
+            return res.status(500).send(); // On error, this replaces the return in the outer try-catch
         }
     }
 });
