@@ -27,7 +27,7 @@ do
             echo "Done with package $pkg"
         elif [[ $CI -eq 1 ]]; then
             echo "Commit SHA: $pkg"
-            
+
             cd ..
             echo "Changed files:"
             git diff --name-only $pkg^1 $pkg
@@ -52,7 +52,8 @@ echo "Index created"
 
 if [[ $SERVER -eq 1 ]]; then
     echo "Starting index server.."
-    python3 -m http.server
+    # We want the child process to replace the shell to handle signals
+    exec python3 /serve.py
 else
     echo "Skipping starting index server"
 fi

@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y unzip autoconf build-essential libssl-d
         rm -rf /var/lib/apt/lists/* && \
         update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2
 
-ADD entrypoint.sh mkindex.sh /
+ADD entrypoint.sh mkindex.sh serve.py /
 
 ENTRYPOINT ["bash","/entrypoint.sh"]
 CMD ["--no-build"]

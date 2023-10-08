@@ -35,7 +35,10 @@ expressWs(app);
             }
         }
     });
-    fss.chmodSync(path.join(config.data_directory, globals.data_directories.jobs), 0o711)
+    fss.chmodSync(
+        path.join(config.data_directory, globals.data_directories.jobs),
+        0o711
+    );
 
     logger.info('Loading packages');
     const pkgdir = path.join(
@@ -92,7 +95,12 @@ expressWs(app);
     logger.debug('Calling app.listen');
     const [address, port] = config.bind_address.split(':');
 
-    app.listen(port, address, () => {
+    const server = app.listen(port, address, () => {
         logger.info('API server started on', config.bind_address);
+    });
+
+    process.on('SIGTERM', () => {
+        server.close();
+        process.exit(0)
     });
 })();
