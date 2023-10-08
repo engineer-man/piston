@@ -210,20 +210,27 @@ router.ws('/connect', async (ws, req) => {
                     if (job === null) {
                         job = await get_job(msg);
 
-                        await job.prime();
+                        try {
+                            await job.prime();
 
-                        ws.send(
-                            JSON.stringify({
-                                type: 'runtime',
-                                language: job.runtime.language,
-                                version: job.runtime.version.raw,
-                            })
-                        );
+                            ws.send(
+                                JSON.stringify({
+                                    type: 'runtime',
+                                    language: job.runtime.language,
+                                    version: job.runtime.version.raw,
+                                })
+                            );
 
-                        await job.execute(event_bus);
-                        await job.cleanup();
-
-                        ws.close(4999, 'Job Completed');
+                            await job.execute(event_bus);
+                        } catch (error) {
+                            logger.error(
+                                `Error cleaning up job: ${job.uuid}:\n${error}`
+                            );
+                            throw error;
+                        } finally {
+                            await job.cleanup();
+                        }
+                        ws.close(4999, 'Job Completed'); // Will not execute if an error is thrown above
                     } else {
                         ws.close(4000, 'Already Initialized');
                     }
@@ -265,9 +272,13 @@ router.ws('/connect', async (ws, req) => {
 });
 
 router.post('/execute', async (req, res) => {
+    let job;
     try {
-        const job = await get_job(req.body);
-
+        job = await get_job(req.body);
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+    try {
         await job.prime();
 
         let result = await job.execute();
@@ -276,11 +287,17 @@ router.post('/execute', async (req, res) => {
             result.run = result.compile;
         }
 
-        await job.cleanup();
-
         return res.status(200).send(result);
     } catch (error) {
-        return res.status(400).json(error);
+        logger.error(`Error executing job: ${job.uuid}:\n${error}`);
+        return res.status(500).send();
+    } finally {
+        try {
+            await job.cleanup(); // This gets executed before the returns in try/catch
+        } catch (error) {
+            logger.error(`Error cleaning up job: ${job.uuid}:\n${error}`);
+            return res.status(500).send(); // On error, this replaces the return in the outer try-catch
+        }
     }
 });
 
