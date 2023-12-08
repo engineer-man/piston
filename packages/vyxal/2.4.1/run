@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-python3 "$VYXAL_PATH"/Vyxal.py "$1"
