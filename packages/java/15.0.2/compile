@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Check if exactly one argument is provided
+if [ $# -eq 1 ]; then
+    mv $1 $1.java
+    filename=$1.java
+    shift
+    java $filename "$@"
+else
+    # Initialize an empty array to hold the filenames
+    declare -a javaFiles
+
+    # Loop through each argument
+    for file in "$@"; do
+        # Check if the file already ends with .java
+        if [[ "$file" == *.java ]]; then
+            # If it does, add it directly to the array
+            javaFiles+=("$file")
+        else
+            # If it doesn't, add .java extension then add to the array
+            javaFiles+=("${file}.java")
+        fi
+    done
+
+    # Compile all Java files at once
+    javac "${javaFiles[@]}"
+
+    # Run the compiled Java classes
+    # Assuming the first argument is the main class file to run
+    # Remove .java extension from the main class name if present
+    mainClass="${1%.java}"
+    # Execute the main class
+    java "$mainClass"
+fi
