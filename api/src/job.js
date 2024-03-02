@@ -144,21 +144,20 @@ class Job {
                 usePs: true,
             }, (err, stat) => {
                 if (err) {
-                    this.logger.error(`Error getting process stats:`, err);
-                    reject(err);
+                    this.logger.debug(`Got error while getting stats:`, err);
+                } else {
+                    let res = {
+                        'cpu': stat.cpu,
+                        'memory': stat.memory,
+                        'ctime': stat.ctime,
+                        'elapsed': stat.elapsed,
+                        'timestamp': stat.timestamp,
+                    };
+
+                    this.logger.debug(`Got stats:`, res);
+
+                    resolve(res);
                 }
-
-                let res = {
-                    'cpu': stat.cpu,
-                    'memory': stat.memory,
-                    'ctime': stat.ctime,
-                    'elapsed': stat.elapsed,
-                    'timestamp': stat.timestamp,
-                };
-
-                this.logger.debug(`Got stats:`, res);
-
-                resolve(res);
             });
         });
     }
