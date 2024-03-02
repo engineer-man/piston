@@ -8,6 +8,7 @@ const globals = require('./globals');
 const fs = require('fs/promises');
 const fss = require('fs');
 const wait_pid = require('waitpid');
+const pidusage = require('pidusage');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -136,6 +137,32 @@ class Job {
         this.logger.debug('Destroyed processes writables');
     }
 
+    get_stats(pid) {
+        // https://www.npmjs.com/package/pidusage
+        return new Promise((resolve, reject) => {
+            pidusage(pid, {
+                usePs: true,
+            }, (err, stat) => {
+                if (err) {
+                    this.logger.error(`Error getting process stats:`, err);
+                    reject(err);
+                }
+
+                let res = {
+                    'cpu': stat.cpu,
+                    'memory': stat.memory,
+                    'ctime': stat.ctime,
+                    'elapsed': stat.elapsed,
+                    'timestamp': stat.timestamp,
+                };
+
+                this.logger.debug(`Got stats:`, res);
+
+                resolve(res);
+            });
+        });
+    }
+
     async safe_call(file, args, timeout, memory_limit, event_bus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
@@ -171,6 +198,7 @@ class Job {
             var stdout = '';
             var stderr = '';
             var output = '';
+            var stats = [];
 
             const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
                 env: {
@@ -185,6 +213,10 @@ class Job {
             });
 
             this.#active_parent_processes.push(proc);
+
+            this.get_stats(proc.pid).then(stat => {
+                stats.push(stat);
+            });
 
             if (event_bus === null) {
                 proc.stdin.write(this.stdin);
@@ -203,6 +235,9 @@ class Job {
             const kill_timeout =
                 (timeout >= 0 &&
                     set_timeout(async _ => {
+                        this.get_stats(proc.pid).then(stat => {
+                            stats.push(stat);
+                        });
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         try {
                             process.kill(proc.pid, 'SIGKILL');
@@ -237,6 +272,10 @@ class Job {
                     stderr += data;
                     output += data;
                 }
+
+                this.get_stats(proc.pid).then(stat => {
+                    stats.push(stat);
+                });
             });
 
             proc.stdout.on('data', async data => {
@@ -258,6 +297,10 @@ class Job {
                     stdout += data;
                     output += data;
                 }
+
+                this.get_stats(proc.pid).then(stat => {
+                    stats.push(stat);
+                });
             });
 
             proc.on('exit', () => this.exit_cleanup());
@@ -265,14 +308,24 @@ class Job {
             proc.on('close', (code, signal) => {
                 this.close_cleanup();
 
-                resolve({ stdout, stderr, code, signal, output });
+                if (stats.length !== 0) {
+                    stats = stats[stats.length - 1];
+                }
+
+                this.logger.debug(`Last stats:`, stats);
+                resolve({ stdout, stderr, code, signal, output, stats });
             });
 
             proc.on('error', err => {
                 this.exit_cleanup();
                 this.close_cleanup();
 
-                reject({ error: err, stdout, stderr, output });
+                if (stats.length !== 0) {
+                    stats = stats[stats.length - 1];
+                }
+
+                this.logger.debug(`Last stats:`, stats);
+                reject({ error: err, stdout, stderr, output, stats });
             });
         });
     }
