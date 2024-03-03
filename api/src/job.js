@@ -199,6 +199,8 @@ class Job {
             var output = '';
             var stats = [];
 
+            var start_time = new Date().getTime();
+
             const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
                 env: {
                     ...this.runtime.env_vars,
@@ -311,8 +313,11 @@ class Job {
                     stats = stats[stats.length - 1];
                 }
 
+                var end_time = new Date().getTime();
+                var exec_time = end_time - start_time;
+
                 this.logger.debug(`Last stats:`, stats);
-                resolve({ stdout, stderr, code, signal, output, stats });
+                resolve({ stdout, stderr, code, signal, output, stats, exec_time });
             });
 
             proc.on('error', err => {
@@ -323,8 +328,11 @@ class Job {
                     stats = stats[stats.length - 1];
                 }
 
+                var end_time = new Date().getTime();
+                var exec_time = end_time - start_time;
+
                 this.logger.debug(`Last stats:`, stats);
-                reject({ error: err, stdout, stderr, output, stats });
+                reject({ error: err, stdout, stderr, output, stats, exec_time });
             });
         });
     }
