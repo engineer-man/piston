@@ -236,9 +236,14 @@ class Job {
             const kill_timeout =
                 (timeout >= 0 &&
                     set_timeout(async _ => {
-                        this.get_stats(proc.pid).then(stat => {
-                            stats.push(stat);
-                        });
+                        try {
+                            this.get_stats(proc.pid).then(stat => {
+                                stats.push(stat);
+                            });
+                        } catch (e) {
+                            this.logger.debug(`Got error while getting stats:`, e);
+                        }
+
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         try {
                             process.kill(proc.pid, 'SIGKILL');
