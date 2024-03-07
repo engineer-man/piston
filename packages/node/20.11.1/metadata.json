@@ -1,0 +1,10 @@
+{
+    "language": "node",
+    "version": "20.11.1",
+    "provides": [
+        {
+            "language": "javascript",
+            "aliases": ["node-javascript", "node-js", "javascript", "js"]
+        }
+    ]
+}
