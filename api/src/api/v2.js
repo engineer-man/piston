@@ -50,6 +50,13 @@ const SIGNALS = [
 ];
 // ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
+// NOTE 
+/**Job Fuctory Function
+ * this function is used to create a job object from the request body
+ * validates the request body and returns a promise that resolves to a job object
+ * @param {Object} body - the request body
+ * @returns {Promise<Job>} - a promise that resolves to a job object
+ */
 function get_job(body) {
     let {
         language,
@@ -122,6 +129,8 @@ function get_job(body) {
                 if (configured_limit <= 0) {
                     continue;
                 }
+                
+                // NOTE - configured limit is specified for each runtime( in the runtime.js file )
                 if (constraint_value > configured_limit) {
                     return reject({
                         message: `${constraint_name} cannot exceed the configured limit of ${configured_limit}`,

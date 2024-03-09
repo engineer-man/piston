@@ -1,0 +1,13 @@
+{
+  "entryFilePath": "src/api/v2.js",
+  "alias": {},
+  "resolveExtensions": [
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".vue",
+    ".scss",
+    ".less"
+  ]
+}

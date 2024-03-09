@@ -71,6 +71,11 @@ class Job {
         );
     }
 
+    // NOTE
+    /** This function is used to prime the job, which means to write the files
+     *  to the job cache and transfer ownership of the files to the runner.
+     * It also waits for a job slot if there are no available slots. (64 slots are available by default)
+     */
     async prime() {
         if (remaining_job_spaces < 1) {
             this.logger.info(`Awaiting job slot`);
@@ -136,10 +141,20 @@ class Job {
         this.logger.debug('Destroyed processes writables');
     }
 
+    /** This function is used to call the child process and limit its resources
+     * - used to compile and run the code.
+     * @param {string} file - The file to be executed
+     * @param {string[]} args - The arguments to be passed to the file
+     * @param {number} timeout - The time limit for the process
+     * @param {number} memory_limit - The memory limit for the process
+     * @param {EventEmitter} event_bus - The event bus to be used for communication
+     */
     async safe_call(file, args, timeout, memory_limit, event_bus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
 
+            // NOTE prlimit is a linux specific command
+            // It is used to limit the resources of the child process
             const prlimit = [
                 'prlimit',
                 '--nproc=' + this.runtime.max_process_count,
@@ -147,10 +162,12 @@ class Job {
                 '--fsize=' + this.runtime.max_file_size,
             ];
 
+            // NOTE timeout_call is a linux specific command
+            // It is used to limit the time of the child process
             const timeout_call = [
                 'timeout',
                 '-s',
-                '9',
+                '9', // SIGKILL
                 Math.ceil(timeout / 1000),
             ];
 
@@ -206,8 +223,7 @@ class Job {
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         try {
                             process.kill(proc.pid, 'SIGKILL');
-                        }
-                        catch (e) {
+                        } catch (e) {
                             // Could already be dead and just needs to be waited on
                             this.logger.debug(
                                 `Got error while SIGKILLing process ${proc}:`,
@@ -221,12 +237,14 @@ class Job {
             proc.stderr.on('data', async data => {
                 if (event_bus !== null) {
                     event_bus.emit('stderr', data);
-                } else if ((stderr.length + data.length) > this.runtime.output_max_size) {
+                } else if (
+                    stderr.length + data.length >
+                    this.runtime.output_max_size
+                ) {
                     this.logger.info(`stderr length exceeded`);
                     try {
                         process.kill(proc.pid, 'SIGKILL');
-                    }
-                    catch (e) {
+                    } catch (e) {
                         // Could already be dead and just needs to be waited on
                         this.logger.debug(
                             `Got error while SIGKILLing process ${proc}:`,
@@ -242,12 +260,14 @@ class Job {
             proc.stdout.on('data', async data => {
                 if (event_bus !== null) {
                     event_bus.emit('stdout', data);
-                } else if ((stdout.length + data.length) > this.runtime.output_max_size) {
+                } else if (
+                    stdout.length + data.length >
+                    this.runtime.output_max_size
+                ) {
                     this.logger.info(`stdout length exceeded`);
                     try {
                         process.kill(proc.pid, 'SIGKILL');
-                    }
-                    catch (e) {
+                    } catch (e) {
                         // Could already be dead and just needs to be waited on
                         this.logger.debug(
                             `Got error while SIGKILLing process ${proc}:`,
@@ -281,7 +301,7 @@ class Job {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
-                this.state.toString()
+                    this.state.toString()
             );
         }
 
@@ -298,22 +318,22 @@ class Job {
         const { emit_event_bus_result, emit_event_bus_stage } =
             event_bus === null
                 ? {
-                    emit_event_bus_result: () => { },
-                    emit_event_bus_stage: () => { },
-                }
+                      emit_event_bus_result: () => {},
+                      emit_event_bus_stage: () => {},
+                  }
                 : {
-                    emit_event_bus_result: (stage, result, event_bus) => {
-                        const { error, code, signal } = result;
-                        event_bus.emit('exit', stage, {
-                            error,
-                            code,
-                            signal,
-                        });
-                    },
-                    emit_event_bus_stage: (stage, event_bus) => {
-                        event_bus.emit('stage', stage);
-                    },
-                };
+                      emit_event_bus_result: (stage, result, event_bus) => {
+                          const { error, code, signal } = result;
+                          event_bus.emit('exit', stage, {
+                              error,
+                              code,
+                              signal,
+                          });
+                      },
+                      emit_event_bus_stage: (stage, event_bus) => {
+                          event_bus.emit('stage', stage);
+                      },
+                  };
 
         if (this.runtime.compiled) {
             this.logger.debug('Compiling');
