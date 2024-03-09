@@ -8,7 +8,6 @@ const globals = require('./globals');
 const fs = require('fs/promises');
 const fss = require('fs');
 const wait_pid = require('waitpid');
-const pidusage = require('pidusage');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
