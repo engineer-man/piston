@@ -14,8 +14,7 @@
         "node-fetch": "^2.6.1",
         "semver": "^7.3.4",
         "uuid": "^8.3.2",
-        "waitpid": "git+https://github.com/HexF/node-waitpid.git",
-        "pidusage": "^3.0.2"
+        "waitpid": "git+https://github.com/HexF/node-waitpid.git"
     },
     "license": "MIT"
 }

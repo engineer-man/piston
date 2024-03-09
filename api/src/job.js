@@ -137,31 +137,6 @@ class Job {
         this.logger.debug('Destroyed processes writables');
     }
 
-    get_stats(pid) {
-        // https://www.npmjs.com/package/pidusage
-        return new Promise((resolve, reject) => {
-            pidusage(pid, {
-                usePs: true,
-            }, (err, stat) => {
-                if (err) {
-                    this.logger.debug(`Got error while getting stats:`, err);
-                } else {
-                    let res = {
-                        'cpu': stat.cpu,
-                        'memory': stat.memory,
-                        'ctime': stat.ctime,
-                        'elapsed': stat.elapsed,
-                        'timestamp': stat.timestamp,
-                    };
-
-                    this.logger.debug(`Got stats:`, res);
-
-                    resolve(res);
-                }
-            });
-        });
-    }
-
     async safe_call(file, args, timeout, memory_limit, event_bus = null) {
         return new Promise((resolve, reject) => {
             const nonetwork = config.disable_networking ? ['nosocket'] : [];
@@ -180,6 +155,10 @@ class Job {
                 Math.ceil(timeout / 1000),
             ];
 
+            const time_format = [
+                '-p'
+            ]
+
             if (memory_limit >= 0) {
                 prlimit.push('--as=' + memory_limit);
             }
@@ -189,6 +168,8 @@ class Job {
                 ...timeout_call,
                 ...prlimit,
                 ...nonetwork,
+                'time',
+                ...time_format,
                 'bash',
                 file,
                 ...args,
@@ -197,7 +178,6 @@ class Job {
             var stdout = '';
             var stderr = '';
             var output = '';
-            var stats = [];
 
             var start_time = new Date().getTime();
 
@@ -214,10 +194,6 @@ class Job {
             });
 
             this.#active_parent_processes.push(proc);
-
-            this.get_stats(proc.pid).then(stat => {
-                stats.push(stat);
-            });
 
             if (event_bus === null) {
                 proc.stdin.write(this.stdin);
@@ -236,14 +212,6 @@ class Job {
             const kill_timeout =
                 (timeout >= 0 &&
                     set_timeout(async _ => {
-                        try {
-                            this.get_stats(proc.pid).then(stat => {
-                                stats.push(stat);
-                            });
-                        } catch (e) {
-                            this.logger.debug(`Got error while getting stats:`, e);
-                        }
-
                         this.logger.info(`Timeout exceeded timeout=${timeout}`);
                         try {
                             process.kill(proc.pid, 'SIGKILL');
@@ -278,10 +246,6 @@ class Job {
                     stderr += data;
                     output += data;
                 }
-
-                this.get_stats(proc.pid).then(stat => {
-                    stats.push(stat);
-                });
             });
 
             proc.stdout.on('data', async data => {
@@ -303,10 +267,6 @@ class Job {
                     stdout += data;
                     output += data;
                 }
-
-                this.get_stats(proc.pid).then(stat => {
-                    stats.push(stat);
-                });
             });
 
             proc.on('exit', () => this.exit_cleanup());
@@ -314,14 +274,17 @@ class Job {
             proc.on('close', (code, signal) => {
                 this.close_cleanup();
 
-                if (stats.length !== 0) {
-                    stats = stats[stats.length - 1];
+                if (stderr.length > 0) {
+                    var stats = stderr.trim().split('\n').slice(-3).join('\n');
+
+                    stderr = stderr.trim().split('\n').slice(0, -3).join('\n');
+                    output = output.trim().split('\n').slice(0, -3).join('\n');
                 }
 
                 var end_time = new Date().getTime();
                 var exec_time = end_time - start_time;
 
-                this.logger.debug(`Last stats:`, stats);
+                this.logger.debug(`Stats:`, stats);
                 resolve({ stdout, stderr, code, signal, output, stats, exec_time });
             });
 
@@ -329,14 +292,17 @@ class Job {
                 this.exit_cleanup();
                 this.close_cleanup();
 
-                if (stats.length !== 0) {
-                    stats = stats[stats.length - 1];
+                if (stderr.length > 0) {
+                    var stats = stderr.trim().split('\n').slice(-3).join('\n');
+
+                    stderr = stderr.trim().split('\n').slice(0, -3).join('\n');
+                    output = output.trim().split('\n').slice(0, -3).join('\n');
                 }
 
                 var end_time = new Date().getTime();
                 var exec_time = end_time - start_time;
 
-                this.logger.debug(`Last stats:`, stats);
+                this.logger.debug(`Stats:`, stats);
                 reject({ error: err, stdout, stderr, output, stats, exec_time });
             });
         });
