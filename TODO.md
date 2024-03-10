@@ -1,1 +1,1 @@
-1. add time format line (https://www.man7.org/linux/man-pages/man1/time.1.html#top_of_page)
+1. ~~add time format line (https://www.man7.org/linux/man-pages/man1/time.1.html#top_of_page)~~

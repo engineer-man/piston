@@ -155,7 +155,8 @@ class Job {
             ];
 
             const time_format = [
-                '-p'
+                '-f',
+                'real %es\\nuser %Us\\nsys %Ss\\nmem %MKb',
             ]
 
             if (memory_limit >= 0) {
@@ -274,10 +275,10 @@ class Job {
                 this.close_cleanup();
 
                 if (stderr.length > 0) {
-                    var stats = stderr.trim().split('\n').slice(-3).join('\n');
+                    var stats = stderr.trim().split('\n').slice(-4).join('\n');
 
-                    stderr = stderr.trim().split('\n').slice(0, -3).join('\n');
-                    output = output.trim().split('\n').slice(0, -3).join('\n');
+                    stderr = stderr.trim().split('\n').slice(0, -4).join('\n');
+                    output = output.trim().split('\n').slice(0, -4).join('\n');
                 }
 
                 var end_time = new Date().getTime();
@@ -292,10 +293,10 @@ class Job {
                 this.close_cleanup();
 
                 if (stderr.length > 0) {
-                    var stats = stderr.trim().split('\n').slice(-3).join('\n');
+                    var stats = stderr.trim().split('\n').slice(-4).join('\n');
 
-                    stderr = stderr.trim().split('\n').slice(0, -3).join('\n');
-                    output = output.trim().split('\n').slice(0, -3).join('\n');
+                    stderr = stderr.trim().split('\n').slice(0, -4).join('\n');
+                    output = output.trim().split('\n').slice(0, -4).join('\n');
                 }
 
                 var end_time = new Date().getTime();
