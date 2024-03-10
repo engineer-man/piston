@@ -156,7 +156,9 @@ class Job {
 
             const time_format = [
                 '-f',
-                'real %es\\nuser %Us\\nsys %Ss\\nmem %MKb',
+                // https://www.man7.org/linux/man-pages/man1/time.1.html#top_of_page
+                // elapsed user system memory
+                '%es %Us %Ss %MKb',
             ]
 
             if (memory_limit >= 0) {
@@ -275,10 +277,16 @@ class Job {
                 this.close_cleanup();
 
                 if (stderr.length > 0) {
-                    var stats = stderr.trim().split('\n').slice(-4).join('\n');
+                    var stats = stderr.trim().split('\n').slice(-1).join('\n').split(' ');
 
-                    stderr = stderr.trim().split('\n').slice(0, -4).join('\n');
-                    output = output.trim().split('\n').slice(0, -4).join('\n');
+                    stderr = stderr.trim().split('\n').slice(0, -1).join('\n');
+                    output = output.trim().split('\n').slice(0, -1).join('\n');
+
+                    stats = {
+                        'elapsed_time': stats[0],
+                        'cpu_time': stats[1] + ' / ' + stats[2],
+                        'max_mem': stats[3],
+                    }
                 }
 
                 var end_time = new Date().getTime();
@@ -293,10 +301,16 @@ class Job {
                 this.close_cleanup();
 
                 if (stderr.length > 0) {
-                    var stats = stderr.trim().split('\n').slice(-4).join('\n');
+                    var stats = stderr.trim().split('\n').slice(-1).join('\n').split(' ');
 
-                    stderr = stderr.trim().split('\n').slice(0, -4).join('\n');
-                    output = output.trim().split('\n').slice(0, -4).join('\n');
+                    stderr = stderr.trim().split('\n').slice(0, -1).join('\n');
+                    output = output.trim().split('\n').slice(0, -1).join('\n');
+
+                    stats = {
+                        'elapsed_time': stats[0],
+                        'cpu_time': stats[1] + ' / ' + stats[2],
+                        'max_mem': stats[3],
+                    }
                 }
 
                 var end_time = new Date().getTime();
