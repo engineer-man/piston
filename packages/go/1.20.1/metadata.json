@@ -1,0 +1,9 @@
+{
+    "language": "go",
+    "version": "1.20.1",
+    "aliases": ["go", "golang"],
+    "limit_overrides": {
+        "max_process_count": 128,
+        "run_timeout": 5000
+    }
+}
