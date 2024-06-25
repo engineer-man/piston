@@ -12,13 +12,14 @@ services:
         volumes:
             - ./data/piston/packages:/piston/packages
         environment:
-            - PISTON_REPO_URL=http://repo:8000/index
+            - PISTON_REPO_URL=https://github.com/engineer-man/piston/releases/download/pkgs/index
         tmpfs:
             - /piston/jobs:exec,uid=1000,gid=1000,mode=711
 
-    repo: # Local testing of packages
+    repo:
+        # Local testing of packages
         build: repo
         container_name: piston_repo
-        command: ['--no-build'] # Don't build anything
+        command: [ '--no-build' ] # Don't build anything
         volumes:
             - .:/piston
