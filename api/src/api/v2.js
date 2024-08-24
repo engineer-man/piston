@@ -211,7 +211,7 @@ router.ws('/connect', async (ws, req) => {
                         job = await get_job(msg);
 
                         try {
-                            await job.prime();
+                            const box = await job.prime();
 
                             ws.send(
                                 JSON.stringify({
@@ -221,7 +221,7 @@ router.ws('/connect', async (ws, req) => {
                                 })
                             );
 
-                            await job.execute(event_bus);
+                            await job.execute(box, event_bus);
                         } catch (error) {
                             logger.error(
                                 `Error cleaning up job: ${job.uuid}:\n${error}`
@@ -279,9 +279,9 @@ router.post('/execute', async (req, res) => {
         return res.status(400).json(error);
     }
     try {
-        await job.prime();
+        const box = await job.prime();
 
-        let result = await job.execute();
+        let result = await job.execute(box);
         // Backward compatibility when the run stage is not started
         if (result.run === undefined) {
             result.run = result.compile;

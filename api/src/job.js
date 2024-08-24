@@ -21,10 +21,7 @@ let job_queue = [];
 const get_next_box_id = () => (box_id + 1) % MAX_BOX_ID;
 
 class Job {
-    #box_id;
-    #metadata_file_path;
-    #box_dir;
-
+    #dirty_boxes;
     constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
         this.uuid = uuidv4();
 
@@ -50,6 +47,34 @@ class Job {
         this.memory_limits = memory_limits;
 
         this.state = job_states.READY;
+        this.#dirty_boxes = [];
+    }
+
+    async #create_isolate_box() {
+        const box_id = get_next_box_id();
+        const metadata_file_path = `/tmp/${box_id}-metadata.txt`;
+        return new Promise((res, rej) => {
+            cp.exec(
+                `isolate --init --cg -b${box_id}`,
+                (error, stdout, stderr) => {
+                    if (error) {
+                        rej(
+                            `Failed to run isolate --init: ${error.message}\nstdout: ${stdout}\nstderr: ${stderr}`
+                        );
+                    }
+                    if (stdout === '') {
+                        rej('Received empty stdout from isolate --init');
+                    }
+                    const box = {
+                        id: box_id,
+                        metadata_file_path,
+                        dir: stdout,
+                    };
+                    this.#dirty_boxes.push(box);
+                    res(box);
+                }
+            );
+        });
     }
 
     async prime() {
@@ -62,32 +87,14 @@ class Job {
         this.logger.info(`Priming job`);
         remaining_job_spaces--;
         this.logger.debug('Running isolate --init');
-        this.#box_id = get_next_box_id();
-        this.#metadata_file_path = `/tmp/${this.#box_id}-metadata.txt`;
-        await new Promise((res, rej) => {
-            cp.exec(
-                `isolate --init --cg -b${this.#box_id}`,
-                (error, stdout, stderr) => {
-                    if (error) {
-                        rej(
-                            `Failed to run isolate --init: ${error.message}\nstdout: ${stdout}\nstderr: ${stderr}`
-                        );
-                    }
-                    if (stdout === '') {
-                        rej('Received empty stdout from isolate --init');
-                    }
-                    this.#box_dir = stdout;
-                    res();
-                }
-            );
-        });
+        const box = await this.#create_isolate_box();
 
         this.logger.debug(`Creating submission files in Isolate box`);
-
-        await fs.mkdir(path.join(this.#box_dir, 'submission'));
+        const submission_dir = path.join(box.dir, 'submission');
+        await fs.mkdir(submission_dir);
         for (const file of this.files) {
-            const file_path = path.join(box_dir, file.name);
-            const rel = path.relative(box_dir, file_path);
+            const file_path = path.join(submission_dir, file.name);
+            const rel = path.relative(submission_dir, file_path);
 
             if (rel.startsWith('..'))
                 throw Error(
@@ -106,9 +113,10 @@ class Job {
         this.state = job_states.PRIMED;
 
         this.logger.debug('Primed job');
+        return box;
     }
 
-    async safe_call(file, args, timeout, memory_limit, event_bus = null) {
+    async safe_call(box, file, args, timeout, memory_limit, event_bus = null) {
         var stdout = '';
         var stderr = '';
         var output = '';
@@ -117,8 +125,8 @@ class Job {
             ISOLATE_PATH,
             [
                 '--run',
-                `-b${this.#box_id}`,
-                `--meta=${this.#metadata_file_path}`,
+                `-b${box.id}`,
+                `--meta=${box.metadata_file_path}`,
                 '--cg',
                 '-s',
                 '-c',
@@ -131,7 +139,7 @@ class Job {
                 `--time=${timeout}`,
                 `--extra-time=0`,
                 ...(memory_limit >= 0 ? [`--cg-mem=${memory_limit}`] : []),
-                ...(config.disable_networking ? [] : '--share-net'),
+                ...(config.disable_networking ? [] : ['--share-net']),
                 '--',
                 file,
                 ...args,
@@ -213,8 +221,8 @@ class Job {
         let time = null;
 
         try {
-            const metadata_str = await fs.readFile(
-                self.metadata_file_path,
+            const metadata_str = await fs.read_file(
+                box.metadata_file_path,
                 'utf-8'
             );
             const metadata_lines = metadata_str.split('\n');
@@ -230,7 +238,7 @@ class Job {
                 switch (key) {
                     case 'cg-mem':
                         memory =
-                            parseInt(value) ||
+                            parse_int(value) ||
                             (() => {
                                 throw new Error(
                                     `Failed to parse memory usage, received value: ${value}`
@@ -239,7 +247,7 @@ class Job {
                         break;
                     case 'exitcode':
                         code =
-                            parseInt(value) ||
+                            parse_int(value) ||
                             (() => {
                                 throw new Error(
                                     `Failed to parse exit code, received value: ${value}`
@@ -248,7 +256,7 @@ class Job {
                         break;
                     case 'exitsig':
                         signal =
-                            parseInt(value) ||
+                            parse_int(value) ||
                             (() => {
                                 throw new Error(
                                     `Failed to parse exit signal, received value: ${value}`
@@ -263,7 +271,7 @@ class Job {
                         break;
                     case 'time':
                         time =
-                            parseFloat(value) ||
+                            parse_float(value) ||
                             (() => {
                                 throw new Error(
                                     `Failed to parse cpu time, received value: ${value}`
@@ -276,7 +284,7 @@ class Job {
             }
         } catch (e) {
             throw new Error(
-                `Error reading metadata file: ${self.metadata_file_path}\nError: ${e.message}\nIsolate run stdout: ${stdout}\nIsolate run stderr: ${stderr}`
+                `Error reading metadata file: ${box.metadata_file_path}\nError: ${e.message}\nIsolate run stdout: ${stdout}\nIsolate run stderr: ${stderr}`
             );
         }
 
@@ -310,7 +318,7 @@ class Job {
         });
     }
 
-    async execute(event_bus = null) {
+    async execute(box, event_bus = null) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
@@ -352,6 +360,7 @@ class Job {
             this.logger.debug('Compiling');
             emit_event_bus_stage('compile');
             compile = await this.safe_call(
+                box,
                 '/runtime/compile',
                 code_files.map(x => x.name),
                 this.timeouts.compile,
@@ -365,8 +374,15 @@ class Job {
         let run;
         if (!compile_errored) {
             this.logger.debug('Running');
+            const old_box_dir = box.dir;
+            const new_box = await this.#create_isolate_box();
+            await fs.rename(
+                path.join(old_box_dir, 'submission'),
+                path.join(new_box, 'submission')
+            );
             emit_event_bus_stage('run');
             run = await this.safe_call(
+                new_box,
                 '/runtime/run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
@@ -389,11 +405,31 @@ class Job {
     async cleanup() {
         this.logger.info(`Cleaning up job`);
 
-        await fs.rm(`${this.#metadata_file_path}`);
         remaining_job_spaces++;
         if (job_queue.length > 0) {
             job_queue.shift()();
         }
+        await Promise.all(
+            this.#dirty_boxes.map(async box => {
+                cp.exec(
+                    `isolate --cleanup --cg -b${box.id}`,
+                    (error, stdout, stderr) => {
+                        if (error) {
+                            this.logger.error(
+                                `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${stdout}\nstderr: ${stderr}`
+                            );
+                        }
+                    }
+                );
+                try {
+                    await fs.rm(box.metadata_file_path);
+                } catch (e) {
+                    this.logger.error(
+                        `Failed to remove the metadata directory of box #${box.id}. Error: ${e.message}`
+                    );
+                }
+            })
+        );
     }
 }
 
