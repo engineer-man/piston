@@ -11,7 +11,6 @@ const platform = `${is_docker() ? 'docker' : 'baremetal'}-${fs
 module.exports = {
     data_directories: {
         packages: 'packages',
-        jobs: 'jobs',
     },
     version: require('../package.json').version,
     platform,
