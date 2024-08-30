@@ -135,23 +135,19 @@ function get_job(body) {
             }
         }
 
-        compile_timeout = compile_timeout || rt.timeouts.compile;
-        run_timeout = run_timeout || rt.timeouts.run;
-        compile_memory_limit = compile_memory_limit || rt.memory_limits.compile;
-        run_memory_limit = run_memory_limit || rt.memory_limits.run;
         resolve(
             new Job({
                 runtime: rt,
-                args: args || [],
-                stdin: stdin || '',
+                args: args ?? [],
+                stdin: stdin ?? '',
                 files,
                 timeouts: {
-                    run: run_timeout,
-                    compile: compile_timeout,
+                    run: run_timeout ?? rt.timeouts.run,
+                    compile: compile_timeout ?? rt.timeouts.compile,
                 },
                 memory_limits: {
-                    run: run_memory_limit,
-                    compile: compile_memory_limit,
+                    run: run_memory_limit ?? rt.memory_limits.run,
+                    compile: compile_memory_limit ?? rt.memory_limits.compile,
                 },
             })
         );

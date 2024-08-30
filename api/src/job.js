@@ -18,7 +18,7 @@ let box_id = 0;
 let remaining_job_spaces = config.max_concurrent_jobs;
 let job_queue = [];
 
-const get_next_box_id = () => (box_id + 1) % MAX_BOX_ID;
+const get_next_box_id = () => ++box_id % MAX_BOX_ID;
 
 class Job {
     #dirty_boxes;
@@ -68,7 +68,7 @@ class Job {
                     const box = {
                         id: box_id,
                         metadata_file_path,
-                        dir: stdout,
+                        dir: `${stdout.trim()}/box`,
                     };
                     this.#dirty_boxes.push(box);
                     res(box);
@@ -117,9 +117,15 @@ class Job {
     }
 
     async safe_call(box, file, args, timeout, memory_limit, event_bus = null) {
-        var stdout = '';
-        var stderr = '';
-        var output = '';
+        let stdout = '';
+        let stderr = '';
+        let output = '';
+        let memory = null;
+        let code = null;
+        let signal = null;
+        let message = null;
+        let status = null;
+        let time = null;
 
         const proc = cp.spawn(
             ISOLATE_PATH,
@@ -133,14 +139,18 @@ class Job {
                 '/box/submission',
                 '-e',
                 `--dir=/runtime=${this.runtime.pkgdir}`,
+                `--dir=/etc:noexec`,
                 `--processes=${this.runtime.max_process_count}`,
                 `--open-files=${this.runtime.max_open_files}`,
-                `--fsize=${this.runtime.max_file_size}`,
-                `--time=${timeout}`,
+                `--fsize=${Math.floor(this.runtime.max_file_size / 1000)}`,
+                `--time=${timeout / 1000}`,
                 `--extra-time=0`,
-                ...(memory_limit >= 0 ? [`--cg-mem=${memory_limit}`] : []),
+                ...(memory_limit >= 0
+                    ? [`--cg-mem=${Math.floor(memory_limit / 1000)}`]
+                    : []),
                 ...(config.disable_networking ? [] : ['--share-net']),
                 '--',
+                '/bin/bash',
                 file,
                 ...args,
             ],
@@ -174,7 +184,8 @@ class Job {
                 stderr.length + data.length >
                 this.runtime.output_max_size
             ) {
-                this.logger.info(`stderr length exceeded`);
+                message = 'stderr length exceeded';
+                this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
                 } catch (e) {
@@ -197,7 +208,8 @@ class Job {
                 stdout.length + data.length >
                 this.runtime.output_max_size
             ) {
-                this.logger.info(`stdout length exceeded`);
+                message = 'stdout length exceeded';
+                this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
                 } catch (e) {
@@ -213,18 +225,27 @@ class Job {
             }
         });
 
-        let memory = null;
-        let code = null;
-        let signal = null;
-        let message = null;
-        let status = null;
-        let time = null;
+        const data = await new Promise((res, rej) => {
+            proc.on('close', () => {
+                res({
+                    stdout,
+                    stderr,
+                });
+            });
+
+            proc.on('error', err => {
+                rej({
+                    error: err,
+                    stdout,
+                    stderr,
+                });
+            });
+        });
 
         try {
-            const metadata_str = await fs.read_file(
-                box.metadata_file_path,
-                'utf-8'
-            );
+            const metadata_str = (
+                await fs.read_file(box.metadata_file_path)
+            ).toString();
             const metadata_lines = metadata_str.split('\n');
             for (const line of metadata_lines) {
                 if (!line) continue;
@@ -237,46 +258,46 @@ class Job {
                 }
                 switch (key) {
                     case 'cg-mem':
-                        memory =
-                            parse_int(value) ||
-                            (() => {
-                                throw new Error(
-                                    `Failed to parse memory usage, received value: ${value}`
-                                );
-                            })();
+                        try {
+                            memory = parse_int(value);
+                        } catch (e) {
+                            throw new Error(
+                                `Failed to parse memory usage, received value: ${value}`
+                            );
+                        }
                         break;
                     case 'exitcode':
-                        code =
-                            parse_int(value) ||
-                            (() => {
-                                throw new Error(
-                                    `Failed to parse exit code, received value: ${value}`
-                                );
-                            })();
+                        try {
+                            code = parse_int(value);
+                        } catch (e) {
+                            throw new Error(
+                                `Failed to parse exit code, received value: ${value}`
+                            );
+                        }
                         break;
                     case 'exitsig':
-                        signal =
-                            parse_int(value) ||
-                            (() => {
-                                throw new Error(
-                                    `Failed to parse exit signal, received value: ${value}`
-                                );
-                            })();
+                        try {
+                            signal = parse_int(value);
+                        } catch (e) {
+                            throw new Error(
+                                `Failed to parse exit signal, received value: ${value}`
+                            );
+                        }
                         break;
                     case 'message':
-                        message = value;
+                        message = message || value;
                         break;
                     case 'status':
                         status = value;
                         break;
                     case 'time':
-                        time =
-                            parse_float(value) ||
-                            (() => {
-                                throw new Error(
-                                    `Failed to parse cpu time, received value: ${value}`
-                                );
-                            })();
+                        try {
+                            time = parse_float(value);
+                        } catch (e) {
+                            throw new Error(
+                                `Failed to parse cpu time, received value: ${value}`
+                            );
+                        }
                         break;
                     default:
                         break;
@@ -288,34 +309,16 @@ class Job {
             );
         }
 
-        proc.on('close', () => {
-            resolve({
-                stdout,
-                stderr,
-                code,
-                signal,
-                output,
-                memory,
-                message,
-                status,
-                time,
-            });
-        });
-
-        proc.on('error', err => {
-            reject({
-                error: err,
-                stdout,
-                stderr,
-                code,
-                signal,
-                output,
-                memory,
-                message,
-                status,
-                time,
-            });
-        });
+        return {
+            ...data,
+            code,
+            signal,
+            output,
+            memory,
+            message,
+            status,
+            time,
+        };
     }
 
     async execute(box, event_bus = null) {
@@ -369,20 +372,22 @@ class Job {
             );
             emit_event_bus_result('compile', compile);
             compile_errored = compile.code !== 0;
+            if (!compile_errored) {
+                const old_box_dir = box.dir;
+                box = await this.#create_isolate_box();
+                await fs.rename(
+                    path.join(old_box_dir, 'submission'),
+                    path.join(box.dir, 'submission')
+                );
+            }
         }
 
         let run;
         if (!compile_errored) {
             this.logger.debug('Running');
-            const old_box_dir = box.dir;
-            const new_box = await this.#create_isolate_box();
-            await fs.rename(
-                path.join(old_box_dir, 'submission'),
-                path.join(new_box, 'submission')
-            );
             emit_event_bus_stage('run');
             run = await this.safe_call(
-                new_box,
+                box,
                 '/runtime/run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,

@@ -35,10 +35,6 @@ expressWs(app);
             }
         }
     });
-    fss.chmodSync(
-        path.join(config.data_directory, globals.data_directories.jobs),
-        0o711
-    );
 
     logger.info('Loading packages');
     const pkgdir = path.join(
