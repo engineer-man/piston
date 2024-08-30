@@ -22,7 +22,15 @@ const get_next_box_id = () => ++box_id % MAX_BOX_ID;
 
 class Job {
     #dirty_boxes;
-    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
+    constructor({
+        runtime,
+        files,
+        args,
+        stdin,
+        timeouts,
+        cpu_times,
+        memory_limits,
+    }) {
         this.uuid = uuidv4();
 
         this.logger = logplease.create(`job/${this.uuid}`);
@@ -44,6 +52,7 @@ class Job {
         }
 
         this.timeouts = timeouts;
+        this.cpu_times = cpu_times;
         this.memory_limits = memory_limits;
 
         this.state = job_states.READY;
@@ -116,7 +125,15 @@ class Job {
         return box;
     }
 
-    async safe_call(box, file, args, timeout, memory_limit, event_bus = null) {
+    async safe_call(
+        box,
+        file,
+        args,
+        timeout,
+        cpu_time,
+        memory_limit,
+        event_bus = null
+    ) {
         let stdout = '';
         let stderr = '';
         let output = '';
@@ -125,7 +142,8 @@ class Job {
         let signal = null;
         let message = null;
         let status = null;
-        let time = null;
+        let cpu_time_stat = null;
+        let wall_time_stat = null;
 
         const proc = cp.spawn(
             ISOLATE_PATH,
@@ -143,7 +161,8 @@ class Job {
                 `--processes=${this.runtime.max_process_count}`,
                 `--open-files=${this.runtime.max_open_files}`,
                 `--fsize=${Math.floor(this.runtime.max_file_size / 1000)}`,
-                `--time=${timeout / 1000}`,
+                `--wall-time=${timeout / 1000}`,
+                `--time=${cpu_time / 1000}`,
                 `--extra-time=0`,
                 ...(memory_limit >= 0
                     ? [`--cg-mem=${Math.floor(memory_limit / 1000)}`]
@@ -292,10 +311,19 @@ class Job {
                         break;
                     case 'time':
                         try {
-                            time = parse_float(value);
+                            cpu_time_stat = parse_float(value);
                         } catch (e) {
                             throw new Error(
                                 `Failed to parse cpu time, received value: ${value}`
+                            );
+                        }
+                        break;
+                    case 'time-wall':
+                        try {
+                            wall_time_stat = parse_float(value);
+                        } catch (e) {
+                            throw new Error(
+                                `Failed to parse wall time, received value: ${value}`
                             );
                         }
                         break;
@@ -317,7 +345,8 @@ class Job {
             memory,
             message,
             status,
-            time,
+            cpu_time: cpu_time_stat,
+            wall_time: wall_time_stat,
         };
     }
 
@@ -367,6 +396,7 @@ class Job {
                 '/runtime/compile',
                 code_files.map(x => x.name),
                 this.timeouts.compile,
+                this.cpu_times.compile,
                 this.memory_limits.compile,
                 event_bus
             );
@@ -391,6 +421,7 @@ class Job {
                 '/runtime/run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
+                this.cpu_times.run,
                 this.memory_limits.run,
                 event_bus
             );

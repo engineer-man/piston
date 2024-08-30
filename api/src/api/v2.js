@@ -61,6 +61,8 @@ function get_job(body) {
         run_memory_limit,
         run_timeout,
         compile_timeout,
+        run_cpu_time,
+        compile_cpu_time,
     } = body;
 
     return new Promise((resolve, reject) => {
@@ -106,7 +108,7 @@ function get_job(body) {
             });
         }
 
-        for (const constraint of ['memory_limit', 'timeout']) {
+        for (const constraint of ['memory_limit', 'timeout', 'cpu_time']) {
             for (const type of ['compile', 'run']) {
                 const constraint_name = `${type}_${constraint}`;
                 const constraint_value = body[constraint_name];
@@ -144,6 +146,10 @@ function get_job(body) {
                 timeouts: {
                     run: run_timeout ?? rt.timeouts.run,
                     compile: compile_timeout ?? rt.timeouts.compile,
+                },
+                cpu_times: {
+                    run: run_cpu_time ?? rt.cpu_times.run,
+                    compile: compile_cpu_time ?? rt.cpu_times.compile,
                 },
                 memory_limits: {
                     run: run_memory_limit ?? rt.memory_limits.run,
@@ -272,6 +278,7 @@ router.post('/execute', async (req, res) => {
     try {
         job = await get_job(req.body);
     } catch (error) {
+        logger.error({ error });
         return res.status(400).json(error);
     }
     try {

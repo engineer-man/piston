@@ -178,7 +178,7 @@ default: {}
 ```
 
 Per-language overrides/exceptions for the each of `max_process_count`, `max_open_files`, `max_file_size`,
-`compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `output_max_size`. Defined as follows:
+`compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `compile_cpu_time`, `run_cpu_time`, `output_max_size`. Defined as follows:
 
 ```
 PISTON_LIMIT_OVERRIDES={"c++":{"max_process_count":128}}
