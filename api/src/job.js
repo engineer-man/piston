@@ -4,6 +4,7 @@ const cp = require('child_process');
 const path = require('path');
 const config = require('./config');
 const fs = require('fs/promises');
+const globals = require('./globals');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -245,18 +246,15 @@ class Job {
         });
 
         const data = await new Promise((res, rej) => {
-            proc.on('close', () => {
+            proc.on('exit', (_, signal) => {
                 res({
-                    stdout,
-                    stderr,
+                    signal,
                 });
             });
 
             proc.on('error', err => {
                 rej({
                     error: err,
-                    stdout,
-                    stderr,
                 });
             });
         });
@@ -277,31 +275,13 @@ class Job {
                 }
                 switch (key) {
                     case 'cg-mem':
-                        try {
-                            memory = parse_int(value);
-                        } catch (e) {
-                            throw new Error(
-                                `Failed to parse memory usage, received value: ${value}`
-                            );
-                        }
+                        memory = parse_int(value);
                         break;
                     case 'exitcode':
-                        try {
-                            code = parse_int(value);
-                        } catch (e) {
-                            throw new Error(
-                                `Failed to parse exit code, received value: ${value}`
-                            );
-                        }
+                        code = parse_int(value);
                         break;
                     case 'exitsig':
-                        try {
-                            signal = parse_int(value);
-                        } catch (e) {
-                            throw new Error(
-                                `Failed to parse exit signal, received value: ${value}`
-                            );
-                        }
+                        signal = globals.SIGNALS[parse_int(value)] ?? null;
                         break;
                     case 'message':
                         message = message || value;
@@ -310,22 +290,10 @@ class Job {
                         status = value;
                         break;
                     case 'time':
-                        try {
-                            cpu_time_stat = parse_float(value);
-                        } catch (e) {
-                            throw new Error(
-                                `Failed to parse cpu time, received value: ${value}`
-                            );
-                        }
+                        cpu_time_stat = parse_float(value) * 1000;
                         break;
                     case 'time-wall':
-                        try {
-                            wall_time_stat = parse_float(value);
-                        } catch (e) {
-                            throw new Error(
-                                `Failed to parse wall time, received value: ${value}`
-                            );
-                        }
+                        wall_time_stat = parse_float(value) * 1000;
                         break;
                     default:
                         break;
@@ -339,6 +307,8 @@ class Job {
 
         return {
             ...data,
+            stdout,
+            stderr,
             code,
             signal,
             output,

@@ -6,49 +6,8 @@ const events = require('events');
 const runtime = require('../runtime');
 const { Job } = require('../job');
 const package = require('../package');
+const globals = require('../globals');
 const logger = require('logplease').create('api/v2');
-
-const SIGNALS = [
-    'SIGABRT',
-    'SIGALRM',
-    'SIGBUS',
-    'SIGCHLD',
-    'SIGCLD',
-    'SIGCONT',
-    'SIGEMT',
-    'SIGFPE',
-    'SIGHUP',
-    'SIGILL',
-    'SIGINFO',
-    'SIGINT',
-    'SIGIO',
-    'SIGIOT',
-    'SIGKILL',
-    'SIGLOST',
-    'SIGPIPE',
-    'SIGPOLL',
-    'SIGPROF',
-    'SIGPWR',
-    'SIGQUIT',
-    'SIGSEGV',
-    'SIGSTKFLT',
-    'SIGSTOP',
-    'SIGTSTP',
-    'SIGSYS',
-    'SIGTERM',
-    'SIGTRAP',
-    'SIGTTIN',
-    'SIGTTOU',
-    'SIGUNUSED',
-    'SIGURG',
-    'SIGUSR1',
-    'SIGUSR2',
-    'SIGVTALRM',
-    'SIGXCPU',
-    'SIGXFSZ',
-    'SIGWINCH',
-];
-// ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
 function get_job(body) {
     let {
@@ -250,7 +209,9 @@ router.ws('/connect', async (ws, req) => {
                     break;
                 case 'signal':
                     if (job !== null) {
-                        if (SIGNALS.includes(msg.signal)) {
+                        if (
+                            Object.values(globals.SIGNALS).includes(msg.signal)
+                        ) {
                             event_bus.emit('signal', msg.signal);
                         } else {
                             ws.close(4005, 'Invalid signal');

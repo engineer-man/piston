@@ -135,8 +135,21 @@ key:
 default: 3000
 ```
 
-The maximum time that is allowed to be taken by a stage in milliseconds.
-Use -1 for unlimited time.
+The maximum time that is allowed to be taken by a stage in milliseconds. This is the wall-time of the stage. The time that the CPU does not spend working on the stage (e.g, due to context switches or IO) is counted.
+
+## Compile/Run CPU-Time
+
+```yaml
+key:
+  - PISTON_COMPILE_CPU_TIME
+default: 10000
+
+key:
+  - PISTON_RUN_CPU_TIME
+default: 3000
+```
+
+The maximum CPU-time that is allowed to be consumed by a stage in milliseconds. The time that the CPU does not spend working on the stage (e.g, IO and context switches) is not counted. This option is typically used in algorithm contests.
 
 ## Compile/Run memory limits
 
