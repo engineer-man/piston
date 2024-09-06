@@ -9,4 +9,5 @@ mkdir init && \
 echo 1 > init/cgroup.procs && \
 echo '+cpuset +memory' > cgroup.subtree_control && \
 echo "Initialized cgroup" && \
+chown -R piston:piston /piston && \
 exec su -- piston -c 'ulimit -n 65536 && node /piston_api/src'

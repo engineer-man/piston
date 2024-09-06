@@ -239,7 +239,6 @@ router.post('/execute', async (req, res) => {
     try {
         job = await get_job(req.body);
     } catch (error) {
-        logger.error({ error });
         return res.status(400).json(error);
     }
     try {
