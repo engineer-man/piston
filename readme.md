@@ -301,7 +301,8 @@ Content-Type: application/json
         "message": null,
         "status": null,
         "cpu_time": 8,
-        "wall_time": 154
+        "wall_time": 154,
+        "memory": 1160000
     }
 }
 ```

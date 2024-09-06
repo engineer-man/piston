@@ -275,7 +275,7 @@ class Job {
                 }
                 switch (key) {
                     case 'cg-mem':
-                        memory = parse_int(value);
+                        memory = parse_int(value) * 1000;
                         break;
                     case 'exitcode':
                         code = parse_int(value);
