@@ -92,7 +92,7 @@ jobs:
                   docker run -v $(pwd)'/repo:/piston/repo' -v $(pwd)'/packages:/piston/packages' -d --name repo docker.pkg.github.com/engineer-man/piston/repo-builder --no-build
                   docker pull docker.pkg.github.com/engineer-man/piston/api
                   docker build -t piston-api api
-                  docker run --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api piston-api
+                  docker run --privileged --network container:repo -v $(pwd)'/data:/piston' -e PISTON_LOG_LEVEL=DEBUG -e 'PISTON_REPO_URL=http://localhost:8000/index' -d --name api piston-api
                   echo Waiting for API to start..
                   docker run --network container:api appropriate/curl -s --retry 10 --retry-connrefused http://localhost:2000/api/v2/runtimes
 

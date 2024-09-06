@@ -10,10 +10,12 @@ services:
             - 2000:2000
         volumes:
             - ./data/piston/packages:/piston/packages
-        environment:
-            - PISTON_REPO_URL=http://repo:8000/index
         tmpfs:
             - /piston/jobs:exec,uid=1000,gid=1000,mode=711
+        environment:
+            - PISTON_DISABLE_NETWORKING=false
+            - PISTON_RUN_CPU_TIME=1000
+            - PISTON_LIMIT_OVERRIDES={"c++":{"run_cpu_time":700}}
 
     repo: # Local testing of packages
         build: repo
