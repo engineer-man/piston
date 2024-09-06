@@ -25,7 +25,6 @@ fetch_packages(){
     docker run \
         --privileged \
         -v "$PWD/build":'/piston/packages' \
-        --tmpfs /piston/jobs \
         -dit \
         -p $port:2000 \
         --name builder_piston_instance \
@@ -62,4 +61,4 @@ fetch_packages $SPEC_FILE
 build_container $TAG
 
 echo "Start your custom piston container with"
-echo "$ docker run --privileged --tmpfs /piston/jobs -dit -p 2000:2000 $TAG"
+echo "$ docker run --privileged -dit -p 2000:2000 $TAG"

@@ -138,7 +138,6 @@ The API will now be online with no language runtimes installed. To install runti
 docker run \
     --privileged \
     -v $PWD:'/piston' \
-    --tmpfs /piston/jobs \
     -dit \
     -p 2000:2000 \
     --name piston_api \
