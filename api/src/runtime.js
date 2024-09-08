@@ -15,6 +15,7 @@ class Runtime {
         pkgdir,
         runtime,
         timeouts,
+        cpu_times,
         memory_limits,
         max_process_count,
         max_open_files,
@@ -27,6 +28,7 @@ class Runtime {
         this.pkgdir = pkgdir;
         this.runtime = runtime;
         this.timeouts = timeouts;
+        this.cpu_times = cpu_times;
         this.memory_limits = memory_limits;
         this.max_process_count = max_process_count;
         this.max_open_files = max_open_files;
@@ -59,6 +61,18 @@ class Runtime {
                 run: this.compute_single_limit(
                     language_name,
                     'run_timeout',
+                    language_limit_overrides
+                ),
+            },
+            cpu_times: {
+                compile: this.compute_single_limit(
+                    language_name,
+                    'compile_cpu_time',
+                    language_limit_overrides
+                ),
+                run: this.compute_single_limit(
+                    language_name,
+                    'run_cpu_time',
                     language_limit_overrides
                 ),
             },
@@ -171,6 +185,7 @@ class Runtime {
                 .split('\n')
                 .map(line => line.split('=', 2))
                 .forEach(([key, val]) => {
+                    val = val.replace_all(this.pkgdir, '/runtime');
                     this._env_vars[key.trim()] = val.trim();
                 });
         }

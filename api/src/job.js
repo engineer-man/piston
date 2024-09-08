@@ -1,13 +1,10 @@
 const logplease = require('logplease');
-const logger = logplease.create('job');
 const { v4: uuidv4 } = require('uuid');
 const cp = require('child_process');
 const path = require('path');
 const config = require('./config');
-const globals = require('./globals');
 const fs = require('fs/promises');
-const fss = require('fs');
-const wait_pid = require('waitpid');
+const globals = require('./globals');
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -15,17 +12,26 @@ const job_states = {
     EXECUTED: Symbol('Executed and ready for cleanup'),
 };
 
-let uid = 0;
-let gid = 0;
+const MAX_BOX_ID = 999;
+const ISOLATE_PATH = '/usr/local/bin/isolate';
+let box_id = 0;
 
 let remaining_job_spaces = config.max_concurrent_jobs;
 let job_queue = [];
 
-class Job {
-    #active_timeouts;
-    #active_parent_processes;
+const get_next_box_id = () => ++box_id % MAX_BOX_ID;
 
-    constructor({ runtime, files, args, stdin, timeouts, memory_limits }) {
+class Job {
+    #dirty_boxes;
+    constructor({
+        runtime,
+        files,
+        args,
+        stdin,
+        timeouts,
+        cpu_times,
+        memory_limits,
+    }) {
         this.uuid = uuidv4();
 
         this.logger = logplease.create(`job/${this.uuid}`);
@@ -46,29 +52,39 @@ class Job {
             this.stdin += '\n';
         }
 
-        this.#active_timeouts = [];
-        this.#active_parent_processes = [];
-
         this.timeouts = timeouts;
+        this.cpu_times = cpu_times;
         this.memory_limits = memory_limits;
 
-        this.uid = config.runner_uid_min + uid;
-        this.gid = config.runner_gid_min + gid;
-
-        uid++;
-        gid++;
-
-        uid %= config.runner_uid_max - config.runner_uid_min + 1;
-        gid %= config.runner_gid_max - config.runner_gid_min + 1;
-
-        this.logger.debug(`Assigned uid=${this.uid} gid=${this.gid}`);
-
         this.state = job_states.READY;
-        this.dir = path.join(
-            config.data_directory,
-            globals.data_directories.jobs,
-            this.uuid
-        );
+        this.#dirty_boxes = [];
+    }
+
+    async #create_isolate_box() {
+        const box_id = get_next_box_id();
+        const metadata_file_path = `/tmp/${box_id}-metadata.txt`;
+        return new Promise((res, rej) => {
+            cp.exec(
+                `isolate --init --cg -b${box_id}`,
+                (error, stdout, stderr) => {
+                    if (error) {
+                        rej(
+                            `Failed to run isolate --init: ${error.message}\nstdout: ${stdout}\nstderr: ${stderr}`
+                        );
+                    }
+                    if (stdout === '') {
+                        rej('Received empty stdout from isolate --init');
+                    }
+                    const box = {
+                        id: box_id,
+                        metadata_file_path,
+                        dir: `${stdout.trim()}/box`,
+                    };
+                    this.#dirty_boxes.push(box);
+                    res(box);
+                }
+            );
+        });
     }
 
     async prime() {
@@ -80,208 +96,235 @@ class Job {
         }
         this.logger.info(`Priming job`);
         remaining_job_spaces--;
-        this.logger.debug('Writing files to job cache');
+        this.logger.debug('Running isolate --init');
+        const box = await this.#create_isolate_box();
 
-        this.logger.debug(`Transfering ownership`);
-
-        await fs.mkdir(this.dir, { mode: 0o700 });
-        await fs.chown(this.dir, this.uid, this.gid);
-
+        this.logger.debug(`Creating submission files in Isolate box`);
+        const submission_dir = path.join(box.dir, 'submission');
+        await fs.mkdir(submission_dir);
         for (const file of this.files) {
-            const file_path = path.join(this.dir, file.name);
-            const rel = path.relative(this.dir, file_path);
-            const file_content = Buffer.from(file.content, file.encoding);
+            const file_path = path.join(submission_dir, file.name);
+            const rel = path.relative(submission_dir, file_path);
 
             if (rel.startsWith('..'))
                 throw Error(
                     `File path "${file.name}" tries to escape parent directory: ${rel}`
                 );
 
+            const file_content = Buffer.from(file.content, file.encoding);
+
             await fs.mkdir(path.dirname(file_path), {
                 recursive: true,
                 mode: 0o700,
             });
-            await fs.chown(path.dirname(file_path), this.uid, this.gid);
-
             await fs.write_file(file_path, file_content);
-            await fs.chown(file_path, this.uid, this.gid);
         }
 
         this.state = job_states.PRIMED;
 
         this.logger.debug('Primed job');
+        return box;
     }
 
-    exit_cleanup() {
-        for (const timeout of this.#active_timeouts) {
-            clear_timeout(timeout);
-        }
-        this.#active_timeouts = [];
-        this.logger.debug('Cleared the active timeouts');
+    async safe_call(
+        box,
+        file,
+        args,
+        timeout,
+        cpu_time,
+        memory_limit,
+        event_bus = null
+    ) {
+        let stdout = '';
+        let stderr = '';
+        let output = '';
+        let memory = null;
+        let code = null;
+        let signal = null;
+        let message = null;
+        let status = null;
+        let cpu_time_stat = null;
+        let wall_time_stat = null;
 
-        this.cleanup_processes();
-        this.logger.debug(`Finished exit cleanup`);
-    }
-
-    close_cleanup() {
-        for (const proc of this.#active_parent_processes) {
-            proc.stderr.destroy();
-            if (!proc.stdin.destroyed) {
-                proc.stdin.end();
-                proc.stdin.destroy();
-            }
-            proc.stdout.destroy();
-        }
-        this.#active_parent_processes = [];
-        this.logger.debug('Destroyed processes writables');
-    }
-
-    async safe_call(file, args, timeout, memory_limit, event_bus = null) {
-        return new Promise((resolve, reject) => {
-            const nonetwork = config.disable_networking ? ['nosocket'] : [];
-
-            const prlimit = [
-                'prlimit',
-                '--nproc=' + this.runtime.max_process_count,
-                '--nofile=' + this.runtime.max_open_files,
-                '--fsize=' + this.runtime.max_file_size,
-            ];
-
-            const timeout_call = [
-                'timeout',
+        const proc = cp.spawn(
+            ISOLATE_PATH,
+            [
+                '--run',
+                `-b${box.id}`,
+                `--meta=${box.metadata_file_path}`,
+                '--cg',
                 '-s',
-                '9',
-                Math.ceil(timeout / 1000),
-            ];
-
-            if (memory_limit >= 0) {
-                prlimit.push('--as=' + memory_limit);
-            }
-
-            const proc_call = [
-                'nice',
-                ...timeout_call,
-                ...prlimit,
-                ...nonetwork,
-                'bash',
+                '-c',
+                '/box/submission',
+                '-e',
+                `--dir=/runtime=${this.runtime.pkgdir}`,
+                `--dir=/etc:noexec`,
+                `--processes=${this.runtime.max_process_count}`,
+                `--open-files=${this.runtime.max_open_files}`,
+                `--fsize=${Math.floor(this.runtime.max_file_size / 1000)}`,
+                `--wall-time=${timeout / 1000}`,
+                `--time=${cpu_time / 1000}`,
+                `--extra-time=0`,
+                ...(memory_limit >= 0
+                    ? [`--cg-mem=${Math.floor(memory_limit / 1000)}`]
+                    : []),
+                ...(config.disable_networking ? [] : ['--share-net']),
+                '--',
+                '/bin/bash',
                 file,
                 ...args,
-            ];
-
-            var stdout = '';
-            var stderr = '';
-            var output = '';
-
-            const proc = cp.spawn(proc_call[0], proc_call.splice(1), {
+            ],
+            {
                 env: {
                     ...this.runtime.env_vars,
                     PISTON_LANGUAGE: this.runtime.language,
                 },
                 stdio: 'pipe',
-                cwd: this.dir,
-                uid: this.uid,
-                gid: this.gid,
-                detached: true, //give this process its own process group
-            });
-
-            this.#active_parent_processes.push(proc);
-
-            if (event_bus === null) {
-                proc.stdin.write(this.stdin);
-                proc.stdin.end();
-                proc.stdin.destroy();
-            } else {
-                event_bus.on('stdin', data => {
-                    proc.stdin.write(data);
-                });
-
-                event_bus.on('kill', signal => {
-                    proc.kill(signal);
-                });
             }
+        );
 
-            const kill_timeout =
-                (timeout >= 0 &&
-                    set_timeout(async _ => {
-                        this.logger.info(`Timeout exceeded timeout=${timeout}`);
-                        try {
-                            process.kill(proc.pid, 'SIGKILL');
-                        }
-                        catch (e) {
-                            // Could already be dead and just needs to be waited on
-                            this.logger.debug(
-                                `Got error while SIGKILLing process ${proc}:`,
-                                e
-                            );
-                        }
-                    }, timeout)) ||
-                null;
-            this.#active_timeouts.push(kill_timeout);
-
-            proc.stderr.on('data', async data => {
-                if (event_bus !== null) {
-                    event_bus.emit('stderr', data);
-                } else if ((stderr.length + data.length) > this.runtime.output_max_size) {
-                    this.logger.info(`stderr length exceeded`);
-                    try {
-                        process.kill(proc.pid, 'SIGKILL');
-                    }
-                    catch (e) {
-                        // Could already be dead and just needs to be waited on
-                        this.logger.debug(
-                            `Got error while SIGKILLing process ${proc}:`,
-                            e
-                        );
-                    }
-                } else {
-                    stderr += data;
-                    output += data;
-                }
+        if (event_bus === null) {
+            proc.stdin.write(this.stdin);
+            proc.stdin.end();
+            proc.stdin.destroy();
+        } else {
+            event_bus.on('stdin', data => {
+                proc.stdin.write(data);
             });
 
-            proc.stdout.on('data', async data => {
-                if (event_bus !== null) {
-                    event_bus.emit('stdout', data);
-                } else if ((stdout.length + data.length) > this.runtime.output_max_size) {
-                    this.logger.info(`stdout length exceeded`);
-                    try {
-                        process.kill(proc.pid, 'SIGKILL');
-                    }
-                    catch (e) {
-                        // Could already be dead and just needs to be waited on
-                        this.logger.debug(
-                            `Got error while SIGKILLing process ${proc}:`,
-                            e
-                        );
-                    }
-                } else {
-                    stdout += data;
-                    output += data;
-                }
+            event_bus.on('kill', signal => {
+                proc.kill(signal);
             });
+        }
 
-            proc.on('exit', () => this.exit_cleanup());
+        proc.stderr.on('data', async data => {
+            if (event_bus !== null) {
+                event_bus.emit('stderr', data);
+            } else if (
+                stderr.length + data.length >
+                this.runtime.output_max_size
+            ) {
+                message = 'stderr length exceeded';
+                this.logger.info(message);
+                try {
+                    process.kill(proc.pid, 'SIGABRT');
+                } catch (e) {
+                    // Could already be dead and just needs to be waited on
+                    this.logger.debug(
+                        `Got error while SIGABRTing process ${proc}:`,
+                        e
+                    );
+                }
+            } else {
+                stderr += data;
+                output += data;
+            }
+        });
 
-            proc.on('close', (code, signal) => {
-                this.close_cleanup();
+        proc.stdout.on('data', async data => {
+            if (event_bus !== null) {
+                event_bus.emit('stdout', data);
+            } else if (
+                stdout.length + data.length >
+                this.runtime.output_max_size
+            ) {
+                message = 'stdout length exceeded';
+                this.logger.info(message);
+                try {
+                    process.kill(proc.pid, 'SIGABRT');
+                } catch (e) {
+                    // Could already be dead and just needs to be waited on
+                    this.logger.debug(
+                        `Got error while SIGABRTing process ${proc}:`,
+                        e
+                    );
+                }
+            } else {
+                stdout += data;
+                output += data;
+            }
+        });
 
-                resolve({ stdout, stderr, code, signal, output });
+        const data = await new Promise((res, rej) => {
+            proc.on('exit', (_, signal) => {
+                res({
+                    signal,
+                });
             });
 
             proc.on('error', err => {
-                this.exit_cleanup();
-                this.close_cleanup();
-
-                reject({ error: err, stdout, stderr, output });
+                rej({
+                    error: err,
+                });
             });
         });
+
+        try {
+            const metadata_str = (
+                await fs.read_file(box.metadata_file_path)
+            ).toString();
+            const metadata_lines = metadata_str.split('\n');
+            for (const line of metadata_lines) {
+                if (!line) continue;
+
+                const [key, value] = line.split(':');
+                if (key === undefined || value === undefined) {
+                    throw new Error(
+                        `Failed to parse metadata file, received: ${line}`
+                    );
+                }
+                switch (key) {
+                    case 'cg-mem':
+                        memory = parse_int(value) * 1000;
+                        break;
+                    case 'exitcode':
+                        code = parse_int(value);
+                        break;
+                    case 'exitsig':
+                        signal = globals.SIGNALS[parse_int(value)] ?? null;
+                        break;
+                    case 'message':
+                        message = message || value;
+                        break;
+                    case 'status':
+                        status = value;
+                        break;
+                    case 'time':
+                        cpu_time_stat = parse_float(value) * 1000;
+                        break;
+                    case 'time-wall':
+                        wall_time_stat = parse_float(value) * 1000;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } catch (e) {
+            throw new Error(
+                `Error reading metadata file: ${box.metadata_file_path}\nError: ${e.message}\nIsolate run stdout: ${stdout}\nIsolate run stderr: ${stderr}`
+            );
+        }
+
+        return {
+            ...data,
+            stdout,
+            stderr,
+            code,
+            signal,
+            output,
+            memory,
+            message,
+            status,
+            cpu_time: cpu_time_stat,
+            wall_time: wall_time_stat,
+        };
     }
 
-    async execute(event_bus = null) {
+    async execute(box, event_bus = null) {
         if (this.state !== job_states.PRIMED) {
             throw new Error(
                 'Job must be in primed state, current state: ' +
-                this.state.toString()
+                    this.state.toString()
             );
         }
 
@@ -298,49 +341,61 @@ class Job {
         const { emit_event_bus_result, emit_event_bus_stage } =
             event_bus === null
                 ? {
-                    emit_event_bus_result: () => { },
-                    emit_event_bus_stage: () => { },
-                }
+                      emit_event_bus_result: () => {},
+                      emit_event_bus_stage: () => {},
+                  }
                 : {
-                    emit_event_bus_result: (stage, result, event_bus) => {
-                        const { error, code, signal } = result;
-                        event_bus.emit('exit', stage, {
-                            error,
-                            code,
-                            signal,
-                        });
-                    },
-                    emit_event_bus_stage: (stage, event_bus) => {
-                        event_bus.emit('stage', stage);
-                    },
-                };
+                      emit_event_bus_result: (stage, result) => {
+                          const { error, code, signal } = result;
+                          event_bus.emit('exit', stage, {
+                              error,
+                              code,
+                              signal,
+                          });
+                      },
+                      emit_event_bus_stage: stage => {
+                          event_bus.emit('stage', stage);
+                      },
+                  };
 
         if (this.runtime.compiled) {
             this.logger.debug('Compiling');
-            emit_event_bus_stage('compile', event_bus);
+            emit_event_bus_stage('compile');
             compile = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'compile'),
+                box,
+                '/runtime/compile',
                 code_files.map(x => x.name),
                 this.timeouts.compile,
+                this.cpu_times.compile,
                 this.memory_limits.compile,
                 event_bus
             );
-            emit_event_bus_result('compile', compile, event_bus);
+            emit_event_bus_result('compile', compile);
             compile_errored = compile.code !== 0;
+            if (!compile_errored) {
+                const old_box_dir = box.dir;
+                box = await this.#create_isolate_box();
+                await fs.rename(
+                    path.join(old_box_dir, 'submission'),
+                    path.join(box.dir, 'submission')
+                );
+            }
         }
 
         let run;
         if (!compile_errored) {
             this.logger.debug('Running');
-            emit_event_bus_stage('run', event_bus);
+            emit_event_bus_stage('run');
             run = await this.safe_call(
-                path.join(this.runtime.pkgdir, 'run'),
+                box,
+                '/runtime/run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
+                this.cpu_times.run,
                 this.memory_limits.run,
                 event_bus
             );
-            emit_event_bus_result('run', run, event_bus);
+            emit_event_bus_result('run', run);
         }
 
         this.state = job_states.EXECUTED;
@@ -353,139 +408,34 @@ class Job {
         };
     }
 
-    cleanup_processes(dont_wait = []) {
-        let processes = [1];
-        const to_wait = [];
-        this.logger.debug(`Cleaning up processes`);
-
-        while (processes.length > 0) {
-            processes = [];
-
-            const proc_ids = fss.readdir_sync('/proc');
-
-            processes = proc_ids.map(proc_id => {
-                if (isNaN(proc_id)) return -1;
-                try {
-                    const proc_status = fss.read_file_sync(
-                        path.join('/proc', proc_id, 'status')
-                    );
-                    const proc_lines = proc_status.to_string().split('\n');
-                    const state_line = proc_lines.find(line =>
-                        line.starts_with('State:')
-                    );
-                    const uid_line = proc_lines.find(line =>
-                        line.starts_with('Uid:')
-                    );
-                    const [_, ruid, euid, suid, fuid] = uid_line.split(/\s+/);
-
-                    const [_1, state, user_friendly] = state_line.split(/\s+/);
-
-                    const proc_id_int = parse_int(proc_id);
-
-                    // Skip over any processes that aren't ours.
-                    if (ruid != this.uid && euid != this.uid) return -1;
-
-                    if (state == 'Z') {
-                        // Zombie process, just needs to be waited, regardless of the user id
-                        if (!to_wait.includes(proc_id_int))
-                            to_wait.push(proc_id_int);
-
-                        return -1;
-                    }
-                    // We should kill in all other state (Sleep, Stopped & Running)
-
-                    return proc_id_int;
-                } catch {
-                    return -1;
-                }
-
-                return -1;
-            });
-
-            processes = processes.filter(p => p > 0);
-
-            if (processes.length > 0)
-                this.logger.debug(`Got processes to kill: ${processes}`);
-
-            for (const proc of processes) {
-                // First stop the processes, but keep their resources allocated so they cant re-fork
-                try {
-                    process.kill(proc, 'SIGSTOP');
-                } catch (e) {
-                    // Could already be dead
-                    this.logger.debug(
-                        `Got error while SIGSTOPping process ${proc}:`,
-                        e
-                    );
-                }
-            }
-
-            for (const proc of processes) {
-                // Then clear them out of the process tree
-                try {
-                    process.kill(proc, 'SIGKILL');
-                } catch (e) {
-                    // Could already be dead and just needs to be waited on
-                    this.logger.debug(
-                        `Got error while SIGKILLing process ${proc}:`,
-                        e
-                    );
-                }
-
-                to_wait.push(proc);
-            }
-        }
-
-        this.logger.debug(
-            `Finished kill-loop, calling wait_pid to end any zombie processes`
-        );
-
-        for (const proc of to_wait) {
-            if (dont_wait.includes(proc)) continue;
-
-            wait_pid(proc);
-        }
-
-        this.logger.debug(`Cleaned up processes`);
-    }
-
-    async cleanup_filesystem() {
-        for (const clean_path of globals.clean_directories) {
-            const contents = await fs.readdir(clean_path);
-
-            for (const file of contents) {
-                const file_path = path.join(clean_path, file);
-
-                try {
-                    const stat = await fs.stat(file_path);
-
-                    if (stat.uid === this.uid) {
-                        await fs.rm(file_path, {
-                            recursive: true,
-                            force: true,
-                        });
-                    }
-                } catch (e) {
-                    // File was somehow deleted in the time that we read the dir to when we checked the file
-                    this.logger.warn(`Error removing file ${file_path}: ${e}`);
-                }
-            }
-        }
-
-        await fs.rm(this.dir, { recursive: true, force: true });
-    }
-
     async cleanup() {
         this.logger.info(`Cleaning up job`);
-
-        this.exit_cleanup(); // Run process janitor, just incase there are any residual processes somehow
-        this.close_cleanup();
-        await this.cleanup_filesystem();
 
         remaining_job_spaces++;
         if (job_queue.length > 0) {
             job_queue.shift()();
         }
+        await Promise.all(
+            this.#dirty_boxes.map(async box => {
+                cp.exec(
+                    `isolate --cleanup --cg -b${box.id}`,
+                    (error, stdout, stderr) => {
+                        if (error) {
+                            this.logger.error(
+                                `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${stdout}\nstderr: ${stderr}`
+                            );
+                        }
+                    }
+                );
+                try {
+                    await fs.rm(box.metadata_file_path);
+                } catch (e) {
+                    this.logger.error(
+                        `Failed to remove the metadata directory of box #${box.id}. Error: ${e.message}`
+                    );
+                }
+            })
+        );
     }
 }
 

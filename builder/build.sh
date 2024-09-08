@@ -23,20 +23,20 @@ fetch_packages(){
     mkdir build
     # Start a piston container
     docker run \
+        --privileged \
         -v "$PWD/build":'/piston/packages' \
-        --tmpfs /piston/jobs \
         -dit \
         -p $port:2000 \
         --name builder_piston_instance \
         ghcr.io/engineer-man/piston
-    
+
     # Ensure the CLI is installed
     cd ../cli
     npm i
     cd -
 
     # Evalulate the specfile
-    ../cli/index.js -u "http://127.0.0.1:$port" ppman spec $1   
+    ../cli/index.js -u "http://127.0.0.1:$port" ppman spec $1
 }
 
 build_container(){
@@ -61,4 +61,4 @@ fetch_packages $SPEC_FILE
 build_container $TAG
 
 echo "Start your custom piston container with"
-echo "$ docker run --tmpfs /piston/jobs -dit -p 2000:2000 $TAG"
+echo "$ docker run --privileged -dit -p 2000:2000 $TAG"

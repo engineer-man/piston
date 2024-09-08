@@ -104,7 +104,8 @@ POST https://emkc.org/api/v2/piston/execute
 
 -   Docker
 -   Docker Compose
--   Node JS (>= 13, preferably >= 15)
+-   Node JS (>= 15)
+-   cgroup v2 enabled, and cgroup v1 disabled
 
 ### After system dependencies are installed, clone this repository:
 
@@ -135,8 +136,8 @@ The API will now be online with no language runtimes installed. To install runti
 
 ```sh
 docker run \
+    --privileged \
     -v $PWD:'/piston' \
-    --tmpfs /piston/jobs \
     -dit \
     -p 2000:2000 \
     --name piston_api \
@@ -245,8 +246,10 @@ This endpoint requests execution of some arbitrary code.
 -   `files[].encoding` (_optional_) The encoding scheme used for the file content. One of `base64`, `hex` or `utf8`. Defaults to `utf8`.
 -   `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
 -   `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
--   `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
--   `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_timeout` (_optional_) The maximum wall-time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_timeout` (_optional_) The maximum wall-time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_cpu_time` (_optional_) The maximum CPU-time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_cpu_time` (_optional_) The maximum CPU-time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
 -   `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 -   `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 
@@ -264,6 +267,8 @@ This endpoint requests execution of some arbitrary code.
     "args": ["1", "2", "3"],
     "compile_timeout": 10000,
     "run_timeout": 3000,
+    "compile_cpu_time": 10000,
+    "run_cpu_time": 3000,
     "compile_memory_limit": -1,
     "run_memory_limit": -1
 }
@@ -273,7 +278,12 @@ A typical response upon successful execution will contain 1 or 2 keys `run` and 
 `compile` will only be present if the language requested requires a compile stage.
 
 Each of these keys has an identical structure, containing both a `stdout` and `stderr` key, which is a string containing the text outputted during the stage into each buffer.
-It also contains the `code` and `signal` which was returned from each process.
+It also contains the `code` and `signal` which was returned from each process. It also includes a nullable human-readable `message` which is a description of why a stage has failed and a two-letter `status` that is either:
+
+-   `RE` for runtime error
+-   `SG` for dying on a signal
+-   `TO` for timeout (either via `timeout` or `cpu_time`)
+-   `XX` for internal error
 
 ```json
 HTTP/1.1 200 OK
@@ -287,7 +297,12 @@ Content-Type: application/json
         "stderr": "",
         "output": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "code": 0,
-        "signal": null
+        "signal": null,
+        "message": null,
+        "status": null,
+        "cpu_time": 8,
+        "wall_time": 154,
+        "memory": 1160000
     }
 }
 ```
