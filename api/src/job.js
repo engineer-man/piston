@@ -205,6 +205,7 @@ class Job {
                 this.runtime.output_max_size
             ) {
                 message = 'stderr length exceeded';
+                status = 'EL';
                 this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
@@ -229,6 +230,7 @@ class Job {
                 this.runtime.output_max_size
             ) {
                 message = 'stdout length exceeded';
+                status = 'OL';
                 this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
@@ -287,7 +289,7 @@ class Job {
                         message = message || value;
                         break;
                     case 'status':
-                        status = value;
+                        status = status || value;
                         break;
                     case 'time':
                         cpu_time_stat = parse_float(value) * 1000;
@@ -310,7 +312,7 @@ class Job {
             stdout,
             stderr,
             code,
-            signal,
+            signal: ['TO', 'OL', 'EL'].includes(status) ? 'SIGKILL' : signal,
             output,
             memory,
             message,

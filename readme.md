@@ -283,6 +283,8 @@ It also contains the `code` and `signal` which was returned from each process. I
 -   `RE` for runtime error
 -   `SG` for dying on a signal
 -   `TO` for timeout (either via `timeout` or `cpu_time`)
+-   `OL` for stdout length exceeded
+-   `EL` for stderr length exceeded
 -   `XX` for internal error
 
 ```json
