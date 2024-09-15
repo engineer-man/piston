@@ -185,7 +185,6 @@ class Runtime {
                 .split('\n')
                 .map(line => line.split('=', 2))
                 .forEach(([key, val]) => {
-                    val = val.replace_all(this.pkgdir, '/runtime');
                     this._env_vars[key.trim()] = val.trim();
                 });
         }

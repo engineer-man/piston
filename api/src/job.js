@@ -157,7 +157,7 @@ class Job {
                 '-c',
                 '/box/submission',
                 '-e',
-                `--dir=/runtime=${this.runtime.pkgdir}`,
+                `--dir=${this.runtime.pkgdir}`,
                 `--dir=/etc:noexec`,
                 `--processes=${this.runtime.max_process_count}`,
                 `--open-files=${this.runtime.max_open_files}`,
@@ -171,7 +171,7 @@ class Job {
                 ...(config.disable_networking ? [] : ['--share-net']),
                 '--',
                 '/bin/bash',
-                file,
+                path.join(this.runtime.pkgdir, file),
                 ...args,
             ],
             {
@@ -205,6 +205,7 @@ class Job {
                 this.runtime.output_max_size
             ) {
                 message = 'stderr length exceeded';
+                status = 'EL';
                 this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
@@ -229,6 +230,7 @@ class Job {
                 this.runtime.output_max_size
             ) {
                 message = 'stdout length exceeded';
+                status = 'OL';
                 this.logger.info(message);
                 try {
                     process.kill(proc.pid, 'SIGABRT');
@@ -287,7 +289,7 @@ class Job {
                         message = message || value;
                         break;
                     case 'status':
-                        status = value;
+                        status = status || value;
                         break;
                     case 'time':
                         cpu_time_stat = parse_float(value) * 1000;
@@ -310,7 +312,7 @@ class Job {
             stdout,
             stderr,
             code,
-            signal,
+            signal: ['TO', 'OL', 'EL'].includes(status) ? 'SIGKILL' : signal,
             output,
             memory,
             message,
@@ -363,7 +365,7 @@ class Job {
             emit_event_bus_stage('compile');
             compile = await this.safe_call(
                 box,
-                '/runtime/compile',
+                'compile',
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.cpu_times.compile,
@@ -388,7 +390,7 @@ class Job {
             emit_event_bus_stage('run');
             run = await this.safe_call(
                 box,
-                '/runtime/run',
+                'run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
                 this.cpu_times.run,

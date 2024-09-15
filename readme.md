@@ -283,6 +283,8 @@ It also contains the `code` and `signal` which was returned from each process. I
 -   `RE` for runtime error
 -   `SG` for dying on a signal
 -   `TO` for timeout (either via `timeout` or `cpu_time`)
+-   `OL` for stdout length exceeded
+-   `EL` for stderr length exceeded
 -   `XX` for internal error
 
 ```json
@@ -411,26 +413,26 @@ Content-Type: application/json
 
 # Principle of Operation
 
-Piston uses Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
-which takes in execution requests and executees them within the container safely.
-High level, the API writes any source code to a temporary directory in `/piston/jobs`.
+Piston uses [Isolate](https://www.ucw.cz/moe/isolate.1.html) inside Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
+which takes in execution requests and executes them within the container safely.
+High level, the API writes any source code and executes it inside an Isolate sandbox.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
 <br>
 
 # Security
 
-Docker provides a great deal of security out of the box in that it's separate from the system.
-Piston takes additional steps to make it resistant to
-various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
+Piston uses Isolate which makes use of Linux namespaces, chroot, multiple unprivileged users, and cgroup for sandboxing and resource limiting. Code execution submissions on Piston shall not be aware of each other, shall not affect each other and shall not affect the underlying host system. This is ensured through multiple steps including:
 
--   Disabling outgoing network interaction
+-   Disabling outgoing network interaction by default
 -   Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
 -   Capping max files at 2048 (resists various file based attacks)
 -   Cleaning up all temp space after each execution (resists out of drive space attacks)
--   Running as a variety of unprivileged users
--   Capping runtime execution at 3 seconds
--   Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
+-   Running each submission as a different unprivileged user
+-   Running each submission with its own isolated Linux namespaces
+-   Capping runtime execution at 3 seconds by default (CPU-time and wall-time)
+-   Capping the peak memory that all the submission's processes can use
+-   Capping stdout to 1024 characters by default (resists yes/no bombs and runaway output)
 -   SIGKILLing misbehaving code
 
 <br>
