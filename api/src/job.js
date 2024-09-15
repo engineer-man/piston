@@ -157,7 +157,7 @@ class Job {
                 '-c',
                 '/box/submission',
                 '-e',
-                `--dir=/runtime=${this.runtime.pkgdir}`,
+                `--dir=${this.runtime.pkgdir}`,
                 `--dir=/etc:noexec`,
                 `--processes=${this.runtime.max_process_count}`,
                 `--open-files=${this.runtime.max_open_files}`,
@@ -171,7 +171,7 @@ class Job {
                 ...(config.disable_networking ? [] : ['--share-net']),
                 '--',
                 '/bin/bash',
-                file,
+                path.join(this.runtime.pkgdir, file),
                 ...args,
             ],
             {
@@ -365,7 +365,7 @@ class Job {
             emit_event_bus_stage('compile');
             compile = await this.safe_call(
                 box,
-                '/runtime/compile',
+                'compile',
                 code_files.map(x => x.name),
                 this.timeouts.compile,
                 this.cpu_times.compile,
@@ -390,7 +390,7 @@ class Job {
             emit_event_bus_stage('run');
             run = await this.safe_call(
                 box,
-                '/runtime/run',
+                'run',
                 [code_files[0].name, ...this.args],
                 this.timeouts.run,
                 this.cpu_times.run,
