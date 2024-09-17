@@ -1,4 +1,4 @@
-FROM buildpack-deps:bookworm AS isolate
+FROM buildpack-deps:buster AS isolate
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git libcap-dev && \
     rm -rf /var/lib/apt/lists/* && \
@@ -8,7 +8,7 @@ RUN apt-get update && \
     make -j$(nproc) install && \
     rm -rf /tmp/*
 
-FROM node:20-bookworm-slim
+FROM node:15.10.0-buster-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
