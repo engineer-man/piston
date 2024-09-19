@@ -90,6 +90,18 @@ const options = {
         parser: parse_int,
         validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
     },
+    compile_cpu_time: {
+        desc: 'Max CPU time allowed for compile stage in milliseconds',
+        default: 10000, // 10 seconds
+        parser: parse_int,
+        validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
+    },
+    run_cpu_time: {
+        desc: 'Max CPU time allowed for run stage in milliseconds',
+        default: 3000, // 3 seconds
+        parser: parse_int,
+        validators: [(x, raw) => !is_nan(x) || `${raw} is not a number`],
+    },
     compile_memory_limit: {
         desc: 'Max memory usage for compile stage in bytes (set to -1 for no limit)',
         default: -1, // no limit
@@ -117,7 +129,7 @@ const options = {
     limit_overrides: {
         desc: 'Per-language exceptions in JSON format for each of:\
         max_process_count, max_open_files, max_file_size, compile_memory_limit,\
-        run_memory_limit, compile_timeout, run_timeout, output_max_size',
+        run_memory_limit, compile_timeout, run_timeout, compile_cpu_time, run_cpu_time, output_max_size',
         default: {},
         parser: parse_overrides,
         validators: [
@@ -165,6 +177,8 @@ function parse_overrides(overrides_string) {
                     'run_memory_limit',
                     'compile_timeout',
                     'run_timeout',
+                    'compile_cpu_time',
+                    'run_cpu_time',
                     'output_max_size',
                 ].includes(key)
             ) {

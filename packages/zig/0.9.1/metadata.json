@@ -3,6 +3,7 @@
     "version": "0.9.1",
     "aliases": ["zig"],
     "limit_overrides": {
-        "compile_timeout": 15000
+        "compile_timeout": 15000,
+        "compile_cpu_time": 15000
     }
 }

@@ -104,7 +104,8 @@ POST https://emkc.org/api/v2/piston/execute
 
 -   Docker
 -   Docker Compose
--   Node JS (>= 13, preferably >= 15)
+-   Node JS (>= 15)
+-   cgroup v2 enabled, and cgroup v1 disabled
 
 ### After system dependencies are installed, clone this repository:
 
@@ -135,8 +136,8 @@ The API will now be online with no language runtimes installed. To install runti
 
 ```sh
 docker run \
+    --privileged \
     -v $PWD:'/piston' \
-    --tmpfs /piston/jobs \
     -dit \
     -p 2000:2000 \
     --name piston_api \
@@ -245,8 +246,10 @@ This endpoint requests execution of some arbitrary code.
 -   `files[].encoding` (_optional_) The encoding scheme used for the file content. One of `base64`, `hex` or `utf8`. Defaults to `utf8`.
 -   `stdin` (_optional_) The text to pass as stdin to the program. Must be a string or left out. Defaults to blank string.
 -   `args` (_optional_) The arguments to pass to the program. Must be an array or left out. Defaults to `[]`.
--   `compile_timeout` (_optional_) The maximum time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
--   `run_timeout` (_optional_) The maximum time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_timeout` (_optional_) The maximum wall-time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_timeout` (_optional_) The maximum wall-time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
+-   `compile_cpu_time` (_optional_) The maximum CPU-time allowed for the compile stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `10000` (10 seconds).
+-   `run_cpu_time` (_optional_) The maximum CPU-time allowed for the run stage to finish before bailing out in milliseconds. Must be a number or left out. Defaults to `3000` (3 seconds).
 -   `compile_memory_limit` (_optional_) The maximum amount of memory the compile stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 -   `run_memory_limit` (_optional_) The maximum amount of memory the run stage is allowed to use in bytes. Must be a number or left out. Defaults to `-1` (no limit)
 
@@ -264,6 +267,8 @@ This endpoint requests execution of some arbitrary code.
     "args": ["1", "2", "3"],
     "compile_timeout": 10000,
     "run_timeout": 3000,
+    "compile_cpu_time": 10000,
+    "run_cpu_time": 3000,
     "compile_memory_limit": -1,
     "run_memory_limit": -1
 }
@@ -273,7 +278,14 @@ A typical response upon successful execution will contain 1 or 2 keys `run` and 
 `compile` will only be present if the language requested requires a compile stage.
 
 Each of these keys has an identical structure, containing both a `stdout` and `stderr` key, which is a string containing the text outputted during the stage into each buffer.
-It also contains the `code` and `signal` which was returned from each process.
+It also contains the `code` and `signal` which was returned from each process. It also includes a nullable human-readable `message` which is a description of why a stage has failed and a two-letter `status` that is either:
+
+-   `RE` for runtime error
+-   `SG` for dying on a signal
+-   `TO` for timeout (either via `timeout` or `cpu_time`)
+-   `OL` for stdout length exceeded
+-   `EL` for stderr length exceeded
+-   `XX` for internal error
 
 ```json
 HTTP/1.1 200 OK
@@ -287,7 +299,12 @@ Content-Type: application/json
         "stderr": "",
         "output": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "code": 0,
-        "signal": null
+        "signal": null,
+        "message": null,
+        "status": null,
+        "cpu_time": 8,
+        "wall_time": 154,
+        "memory": 1160000
     }
 }
 ```
@@ -396,26 +413,26 @@ Content-Type: application/json
 
 # Principle of Operation
 
-Piston uses Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
-which takes in execution requests and executees them within the container safely.
-High level, the API writes any source code to a temporary directory in `/piston/jobs`.
+Piston uses [Isolate](https://www.ucw.cz/moe/isolate.1.html) inside Docker as the primary mechanism for sandboxing. There is an API within the container written in Node
+which takes in execution requests and executes them within the container safely.
+High level, the API writes any source code and executes it inside an Isolate sandbox.
 The source file is either ran or compiled and ran (in the case of languages like c, c++, c#, go, etc.).
 
 <br>
 
 # Security
 
-Docker provides a great deal of security out of the box in that it's separate from the system.
-Piston takes additional steps to make it resistant to
-various privilege escalation, denial-of-service, and resource saturation threats. These steps include:
+Piston uses Isolate which makes use of Linux namespaces, chroot, multiple unprivileged users, and cgroup for sandboxing and resource limiting. Code execution submissions on Piston shall not be aware of each other, shall not affect each other and shall not affect the underlying host system. This is ensured through multiple steps including:
 
--   Disabling outgoing network interaction
+-   Disabling outgoing network interaction by default
 -   Capping max processes at 256 by default (resists `:(){ :|: &}:;`, `while True: os.fork()`, etc.)
 -   Capping max files at 2048 (resists various file based attacks)
 -   Cleaning up all temp space after each execution (resists out of drive space attacks)
--   Running as a variety of unprivileged users
--   Capping runtime execution at 3 seconds
--   Capping stdout to 65536 characters (resists yes/no bombs and runaway output)
+-   Running each submission as a different unprivileged user
+-   Running each submission with its own isolated Linux namespaces
+-   Capping runtime execution at 3 seconds by default (CPU-time and wall-time)
+-   Capping the peak memory that all the submission's processes can use
+-   Capping stdout to 1024 characters by default (resists yes/no bombs and runaway output)
 -   SIGKILLing misbehaving code
 
 <br>

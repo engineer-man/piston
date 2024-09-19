@@ -6,49 +6,8 @@ const events = require('events');
 const runtime = require('../runtime');
 const { Job } = require('../job');
 const package = require('../package');
+const globals = require('../globals');
 const logger = require('logplease').create('api/v2');
-
-const SIGNALS = [
-    'SIGABRT',
-    'SIGALRM',
-    'SIGBUS',
-    'SIGCHLD',
-    'SIGCLD',
-    'SIGCONT',
-    'SIGEMT',
-    'SIGFPE',
-    'SIGHUP',
-    'SIGILL',
-    'SIGINFO',
-    'SIGINT',
-    'SIGIO',
-    'SIGIOT',
-    'SIGKILL',
-    'SIGLOST',
-    'SIGPIPE',
-    'SIGPOLL',
-    'SIGPROF',
-    'SIGPWR',
-    'SIGQUIT',
-    'SIGSEGV',
-    'SIGSTKFLT',
-    'SIGSTOP',
-    'SIGTSTP',
-    'SIGSYS',
-    'SIGTERM',
-    'SIGTRAP',
-    'SIGTTIN',
-    'SIGTTOU',
-    'SIGUNUSED',
-    'SIGURG',
-    'SIGUSR1',
-    'SIGUSR2',
-    'SIGVTALRM',
-    'SIGXCPU',
-    'SIGXFSZ',
-    'SIGWINCH',
-];
-// ref: https://man7.org/linux/man-pages/man7/signal.7.html
 
 function get_job(body) {
     let {
@@ -61,6 +20,8 @@ function get_job(body) {
         run_memory_limit,
         run_timeout,
         compile_timeout,
+        run_cpu_time,
+        compile_cpu_time,
     } = body;
 
     return new Promise((resolve, reject) => {
@@ -106,7 +67,7 @@ function get_job(body) {
             });
         }
 
-        for (const constraint of ['memory_limit', 'timeout']) {
+        for (const constraint of ['memory_limit', 'timeout', 'cpu_time']) {
             for (const type of ['compile', 'run']) {
                 const constraint_name = `${type}_${constraint}`;
                 const constraint_value = body[constraint_name];
@@ -135,23 +96,23 @@ function get_job(body) {
             }
         }
 
-        compile_timeout = compile_timeout || rt.timeouts.compile;
-        run_timeout = run_timeout || rt.timeouts.run;
-        compile_memory_limit = compile_memory_limit || rt.memory_limits.compile;
-        run_memory_limit = run_memory_limit || rt.memory_limits.run;
         resolve(
             new Job({
                 runtime: rt,
-                args: args || [],
-                stdin: stdin || '',
+                args: args ?? [],
+                stdin: stdin ?? '',
                 files,
                 timeouts: {
-                    run: run_timeout,
-                    compile: compile_timeout,
+                    run: run_timeout ?? rt.timeouts.run,
+                    compile: compile_timeout ?? rt.timeouts.compile,
+                },
+                cpu_times: {
+                    run: run_cpu_time ?? rt.cpu_times.run,
+                    compile: compile_cpu_time ?? rt.cpu_times.compile,
                 },
                 memory_limits: {
-                    run: run_memory_limit,
-                    compile: compile_memory_limit,
+                    run: run_memory_limit ?? rt.memory_limits.run,
+                    compile: compile_memory_limit ?? rt.memory_limits.compile,
                 },
             })
         );
@@ -211,7 +172,7 @@ router.ws('/connect', async (ws, req) => {
                         job = await get_job(msg);
 
                         try {
-                            await job.prime();
+                            const box = await job.prime();
 
                             ws.send(
                                 JSON.stringify({
@@ -221,7 +182,7 @@ router.ws('/connect', async (ws, req) => {
                                 })
                             );
 
-                            await job.execute(event_bus);
+                            await job.execute(box, event_bus);
                         } catch (error) {
                             logger.error(
                                 `Error cleaning up job: ${job.uuid}:\n${error}`
@@ -248,7 +209,9 @@ router.ws('/connect', async (ws, req) => {
                     break;
                 case 'signal':
                     if (job !== null) {
-                        if (SIGNALS.includes(msg.signal)) {
+                        if (
+                            Object.values(globals.SIGNALS).includes(msg.signal)
+                        ) {
                             event_bus.emit('signal', msg.signal);
                         } else {
                             ws.close(4005, 'Invalid signal');
@@ -279,9 +242,9 @@ router.post('/execute', async (req, res) => {
         return res.status(400).json(error);
     }
     try {
-        await job.prime();
+        const box = await job.prime();
 
-        let result = await job.execute();
+        let result = await job.execute(box);
         // Backward compatibility when the run stage is not started
         if (result.run === undefined) {
             result.run = result.compile;

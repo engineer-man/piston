@@ -135,8 +135,21 @@ key:
 default: 3000
 ```
 
-The maximum time that is allowed to be taken by a stage in milliseconds.
-Use -1 for unlimited time.
+The maximum time that is allowed to be taken by a stage in milliseconds. This is the wall-time of the stage. The time that the CPU does not spend working on the stage (e.g, due to context switches or IO) is counted.
+
+## Compile/Run CPU-Time
+
+```yaml
+key:
+  - PISTON_COMPILE_CPU_TIME
+default: 10000
+
+key:
+  - PISTON_RUN_CPU_TIME
+default: 3000
+```
+
+The maximum CPU-time that is allowed to be consumed by a stage in milliseconds. The time that the CPU does not spend working on the stage (e.g, IO and context switches) is not counted. This option is typically used in algorithm contests.
 
 ## Compile/Run memory limits
 
@@ -178,7 +191,7 @@ default: {}
 ```
 
 Per-language overrides/exceptions for the each of `max_process_count`, `max_open_files`, `max_file_size`,
-`compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `output_max_size`. Defined as follows:
+`compile_memory_limit`, `run_memory_limit`, `compile_timeout`, `run_timeout`, `compile_cpu_time`, `run_cpu_time`, `output_max_size`. Defined as follows:
 
 ```
 PISTON_LIMIT_OVERRIDES={"c++":{"max_process_count":128}}
