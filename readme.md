@@ -320,6 +320,40 @@ Content-Type: application/json
 }
 ```
 
+#### Interactive execution endpoint (not available through the public API)
+
+To interact with running processes in real time, you can establish a WebSocket connection at `/api/v2/connect`. This allows you to both receive output and send input to active processes.
+
+Each message is structured as a JSON object with a `type` key, which indicates the action to perform. Below is a list of message types, their directions, and descriptions:
+
+-   **init** (client -> server): Initializes a job with the same parameters as the `/execute` endpoint, except that stdin is discarded.
+-   **runtime** (server -> client): Provides details on the runtime environment, including the version and language.
+-   **stage** (server -> client): Indicates the current execution stage, either "compile" or "run."
+-   **data** (server <-> client): Exchanges data between the client and server, such as stdin, stdout, or stderr streams.
+-   **signal** (client -> server): Sends a signal (e.g., for termination) to the running process, whether it's in the "compile" or "run" stage.
+-   **exit** (server -> client): Signals the end of a stage, along with the exit code or signal.
+-   **error** (server -> client): Reports an error, typically right before the WebSocket is closed.
+
+An example of this endpoint in use is depicted below (**<** = client to server, **>** = server to client)
+
+1. Client establishes WebSocket connection to `/api/v2/connect`
+2. **<** `{"type":"init", "language":"bash", "version":"*", "files":[{"content": "cat"}]}`
+3. **>** `{"type":"runtime","language": "bash", "version": "5.1.0"}`
+4. **>** `{"type":"stage", "stage":"run"}`
+5. **<** `{"type":"data", "stream":"stdin", "data":"Hello World!"}`
+6. **>** `{"type":"data", "stream":"stdout", "data":"Hello World!"}`
+7. _time passes_
+8. **>** `{"type":"exit", "stage":"run", "code":null, "signal": "SIGKILL"}`
+
+Errors may return status codes as follows:
+
+-   **4000: Already Initialized**: Sent when a second `init` command is issued.
+-   **4001: Initialization Timeout**: No `init` command was sent within 1 second of connection.
+-   **4002: Notified Error**: A fatal error occurred, and an `error` packet was transmitted.
+-   **4003: Not yet Initialized**: A non-`init` command was sent without a job context.
+-   **4004: Can only write to stdin**: The client attempted to write to a stream other than stdin.
+-   **4005: Invalid Signal**: An invalid signal was sent in a `signal` packet.
+
 <br>
 
 # Supported Languages
