@@ -394,6 +394,7 @@ Errors may return status codes as follows:
 `groovy`,
 `haskell`,
 `husk`,
+`hy`,
 `iverilog`,
 `japt`,
 `java`,
