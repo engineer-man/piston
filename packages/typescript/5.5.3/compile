@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Put instructions to compile source code, remove this file if the language does not require this stage
+
+rename 's/$/\.ts/' "$@" # Add .ts extension
+
+tsc *.ts
