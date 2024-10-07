@@ -1,0 +1,20 @@
+{
+    "language": "bun",
+    "version": "1.1.20",
+    "dependencies": {},
+    "provides": [
+        {
+            "language": "typescript",
+            "aliases": [
+                "bun",
+                "bun-ts"
+            ]
+        },
+        {
+            "language": "javascript",
+            "aliases": [
+                "bun-js"
+            ]
+        }
+    ]
+}
