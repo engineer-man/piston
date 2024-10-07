@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+# split out all units in to their own files
+gnatchop $@
+
+# TODO try to compile more than just the hello unit
+if [ -e "test.adb" ] 
+then
+	gnatmake "test.adb"
+else 
+	echo "It looks like you don't have a \"test\" unit"
+fi
+
+
+
+#case "${PISTON_LANGUAGE}" in
+#    ada)
+#        rename 's/$/\.cs/' "$@" # Add .cs extension
+#        csc -out:out *.cs
+#        ;;
+#    basic)
+#        rename 's/$/\.vb/' "$@" # Add .vb extension
+#        vbnc -out:out *.vb
+#        ;;
+#    *)
+#        echo "How did you get here? (${PISTON_LANGUAGE})"
+#        exit 1
+#        ;;
+#esac
