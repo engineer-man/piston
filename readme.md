@@ -404,6 +404,7 @@ Errors may return status codes as follows:
 `javascript`,
 `jelly`,
 `julia`,
+`k`,
 `kotlin`,
 `lisp`,
 `llvm_ir`,
