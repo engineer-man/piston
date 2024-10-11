@@ -114,6 +114,10 @@ POST https://emkc.org/api/v2/piston/execute
 git clone https://github.com/engineer-man/piston
 ```
 
+> [!NOTE]
+>
+> Ensure the repository is cloned with LF line endings
+
 ### Installation
 
 ```sh
