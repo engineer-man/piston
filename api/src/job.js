@@ -156,6 +156,8 @@ class Job {
                 '-s',
                 '-c',
                 '/box/submission',
+                '-E',
+                'HOME=/tmp',
                 '-e',
                 `--dir=${this.runtime.pkgdir}`,
                 `--dir=/etc:noexec`,
