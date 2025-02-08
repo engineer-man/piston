@@ -158,7 +158,9 @@ class Job {
                 '/box/submission',
                 '-E',
                 'HOME=/tmp',
-                '-e',
+                ...this.runtime.env_vars.flat_map(v => ['-E', v]),
+                '-E',
+                `PISTON_LANGUAGE=${this.runtime.language}`,
                 `--dir=${this.runtime.pkgdir}`,
                 `--dir=/etc:noexec`,
                 `--processes=${this.runtime.max_process_count}`,
@@ -177,10 +179,6 @@ class Job {
                 ...args,
             ],
             {
-                env: {
-                    ...this.runtime.env_vars,
-                    PISTON_LANGUAGE: this.runtime.language,
-                },
                 stdio: 'pipe',
             }
         );
