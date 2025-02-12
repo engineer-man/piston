@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Put instructions to run the runtime
+
+CODE=$1.js
+shift
+
+node $CODE "$@"
