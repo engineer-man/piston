@@ -1,4 +1,10 @@
 {
+    "scripts": {
+        "install-runtimes": "node install-runtimes.js",
+        "install-runtimes:clean": "node install-runtimes.js --clean",
+        "install-runtimes:create": "node install-runtimes.js --create",
+        "install-runtimes:help": "node install-runtimes.js --help"
+    },
     "devDependencies": {
         "prettier": "2.4.1"
     }

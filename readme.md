@@ -198,6 +198,81 @@ cli/index.js run python test.py -l 3
 If you are operating on a remote machine, add the `-u` flag like so:
 
 ```sh
+
+### Runtime Installation Scripts
+
+For easier runtime management, we've provided convenient npm scripts to install runtimes automatically:
+
+#### Quick Start
+
+```sh
+# Install all available runtimes (recommended for first-time setup)
+npm run install-runtimes
+```
+
+This will:
+1. Create `runtimes.txt` from available packages if it doesn't exist
+2. Install all runtimes line by line with progress tracking
+3. Provide detailed logging and error handling
+
+#### Available Scripts
+
+```sh
+# Install all runtimes from runtimes.txt
+npm run install-runtimes
+
+# Create runtimes.txt from available packages
+npm run install-runtimes:create
+
+# Clean up special characters from runtimes.txt
+npm run install-runtimes:clean
+
+# Show help information
+npm run install-runtimes:help
+```
+
+#### Manual Runtime Installation
+
+If you prefer to install runtimes manually or need specific versions:
+
+```sh
+# List all available packages
+node cli/index.js ppman list
+
+# Install specific runtime
+node cli/index.js ppman install python=3.12.0
+node cli/index.js ppman install node=20.11.1
+node cli/index.js ppman install bash=5.2.0
+```
+
+#### Runtime Installation Features
+
+- **Line-by-line processing**: Installs runtimes one at a time to avoid overwhelming the system
+- **Progress tracking**: Shows current runtime being installed (e.g., [1/114])
+- **Error handling**: Continues installation even if some runtimes fail
+- **Automatic file creation**: Creates `runtimes.txt` if it doesn't exist
+- **Clean formatting**: Removes special characters from the file
+- **Delay between installations**: 2-second delay to prevent system overload
+
+#### Verification
+
+After installation, verify your runtimes are available:
+
+```sh
+# Check available runtimes via API
+curl http://localhost:2000/api/v2/runtimes
+
+# Test a simple execution
+curl -X POST http://localhost:2000/api/v2/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "bash",
+    "version": "5.2.0",
+    "files": [{"name": "test.sh", "content": "echo \"Hello from Piston!\""}]
+  }'
+```
+
+### API
 cli/index.js -u http://piston.server:2000 ppman list
 ```
 
