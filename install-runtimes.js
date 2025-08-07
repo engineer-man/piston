@@ -122,7 +122,6 @@ async function installRuntimesLineByLine() {
         
         // Add a delay between installations to avoid overwhelming the system
         if (currentIndex < runtimes.length) {
-            console.log('Waiting 2 seconds before next installation...\n');
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
