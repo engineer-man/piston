@@ -169,7 +169,7 @@ Useful for running memory-limited contests.
 
 ```yaml
 key: PISTON_REPO_URL
-default: https://github.com/engineer-man/piston/releases/download/pkgs/index
+default: https://github.com/infoyouth/piston/releases/download/pkgs/index
 ```
 
 URL for repository index, where packages will be downloaded from.

@@ -34,5 +34,5 @@ jobs:
                   push: true
                   pull: true
                   tags: |
-                      docker.pkg.github.com/engineer-man/piston/api
-                      ghcr.io/engineer-man/piston
+                      docker.pkg.github.com/infoyouth/piston/api
+                      ghcr.io/infoyouth/piston

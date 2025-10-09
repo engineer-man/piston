@@ -3,7 +3,7 @@ version: '3.2'
 services:
     api:
         build: api
-        container_name: piston_api
+        container_name: infoyouth_piston_api
         privileged: true
         restart: always
         ports:
