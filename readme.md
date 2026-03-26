@@ -89,7 +89,7 @@ GET  https://emkc.org/api/v2/piston/runtimes
 POST https://emkc.org/api/v2/piston/execute
 ```
 
-> Important Note: The Piston API is no longer freely available to the public (as of Feb 15, 2026). To obain authorization, please reach out to EngineerMan on [Discord](https://discord.gg/engineerman). Authorization is only granted for non-commercial use (no paid products), low volume, and particular those in the educational, tinkering, or competitive code space.
+> Important Note: The Piston API is no longer freely available to the public (as of Feb 15, 2026). To obain authorization, please reach out to EngineerMan on [Discord](https://discord.gg/engineerman). Authorization is only granted for non-commercial use (no paid products), low volume, and particular those in the educational space. Keys **are not** granted for individual projects, portfolio projects, university assignments, conceptual projects, vibe-coded ai slop projects, or projects that generally don't benefit anyone. I reserve complete discretion on key issuance. If a key is not issued, you are more than welcome to run your own instance of Piston, as it is open source, after all.
 
 <br>
 
