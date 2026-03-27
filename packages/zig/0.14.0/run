@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+shift # Filename is only used in compile step, so we can take it out here
+./out "$@"
