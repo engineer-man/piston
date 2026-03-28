@@ -72,6 +72,7 @@ The following are approved and endorsed extensions/utilities to the core Piston 
 -   [Go-Piston](https://github.com/milindmadhukar/go-piston), a Golang wrapper for accessing the Piston API.
 -   [piston_rs](https://github.com/Jonxslays/piston_rs), a Rust wrapper for accessing the Piston API.
 -   [piston_rspy](https://github.com/Jonxslays/piston_rspy), Python bindings for accessing the Piston API via `piston_rs`.
+-   [Piston Ruby SDK](https://github.com/alvii147/piston-ruby-sdk), a Ruby gem for access the Piston API.
 
 <br>
 
