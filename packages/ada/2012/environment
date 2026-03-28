@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Put 'export' statements here for environment variables
+#export PATH=$PWD/bin:$PATH
+export PATH=/opt/gcc-fsf-gnat/bin:$PATH
+export LD_LIBRARY_PATH=/opt/gcc-fsf-gnat/lib64:/opt/gcc-fsf-gnat/lib
+
