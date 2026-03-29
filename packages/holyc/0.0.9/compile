@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Compile HolyC files
+mv $1 $1.HC
+filename=$1.HC
+shift
+hcc $filename
