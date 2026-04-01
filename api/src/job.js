@@ -117,7 +117,7 @@ class Job {
                 recursive: true,
                 mode: 0o700,
             });
-            await fs.write_file(file_path, file_content);
+            await fs.writeFile(file_path, file_content);
         }
 
         this.state = job_states.PRIMED;
@@ -277,13 +277,13 @@ class Job {
                 }
                 switch (key) {
                     case 'cg-mem':
-                        memory = parse_int(value) * 1000;
+                        memory = parseInt(value) * 1000;
                         break;
                     case 'exitcode':
-                        code = parse_int(value);
+                        code = parseInt(value);
                         break;
                     case 'exitsig':
-                        signal = globals.SIGNALS[parse_int(value)] ?? null;
+                        signal = globals.SIGNALS[parseInt(value)] ?? null;
                         break;
                     case 'message':
                         message = message || value;
@@ -292,10 +292,10 @@ class Job {
                         status = status || value;
                         break;
                     case 'time':
-                        cpu_time_stat = parse_float(value) * 1000;
+                        cpu_time_stat = parseFloat(value) * 1000;
                         break;
                     case 'time-wall':
-                        wall_time_stat = parse_float(value) * 1000;
+                        wall_time_stat = parseFloat(value) * 1000;
                         break;
                     default:
                         break;

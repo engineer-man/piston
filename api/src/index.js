@@ -20,7 +20,7 @@ expressWs(app);
     Logger.setLogLevel(config.log_level);
     logger.debug('Ensuring data directories exist');
 
-    Object.values(globals.data_directories).for_each(dir => {
+    Object.values(globals.data_directories).forEach(dir => {
         let data_path = path.join(config.data_directory, dir);
 
         logger.debug(`Ensuring ${data_path} exists`);
@@ -58,7 +58,7 @@ expressWs(app);
             fss.exists_sync(path.join(pkg, globals.pkg_installed_file))
         );
 
-    installed_languages.for_each(pkg => runtime.load_package(pkg));
+    installed_languages.forEach(pkg => runtime.load_package(pkg));
 
     logger.info('Starting API Server');
     logger.debug('Constructing Express App');
