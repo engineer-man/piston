@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# k path
+export PATH=$PWD/bin:$PATH
+export K_PATH=$PWD/k
