@@ -33,7 +33,8 @@ case $1 in
         echo " uninstall <packages...>        Uninstalls language packages"
         echo " bash                           Opens a bash shell for the piston_api container"
         echo
-        echo " update                         Fetches and applies latest updates"
+        echo " update                         Fetches and applies latest updates from origin"
+        echo " sync                           Synchronizes your fork with the upstream repository"
         echo
         echo " <args..>                       Passthrough to piston cli tool"
         echo
@@ -190,6 +191,35 @@ case $1 in
         cd core/cli && npm i > /dev/null && cd -
         docker_compose pull
         docker_compose up -d
+        ;;
+    
+    sync)
+        if ! git remote | grep -q "^upstream$"; then
+            echo "❌ 'upstream' remote not found. Please add it first:"
+            echo "   git remote add upstream https://github.com/engineer-man/piston.git"
+            exit 1
+        fi
+        
+        echo "🔄 Fetching latest changes from upstream..."
+        git fetch upstream
+        
+        echo "⚠️  This will rebase your local customizations on top of the original Piston repository."
+        echo "   Local build fixes (Debian Bullseye, ARM64/x86 logic) will be preserved."
+        echo -n "   Continue? [y/N] "
+        read -r response
+        if [[ ! "$response" =~ ^[yY]$ ]]; then
+            echo "Aborted."
+            exit 0
+        fi
+        
+        echo "🚀 Syncing with upstream/master..."
+        if ! git rebase upstream/master; then
+            echo "❌ Merge conflicts detected! Please resolve them manually and run:"
+            echo "   git rebase --continue"
+            exit 1
+        fi
+        
+        echo "✅ Sync complete! Your personal fork is now up-to-date with upstream."
         ;;
 
     clean-pkgs) git clean -fqXd packages ;;

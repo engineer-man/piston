@@ -39,6 +39,7 @@ The `./piston` script is your main entry point for managing the service.
 | **`./piston list --all`** | List every package available in the repository index. |
 | **`./piston install <pkg>`**| Install a pre-built package from the repository. |
 | **`./piston uninstall <pkg>`** | Remove a language package (cleanly hides it from the list). |
+| **`./piston sync`** | Synchronize your fork with the original upstream repository. |
 | **`./piston start / stop`** | Start or stop the Piston API Docker containers. |
 | **`./piston restart`** | Restart the Piston environment. |
 | **`./piston logs`** | View live logs from the API and repository services. |
