@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [2.1.0] - 2026-04-05
 
 ### Added
+- **API Key Authentication**: Support for securing the API via the `PISTON_KEY` environment variable and `Authorization` header.
 - **Upstream Synchronization**: New `./piston sync` command to safely rebase your personal fork on top of `engineer-man/piston`.
 - **Interactive Setup Wizard**: New `./piston setup` command to easily select, build, and install language packages.
 - **Management Shorthands**:

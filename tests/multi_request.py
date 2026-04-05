@@ -6,21 +6,25 @@
         the file for deletion
     
     Resolution
-        Catching any errors resulting from individual file deletes in the
-        filesystem cleanup.
+        Refactored api/job.js to properly await isolate --cleanup before 
+        removing metadata files.
     
 """
 import aiohttp
 import asyncio
+import os
+
+# Piston API Key from environment
+PISTON_KEY = os.environ.get('PISTON_KEY')
 
 def get_request_data(message):
     return {
-        'language': 'java',
-        'version': '15.0.2',
+        'language': 'python',
+        'version': '3.12.0',
         'files': [
             {
-                'name': 'Test.java',
-                'content': 'public class HelloWorld { public static void main(String[] args) { System.out.print("' + message + '"); }}'
+                'name': 'test.py',
+                'content': f'print("{message}")'
             }
         ],
         'stdin': '',
@@ -30,20 +34,41 @@ def get_request_data(message):
     }
 
 async def post_request(session, data):
-    async with session.post('http://127.0.0.1:2000/api/v2/execute', json=data) as resp:
-        response = await resp.json()
-        return response
+    headers = {'Content-Type': 'application/json'}
+    if PISTON_KEY:
+        headers['Authorization'] = PISTON_KEY
+        
+    async with session.post('http://127.0.0.1:2000/api/v2/execute', json=data, headers=headers) as resp:
+        if resp.status == 401:
+            return {'error': 'Unauthorized: Check your PISTON_KEY'}
+        try:
+            response = await resp.json()
+            return response
+        except Exception as e:
+            return {'error': f'Failed to parse JSON: {str(e)}', 'status': resp.status}
 
 async def run_many_requests(number):
     async with aiohttp.ClientSession() as session:
+        print(f"🚀 Sending {number} parallel requests to Piston...")
+        if PISTON_KEY:
+            print("🔑 Using API Key authentication")
+        
         tasks = []
         for i in range(number):
             request_data = get_request_data(f"Request #{i}")
             tasks.append(asyncio.ensure_future(post_request(session, request_data)))
 
         results = await asyncio.gather(*tasks)
-        for result in results:
-            print(result)
+        
+        success_count = 0
+        for i, result in enumerate(results):
+            if 'run' in result and result['run']['code'] == 0:
+                success_count += 1
+            else:
+                print(f"❌ Request #{i} failed: {result.get('error') or result.get('message') or result}")
+
+        print(f"\n✅ Finished! {success_count}/{number} requests succeeded.")
             
 
-asyncio.run(run_many_requests(5))
+if __name__ == "__main__":
+    asyncio.run(run_many_requests(20))

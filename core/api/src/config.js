@@ -137,6 +137,11 @@ const options = {
             validate_overrides,
         ],
     },
+    key: {
+        desc: 'Secret key for authentication',
+        default: null,
+        validators: [],
+    },
 };
 
 Object.freeze(options);

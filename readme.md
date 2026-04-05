@@ -10,6 +10,7 @@ A high-performance, general-purpose code execution engine, customized for person
 - Node.js (for the CLI)
 - Cgroup v2 enabled (for sandboxing)
 - **Supported Architectures**: x86_64 (Intel/AMD) and ARM64 (Apple Silicon/M-series).
+- **Security (Optional)**: A secret key via the `PISTON_KEY` environment variable.
 
 ### Installation
 
@@ -88,7 +89,16 @@ Returns a list of installed languages and versions.
 - `packages/`: Docker build specifications for each language.
 - `data/`: Persistent storage for installed packages.
 
-## 🛡 Security
+## 🛡 Security & Authentication
+
+By default, the Piston API is open to anyone with network access to the port. For personal use, you can secure it with a secret key.
+
+1.  **Set the Key**: Add `PISTON_KEY=your_secret_here` to your environment variables for the API service (or in your shell).
+2.  **CLI Usage**: The CLI will automatically pick up the `PISTON_KEY` from your environment.
+3.  **Manual API Calls**: Include the key in the `Authorization` header:
+    ```bash
+    curl -H "Authorization: your_secret_here" ...
+    ```
 
 Piston uses [Isolate](https://www.ucw.cz/moe/isolate.1.html) inside Docker for robust sandboxing. It employs Linux namespaces, chroot, and cgroups to ensure:
 - No outgoing network interaction by default.

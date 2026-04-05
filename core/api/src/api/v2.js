@@ -8,6 +8,17 @@ const { Job } = require('../job');
 const package = require('../package');
 const globals = require('../globals');
 const logger = require('logplease').create('api/v2');
+const config = require('../config');
+
+router.use((req, res, next) => {
+    if (config.key && req.headers['authorization'] !== config.key) {
+        return res.status(401).send({
+            message: 'Unauthorized',
+        });
+    }
+
+    next();
+});
 
 function get_job(body) {
     let {

@@ -20,7 +20,28 @@ require('yargs')(process.argv.slice(2))
         desc: 'Piston API URL',
         string: true,
     })
-    .middleware(axios_instance)
+    .option('piston-key', {
+        alias: ['k'],
+        default: process.env.PISTON_KEY,
+        desc: 'Piston API Key (Authorization header)',
+        string: true,
+    })
+    .middleware(argv => {
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        if (argv['piston-key']) {
+            headers['Authorization'] = argv['piston-key'];
+        }
+
+        argv.axios = axios.create({
+            baseURL: argv['piston-url'],
+            headers,
+        });
+
+        return argv;
+    })
     .scriptName('piston')
     .commandDir('commands')
     .demandCommand()

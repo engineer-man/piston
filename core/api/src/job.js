@@ -5,6 +5,8 @@ const path = require('path');
 const config = require('./config');
 const fs = require('fs/promises');
 const globals = require('./globals');
+const util = require('util');
+const exec = util.promisify(cp.exec);
 
 const job_states = {
     READY: Symbol('Ready to be primed'),
@@ -419,16 +421,13 @@ class Job {
         }
         await Promise.all(
             this.#dirty_boxes.map(async box => {
-                cp.exec(
-                    `isolate --cleanup --cg -b${box.id}`,
-                    (error, stdout, stderr) => {
-                        if (error) {
-                            this.logger.error(
-                                `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${stdout}\nstderr: ${stderr}`
-                            );
-                        }
-                    }
-                );
+                try {
+                    await exec(`isolate --cleanup --cg -b${box.id}`);
+                } catch (error) {
+                    this.logger.error(
+                        `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${error.stdout}\nstderr: ${error.stderr}`
+                    );
+                }
                 try {
                     await fs.rm(box.metadata_file_path);
                 } catch (e) {

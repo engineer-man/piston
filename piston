@@ -47,6 +47,7 @@ case $1 in
         echo " list-pkgs                               Lists all packages that can be built"
         echo " build-pkg <package> <version> [builder] Build a package [with desired builder image]"
         echo " rebuild                                 Build and restart the docker container"
+        echo " rebuild-all                             Force a clean, native rebuild of all installed packages"
         echo " lint                                    Lint the codebase using prettier"
 
         else
@@ -184,6 +185,27 @@ case $1 in
 
     rebuild)
         docker_compose build && docker_compose up -d
+        ;;
+
+    rebuild-all)
+        echo "🔄 Rebuilding all installed packages for native $(uname -m)..."
+        # Get installed packages from the CLI
+        installed=($(./piston list | awk '{print $2 "-" $3}'))
+        
+        if [ ${#installed[@]} -eq 0 ]; then
+            echo "No packages currently installed to rebuild."
+            exit 0
+        fi
+
+        for pkg in "${installed[@]}"; do
+            lang=$(echo "$pkg" | cut -d'-' -f1)
+            ver=$(echo "$pkg" | cut -d'-' -f2-)
+            echo "🔨 Force rebuilding $pkg..."
+            # Remove existing binary/lib to force fresh build
+            rm -rf "packages/$lang/$ver/bin" "packages/$lang/$ver/lib" "packages/$lang/$ver/build" "packages/$lang/$ver/obj"
+            ./piston build-pkg "$lang" "$ver"
+        done
+        echo "✅ All packages rebuilt natively!"
         ;;
 
     update)
