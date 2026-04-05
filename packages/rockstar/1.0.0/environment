@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Paths to the Java binary and Rocky jar
-export ROCKSTAR_PATH=$PWD
-export PATH=$PWD/bin:$PATH

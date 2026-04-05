@@ -1,4 +1,0 @@
-#!/bin/bash
-
-export PATH=$PWD/bin:$PATH
-export RETINA_PATH=$PWD

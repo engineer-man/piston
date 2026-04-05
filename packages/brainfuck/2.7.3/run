@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-# Put instructions to run the runtime
-fold -w1 | brainfuck $1

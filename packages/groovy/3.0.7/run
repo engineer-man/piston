@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Run the jar created during compile
-shift
-java -jar out.jar "$@"
