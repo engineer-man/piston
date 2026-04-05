@@ -7,6 +7,9 @@ cd "$PISTON_PATH"
 PISTON_ENV=$(cat .piston_env 2> /dev/null || echo dev)
 
 docker_compose(){
+    # Automaticaly pick up PISTON_KEY if it exists
+    [ -f ".piston_key" ] && export PISTON_KEY=$(cat .piston_key)
+
     if [ -f "docker-compose.$PISTON_ENV.yaml" ]; then
         docker-compose -f "docker-compose.$PISTON_ENV.yaml" "$@"
     else
@@ -23,13 +26,19 @@ case $1 in
         echo " select <environment>           Select the environment"
         echo " docker_compose <args...>       Interact directly with the docker-compose for the selected environment"
         echo " logs                           Show docker-compose logs"
+        echo " key <subcommand>               Manage Piston API secret keys (generate, show)"
         echo
+        echo " setup                          Interactive installation of language packages"
+        echo " list                           Lists all registered packages"
+        echo " install <packages...>          Installs language packages"
         echo " start                          Starts piston"
         echo " stop                           Stops piston"
         echo " restart                        Restarts piston"
+        echo " uninstall <packages...>        Uninstalls language packages"
         echo " bash                           Opens a bash shell for the piston_api container"
         echo
-        echo " update                         Fetches and applies latest updates"
+        echo " update                         Fetches and applies latest updates from origin"
+        echo " sync                           Synchronizes your fork with the upstream repository"
         echo
         echo " <args..>                       Passthrough to piston cli tool"
         echo
@@ -42,41 +51,232 @@ case $1 in
         echo " list-pkgs                               Lists all packages that can be built"
         echo " build-pkg <package> <version> [builder] Build a package [with desired builder image]"
         echo " rebuild                                 Build and restart the docker container"
+        echo " rebuild-all                             Force a clean, native rebuild of all installed packages"
         echo " lint                                    Lint the codebase using prettier"
 
         else
 
-        echo " Switch to developement environment for more info"
+        echo " Switch to development environment for more info"
         echo " > piston select dev"
 
         fi
         ;;
 
-
     select) echo "$2" > .piston_env ;;
     docker_compose) shift; docker_compose "$@";;
     logs) docker_compose logs -f ;;
+
+    list)
+        shift
+        # Ensure CLI is ready
+        [ -d ./core/cli/node_modules ] || (cd core/cli && npm i > /dev/null && cd -)
+        cd "$EXECUTION_PATH"
+        node "${PISTON_PATH}/core/cli/index.js" ppman list "$@"
+        ;;
+
+    install)
+        shift
+        # Ensure CLI is ready
+        [ -d ./core/cli/node_modules ] || (cd core/cli && npm i > /dev/null && cd -)
+        cd "$EXECUTION_PATH"
+        node "${PISTON_PATH}/core/cli/index.js" ppman install "$@"
+        ;;
+
+    setup)
+        echo "=== Piston Setup Wizard ==="
+        echo "Scanning for available language packages..."
+        packages=($(find packages -maxdepth 2 | awk -F/ '$2 && $3{ print $2 "-" $3 }' | sort -V))
+        
+        if [ ${#packages[@]} -eq 0 ]; then
+            echo "No packages found in packages/ directory."
+            exit 1
+        fi
+
+        echo "Available packages:"
+        for i in "${!packages[@]}"; do
+            printf "[%2d] %s\n" $((i+1)) "${packages[$i]}"
+        done
+
+        echo
+        echo "Enter selections (e.g., 1,3,5 or shorthand like 'gcc,node,python')."
+        echo "Multiple selection: "
+        read selection
+
+        indices=()
+        items=$(echo "$selection" | tr ',' ' ')
+
+        if [[ "$selection" == "all" ]]; then
+            indices=("${!packages[@]}")
+        else
+            for item in $items; do
+                if [[ "$item" =~ ^[0-9]+$ ]]; then
+                    indices+=($((item - 1)))
+                else
+                    matches=()
+                    for i in "${!packages[@]}"; do
+                        pkg="${packages[$i]}"
+                        if [[ "$pkg" == "$item" ]] || [[ "$pkg" == "$item-"* ]]; then
+                            matches+=("$i")
+                        fi
+                    done
+                    
+                    if [ ${#matches[@]} -gt 0 ]; then
+                        last_idx=$(( ${#matches[@]} - 1 ))
+                        indices+=("${matches[$last_idx]}")
+                    else
+                        echo "⚠️  No package found for: $item"
+                    fi
+                fi
+            done
+        fi
+
+        unique_indices=($(echo "${indices[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
+        if [ ${#unique_indices[@]} -eq 0 ]; then
+            echo "No valid packages selected."
+            exit 1
+        fi
+
+        echo "========================================"
+        echo "Starting installation for ${#unique_indices[@]} package(s)..."
+        echo "========================================"
+
+        for i in "${unique_indices[@]}"; do
+            pkg="${packages[$i]}"
+            if [[ -z "$pkg" ]]; then continue; fi
+
+            lang=$(echo "$pkg" | cut -d'-' -f1)
+            ver=$(echo "$pkg" | cut -d'-' -f2-)
+
+            echo "📦 Installing $pkg..."
+            echo "   [1/3] Ensuring Piston is running..."
+            ./piston start > /dev/null 2>&1
+            
+            echo "   [2/3] Building package (this may take a while)..."
+            if ! ./piston build-pkg "$lang" "$ver"; then
+                echo "❌ Failed to build $pkg. Check the logs above for details."
+                exit 1
+            fi
+            
+            echo "   [3/3] Registering with Piston API..."
+            if ! ./piston ppman install "$lang"; then
+                echo "❌ Failed to register $pkg with the API."
+                exit 1
+            fi
+            
+            echo "✅ $pkg installed successfully!"
+            echo
+        done
+
+        echo "========================================"
+        echo "Setup complete! All selected packages are ready."
+        echo "Run './piston list' to verify."
+        ;;
 
     restart) docker_compose restart ;;
     start)
         docker_compose up -d
         ;;
     stop) docker_compose down ;;
+    uninstall)
+        shift
+        # Ensure CLI is ready
+        [ -d ./core/cli/node_modules ] || (cd core/cli && npm i > /dev/null && cd -)
+        cd "$EXECUTION_PATH"
+        node "${PISTON_PATH}/core/cli/index.js" ppman uninstall "$@"
+        ;;
     bash) docker_compose exec api /bin/bash ;;
 
     rebuild)
         docker_compose build && docker_compose up -d
         ;;
 
+    rebuild-all)
+        echo "🔄 Rebuilding all installed packages for native $(uname -m)..."
+        # Get installed packages from the CLI
+        installed=($(./piston list | awk '{print $2 "-" $3}'))
+        
+        if [ ${#installed[@]} -eq 0 ]; then
+            echo "No packages currently installed to rebuild."
+            exit 0
+        fi
+
+        for pkg in "${installed[@]}"; do
+            lang=$(echo "$pkg" | cut -d'-' -f1)
+            ver=$(echo "$pkg" | cut -d'-' -f2-)
+            echo "🔨 Force rebuilding $pkg..."
+            # Remove existing binary/lib to force fresh build
+            rm -rf "packages/$lang/$ver/bin" "packages/$lang/$ver/lib" "packages/$lang/$ver/build" "packages/$lang/$ver/obj"
+            ./piston build-pkg "$lang" "$ver"
+        done
+        echo "✅ All packages rebuilt natively!"
+        ;;
+
     update)
         git pull
-        cd cli && npm i > /dev/null && cd -
+        cd core/cli && npm i > /dev/null && cd -
         docker_compose pull
         docker_compose up -d
         ;;
+    
+    key)
+        case $2 in
+            generate)
+                KEY=$(openssl rand -hex 32)
+                echo "$KEY" > .piston_key
+                echo "✅ Secret key generated and saved to .piston_key"
+                echo "🔑 Your Key: $KEY"
+                echo "   (This key will be automatically used by ./piston and the CLI)"
+                ;;
+            show)
+                if [ ! -f ".piston_key" ]; then
+                    echo "❌ No secret key found. Run './piston key generate' first."
+                    exit 1
+                fi
+                KEY=$(cat .piston_key)
+                echo "🔑 Piston Secret Key: $KEY"
+                echo "--------------------------------------------------------"
+                echo "💡 Usage Examples:"
+                echo "   CLI:  PISTON_KEY=$KEY ./piston run python test.py"
+                echo "   curl: curl -H 'Authorization: $KEY' http://127.0.0.1:2000/api/v2/execute ..."
+                ;;
+            *)
+                echo "Usage: ./piston key [generate|show]"
+                ;;
+        esac
+        ;;
+
+    sync)
+        if ! git remote | grep -q "^upstream$"; then
+            echo "❌ 'upstream' remote not found. Please add it first:"
+            echo "   git remote add upstream https://github.com/engineer-man/piston.git"
+            exit 1
+        fi
+        
+        echo "🔄 Fetching latest changes from upstream..."
+        git fetch upstream
+        
+        echo "⚠️  This will rebase your local customizations on top of the original Piston repository."
+        echo "   Local build fixes (Debian Bullseye, ARM64/x86 logic) will be preserved."
+        echo -n "   Continue? [y/N] "
+        read -r response
+        if [[ ! "$response" =~ ^[yY]$ ]]; then
+            echo "Aborted."
+            exit 0
+        fi
+        
+        echo "🚀 Syncing with upstream/master..."
+        if ! git rebase upstream/master; then
+            echo "❌ Merge conflicts detected! Please resolve them manually and run:"
+            echo "   git rebase --continue"
+            exit 1
+        fi
+        
+        echo "✅ Sync complete! Your personal fork is now up-to-date with upstream."
+        ;;
 
     clean-pkgs) git clean -fqXd packages ;;
-    clean-repo) git clean -fqXd repo ;;
+    clean-repo) git clean -fqXd core/repo ;;
 
     list-pkgs) find packages -maxdepth 2 | awk -F/ '$2 && $3{ print $2 "-" $3 }' | column ;;
 
@@ -85,7 +285,7 @@ case $1 in
         BUILDER="${4:-piston-repo-builder}"
         echo "Building $PKGSLUG"
         echo "Ensuring latest builder image"
-        docker build repo -t "$BUILDER"
+        docker build core/repo -t "$BUILDER"
         docker run --rm -v "$PWD:/piston" "$BUILDER" --no-server "$PKGSLUG"
         ;;
 
@@ -94,8 +294,8 @@ case $1 in
         npx prettier --ignore-unknown --write .
         ;;
     *)
-        [ -d ./cli/node_modules ] || npm i > /dev/null
+        [ -d ./core/cli/node_modules ] || (cd core/cli && npm i > /dev/null && cd -)
         cd "$EXECUTION_PATH"
-        node "${PISTON_PATH}/cli/index.js" "$@"
+        node "${PISTON_PATH}/core/cli/index.js" "$@"
         ;;
 esac

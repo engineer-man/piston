@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Put instructions to build your package in here
-[[ -d "bin" ]] && exit 0
 PREFIX=$(realpath $(dirname $0))
 
 mkdir -p build obj

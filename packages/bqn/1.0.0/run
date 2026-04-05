@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-$BQN_PATH/BQN "$@"

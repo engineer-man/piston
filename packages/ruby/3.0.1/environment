@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Path to ruby binary
-export PATH=$PWD/bin:$PATH

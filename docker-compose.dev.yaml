@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
     api:
-        build: api
+        build: core/api
         container_name: piston_api
         privileged: true
         restart: always
@@ -12,9 +12,10 @@ services:
             - ./data/piston/packages:/piston/packages
         environment:
             - PISTON_REPO_URL=http://repo:8000/index
+            - PISTON_KEY=${PISTON_KEY}
 
     repo: # Local testing of packages
-        build: repo
+        build: core/repo
         container_name: piston_repo
         command: ['--no-build'] # Don't build anything
         volumes:

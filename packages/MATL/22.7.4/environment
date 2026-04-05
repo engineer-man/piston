@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Path to MATL binary
-export PATH=$PWD/bin:$PATH
-export MATL_PATH=$PWD
