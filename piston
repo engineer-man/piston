@@ -7,6 +7,9 @@ cd "$PISTON_PATH"
 PISTON_ENV=$(cat .piston_env 2> /dev/null || echo dev)
 
 docker_compose(){
+    # Automaticaly pick up PISTON_KEY if it exists
+    [ -f ".piston_key" ] && export PISTON_KEY=$(cat .piston_key)
+
     if [ -f "docker-compose.$PISTON_ENV.yaml" ]; then
         docker-compose -f "docker-compose.$PISTON_ENV.yaml" "$@"
     else
@@ -23,6 +26,7 @@ case $1 in
         echo " select <environment>           Select the environment"
         echo " docker_compose <args...>       Interact directly with the docker-compose for the selected environment"
         echo " logs                           Show docker-compose logs"
+        echo " key <subcommand>               Manage Piston API secret keys (generate, show)"
         echo
         echo " setup                          Interactive installation of language packages"
         echo " list                           Lists all registered packages"
@@ -215,6 +219,33 @@ case $1 in
         docker_compose up -d
         ;;
     
+    key)
+        case $2 in
+            generate)
+                KEY=$(openssl rand -hex 32)
+                echo "$KEY" > .piston_key
+                echo "✅ Secret key generated and saved to .piston_key"
+                echo "🔑 Your Key: $KEY"
+                echo "   (This key will be automatically used by ./piston and the CLI)"
+                ;;
+            show)
+                if [ ! -f ".piston_key" ]; then
+                    echo "❌ No secret key found. Run './piston key generate' first."
+                    exit 1
+                fi
+                KEY=$(cat .piston_key)
+                echo "🔑 Piston Secret Key: $KEY"
+                echo "--------------------------------------------------------"
+                echo "💡 Usage Examples:"
+                echo "   CLI:  PISTON_KEY=$KEY ./piston run python test.py"
+                echo "   curl: curl -H 'Authorization: $KEY' http://127.0.0.1:2000/api/v2/execute ..."
+                ;;
+            *)
+                echo "Usage: ./piston key [generate|show]"
+                ;;
+        esac
+        ;;
+
     sync)
         if ! git remote | grep -q "^upstream$"; then
             echo "❌ 'upstream' remote not found. Please add it first:"

@@ -13,6 +13,22 @@ const axios_instance = argv => {
     return argv;
 };
 
+const fs = require('fs');
+const path = require('path');
+
+// Try to find .piston_key in the project root if PISTON_KEY is not set
+let default_key = process.env.PISTON_KEY || null;
+if (!default_key) {
+    try {
+        const key_path = path.join(__dirname, '../../.piston_key');
+        if (fs.existsSync(key_path)) {
+            default_key = fs.readFileSync(key_path, 'utf8').trim();
+        }
+    } catch (e) {
+        // Ignore errors
+    }
+}
+
 require('yargs')(process.argv.slice(2))
     .option('piston-url', {
         alias: ['u'],
@@ -22,7 +38,7 @@ require('yargs')(process.argv.slice(2))
     })
     .option('piston-key', {
         alias: ['k'],
-        default: process.env.PISTON_KEY,
+        default: default_key,
         desc: 'Piston API Key (Authorization header)',
         string: true,
     })

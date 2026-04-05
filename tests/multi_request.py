@@ -14,8 +14,15 @@ import aiohttp
 import asyncio
 import os
 
-# Piston API Key from environment
+# Piston API Key from environment or file
 PISTON_KEY = os.environ.get('PISTON_KEY')
+if not PISTON_KEY:
+    try:
+        # Look for .piston_key in the project root
+        with open('.piston_key', 'r') as f:
+            PISTON_KEY = f.read().strip()
+    except FileNotFoundError:
+        pass
 
 def get_request_data(message):
     return {
