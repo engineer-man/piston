@@ -1,0 +1,10 @@
+# Enforce LF for all shell scripts and the piston management script
+piston text eol=lf
+*.sh text eol=lf
+**/run text eol=lf
+**/compile text eol=lf
+**/environment text eol=lf
+**/init text eol=lf
+
+# Default behavior for other text files
+* text=auto
