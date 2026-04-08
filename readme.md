@@ -23,37 +23,67 @@ A high-performance, general-purpose code execution engine, customized for person
 2. **Initialize Piston:**
    The recommended way to start is using the **Setup Wizard**:
    ```sh
-   ./piston setup
+   cp .env.example .env
    ```
-   *This will start the API, scan your local packages, and guide you through building and installing your first runtimes.*
+   Open `.env` and set your preferred port and the list of languages you want to install:
+   ```env
+   # Example: Install Python, Node.js, and GCC
+   PISTON_INSTALL_PACKAGES=python,node,gcc
+   ```
+
+3. **Build the container image:** (Required for new setup)
+   ```sh
+   docker-compose build api
+   ```
+
+4. **Start Piston:**
+   ```sh
+   docker-compose up -d
+   ```
+   *The container will automatically download and install the languages you've listed in `.env` on startup. Check the progress with `docker-compose logs -f`.*
+
+---
 
 ## 🛠 Usage
 
-### Management Script (`./piston`)
+### Standard Docker Commands
 
-The `./piston` script is your main entry point for managing the service.
+A thin helper script is provided for common tasks:
 
 | Command | Description |
 | :--- | :--- |
-| **`./piston setup`** | **(Recommended)** Interactive wizard for building and installing languages. |
-| **`./piston key generate`**| **Security**: Automatically generate a secret key for API authentication. |
-| **`./piston key show`** | **Security**: Show your current key and usage examples. |
-| **`./piston sync`** | Synchronize your fork with the original upstream repository. |
-| **`./piston rebuild-all`**| **ARM64**: Force a clean, native rebuild of all installed packages. |
-| **`./piston list`** | List all currently installed and active language packages. |
-| **`./piston install <pkg>`**| Install a pre-built package from the repository. |
-| **`./piston uninstall <pkg>`** | Remove a language package (cleanly hides it from the list). |
-| **`./piston start / stop`** | Start or stop the Piston API Docker containers. |
-| **`./piston logs`** | View live logs from the API and repository services. |
+| **`docker-compose up -d`** | Start Piston in the background |
+| **`docker-compose stop`** | Stop Piston |
+| **`docker-compose restart`** | Restart Piston containers |
+| **`docker-compose logs -f`** | Follow Piston logs |
+| **`docker-compose exec api /bin/bash`** | Open a bash shell in the API container |
+| **`docker-compose build api`** | Rebuild the Piston image after changes |
+
+### Managing Runtimes
+
+To interact with the Piston API from your host machine:
+
+- **List Runtimes:**
+  ```sh
+  curl -s http://localhost:2000/api/v2/runtimes | jq -r '.[].language + " (" + .version + ")"'
+  ```
+- **List All Available Packages:**
+  ```sh
+  docker-compose exec -T api node core/cli/index.js ppman list --all
+  ```
+- **Install/Uninstall a Package:**
+  ```sh
+  docker-compose exec -T api node core/cli/index.js ppman install python
+  ```
 
 ### CLI (`core/cli/index.js`)
 
-You can also interact with the CLI directly via the helper script for more advanced usage:
+You can also interact with the CLI directly via `docker-compose` for more advanced usage:
 
 ```sh
 # Run a script immediately
 echo 'print("Hello from Piston!")' > test.py
-./piston run python test.py
+docker-compose exec -T api node core/cli/index.js run python test.py
 ```
 
 ## 🌐 API Reference
@@ -89,10 +119,24 @@ Returns a list of installed languages and versions.
 ## 🗂 Project Structure
 
 - `core/api`: The backend execution engine.
-- `core/cli`: Command-line tool for package management and testing.
-- `core/repo`: Local package repository for building and caching runtimes.
-- `packages/`: Docker build specifications for each language.
-- `data/`: Persistent storage for installed packages.
+- `core/cli`: Internal CLI tool for automated package management.
+- `core/repo`: Local package repository (optional configuration).
+- `scripts/`: Management and internal setup scripts.
+- `data/`: Persistent storage for installed packages and logs.
+- `packages/`: Docker build recipes for custom language runtimes.
+- `tests/`: Security and exploit resistance tests.
+
+## 🛠 Troubleshooting
+
+### `jq: parse error: Invalid numeric literal`
+If you see this error when listing runtimes, it means the API is not returning the expected JSON. This usually happens if:
+1. **Stale Image**: You started the container without building it first. Run `docker-compose build api` then `docker-compose up -d`.
+2. **Setup in Progress**: The container is still installing languages. Check the logs with `docker-compose logs -f`.
+
+### Runtimes not showing up
+If runtimes are missing:
+- Ensure `PISTON_INSTALL_PACKAGES` is correctly set in your `.env`.
+- Check logs for any installation errors.
 
 ## 🛡 Security & Authentication
 
