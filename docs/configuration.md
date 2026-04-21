@@ -30,6 +30,17 @@ Port and IP address to bind the Piston API to.
 
     This changes the bind address inside the container, and thus serves no purpose when running in a container
 
+## Body Parser JSON Limit
+
+```yaml
+key: PISTON_BODY_PARSER_JSON
+default: 100kb
+```
+
+Maximum size of the JSON request body.
+
+Increase this value if you need to submit large code or arguments (e.g. `10mb`).
+
 ## Data Directory
 
 ```yaml
