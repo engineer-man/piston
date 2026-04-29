@@ -137,6 +137,16 @@ const options = {
             validate_overrides,
         ],
     },
+    disable_isolate: {
+        desc:
+            'Run code without the isolate sandbox. Required on managed platforms ' +
+            'that do not allow privileged containers (Railway, Cloud Run, etc.). ' +
+            'WARNING: this disables sandboxing -- only enable on trusted, ' +
+            'low-volume deployments.',
+        default: false,
+        parser: x => x === 'true',
+        validators: [x => typeof x === 'boolean' || `${x} is not a boolean`],
+    },
 };
 
 Object.freeze(options);

@@ -2,6 +2,7 @@ const logplease = require('logplease');
 const { v4: uuidv4 } = require('uuid');
 const cp = require('child_process');
 const path = require('path');
+const os = require('os');
 const config = require('./config');
 const fs = require('fs/promises');
 const globals = require('./globals');
@@ -14,6 +15,12 @@ const job_states = {
 
 const MAX_BOX_ID = 999;
 const ISOLATE_PATH = '/usr/local/bin/isolate';
+// When `disable_isolate` is set we skip the isolate sandbox entirely and run
+// jobs in plain temporary directories. Required for managed platforms
+// (Railway etc.) that disallow privileged containers. This trades the
+// isolate sandbox for plain bash execution -- only enable on trusted,
+// low-volume deployments.
+const ISOLATE_DISABLED = !!config.disable_isolate;
 let box_id = 0;
 
 let remaining_job_spaces = config.max_concurrent_jobs;
@@ -61,11 +68,30 @@ class Job {
     }
 
     async #create_isolate_box() {
-        const box_id = get_next_box_id();
-        const metadata_file_path = `/tmp/${box_id}-metadata.txt`;
+        const next_box_id = get_next_box_id();
+        const metadata_file_path = `/tmp/${next_box_id}-metadata.txt`;
+
+        if (ISOLATE_DISABLED) {
+            // Use a regular temp directory in lieu of an isolate sandbox.
+            const root = await fs.mkdtemp(
+                path.join(os.tmpdir(), `piston-job-${this.uuid}-`)
+            );
+            const box_dir = path.join(root, 'box');
+            await fs.mkdir(box_dir, { recursive: true, mode: 0o755 });
+            const box = {
+                id: next_box_id,
+                metadata_file_path,
+                dir: box_dir,
+                root,
+                isolated: false,
+            };
+            this.#dirty_boxes.push(box);
+            return box;
+        }
+
         return new Promise((res, rej) => {
             cp.exec(
-                `isolate --init --cg -b${box_id}`,
+                `isolate --init --cg -b${next_box_id}`,
                 (error, stdout, stderr) => {
                     if (error) {
                         rej(
@@ -76,9 +102,10 @@ class Job {
                         rej('Received empty stdout from isolate --init');
                     }
                     const box = {
-                        id: box_id,
+                        id: next_box_id,
                         metadata_file_path,
                         dir: `${stdout.trim()}/box`,
+                        isolated: true,
                     };
                     this.#dirty_boxes.push(box);
                     res(box);
@@ -145,43 +172,83 @@ class Job {
         let status = null;
         let cpu_time_stat = null;
         let wall_time_stat = null;
+        const start_time = Date.now();
 
-        const proc = cp.spawn(
-            ISOLATE_PATH,
-            [
-                '--run',
-                `-b${box.id}`,
-                `--meta=${box.metadata_file_path}`,
-                '--cg',
-                '-s',
-                '-c',
-                '/box/submission',
-                '-E',
-                'HOME=/tmp',
-                ...this.runtime.env_vars.flat_map(v => ['-E', v]),
-                '-E',
-                `PISTON_LANGUAGE=${this.runtime.language}`,
-                `--dir=${this.runtime.pkgdir}`,
-                `--dir=/etc:noexec`,
-                `--processes=${this.runtime.max_process_count}`,
-                `--open-files=${this.runtime.max_open_files}`,
-                `--fsize=${Math.floor(this.runtime.max_file_size / 1000)}`,
-                `--wall-time=${timeout / 1000}`,
-                `--time=${cpu_time / 1000}`,
-                `--extra-time=0`,
-                ...(memory_limit >= 0
-                    ? [`--cg-mem=${Math.floor(memory_limit / 1000)}`]
-                    : []),
-                ...(config.disable_networking ? [] : ['--share-net']),
-                '--',
-                '/bin/bash',
-                path.join(this.runtime.pkgdir, file),
-                ...args,
-            ],
-            {
-                stdio: 'pipe',
+        let proc;
+        if (box.isolated) {
+            proc = cp.spawn(
+                ISOLATE_PATH,
+                [
+                    '--run',
+                    `-b${box.id}`,
+                    `--meta=${box.metadata_file_path}`,
+                    '--cg',
+                    '-s',
+                    '-c',
+                    '/box/submission',
+                    '-E',
+                    'HOME=/tmp',
+                    ...this.runtime.env_vars.flat_map(v => ['-E', v]),
+                    '-E',
+                    `PISTON_LANGUAGE=${this.runtime.language}`,
+                    `--dir=${this.runtime.pkgdir}`,
+                    `--dir=/etc:noexec`,
+                    `--processes=${this.runtime.max_process_count}`,
+                    `--open-files=${this.runtime.max_open_files}`,
+                    `--fsize=${Math.floor(this.runtime.max_file_size / 1000)}`,
+                    `--wall-time=${timeout / 1000}`,
+                    `--time=${cpu_time / 1000}`,
+                    `--extra-time=0`,
+                    ...(memory_limit >= 0
+                        ? [`--cg-mem=${Math.floor(memory_limit / 1000)}`]
+                        : []),
+                    ...(config.disable_networking ? [] : ['--share-net']),
+                    '--',
+                    '/bin/bash',
+                    path.join(this.runtime.pkgdir, file),
+                    ...args,
+                ],
+                {
+                    stdio: 'pipe',
+                }
+            );
+        } else {
+            // No-isolate fallback: run the package's bash script directly
+            // inside the submission directory under a wall-clock `timeout`.
+            // Resource isolation is intentionally limited -- this mode is
+            // only meant for managed platforms that cannot grant the
+            // privileges isolate requires.
+            const submission_dir = path.join(box.dir, 'submission');
+            const env_pairs = {};
+            for (const v of this.runtime.env_vars) {
+                if (!v) continue;
+                const idx = v.indexOf('=');
+                if (idx === -1) continue;
+                env_pairs[v.slice(0, idx)] = v.slice(idx + 1);
             }
-        );
+            const child_env = {
+                ...process.env,
+                ...env_pairs,
+                HOME: '/tmp',
+                PISTON_LANGUAGE: this.runtime.language,
+            };
+            const wall_seconds = Math.max(1, Math.ceil(timeout / 1000));
+            proc = cp.spawn(
+                'timeout',
+                [
+                    '--signal=KILL',
+                    `${wall_seconds}s`,
+                    '/bin/bash',
+                    path.join(this.runtime.pkgdir, file),
+                    ...args,
+                ],
+                {
+                    stdio: 'pipe',
+                    cwd: submission_dir,
+                    env: child_env,
+                }
+            );
+        }
 
         if (event_bus === null) {
             proc.stdin.write(this.stdin);
@@ -248,9 +315,10 @@ class Job {
         });
 
         const data = await new Promise((res, rej) => {
-            proc.on('exit', (_, signal) => {
+            proc.on('exit', (exit_code, exit_signal) => {
                 res({
-                    signal,
+                    code: exit_code,
+                    signal: exit_signal,
                 });
             });
 
@@ -260,6 +328,46 @@ class Job {
                 });
             });
         });
+
+        // In no-isolate mode there is no metadata file; synthesise one
+        // so the rest of the parsing logic can be reused unchanged.
+        if (!box.isolated) {
+            const wall_ms = Date.now() - start_time;
+            const exit_code = data.code !== undefined ? data.code : null;
+            const exit_signal = data.signal || null;
+            // `timeout` exits with 124 on timeout (or 137 when --signal=KILL).
+            const timed_out =
+                exit_code === 124 ||
+                exit_code === 137 ||
+                exit_signal === 'SIGKILL';
+            const meta_lines = [];
+            if (exit_code !== null) {
+                meta_lines.push(`exitcode:${exit_code}`);
+            }
+            if (exit_signal) {
+                // map signal name back to number where possible
+                const sig_num = Object.entries(globals.SIGNALS).find(
+                    ([, name]) => name === exit_signal
+                );
+                if (sig_num) meta_lines.push(`exitsig:${sig_num[0]}`);
+            }
+            meta_lines.push(`time:${(wall_ms / 1000).toFixed(3)}`);
+            meta_lines.push(`time-wall:${(wall_ms / 1000).toFixed(3)}`);
+            if (timed_out) {
+                meta_lines.push('status:TO');
+                meta_lines.push('message:Time limit exceeded');
+            }
+            try {
+                await fs.write_file(
+                    box.metadata_file_path,
+                    meta_lines.join('\n') + '\n'
+                );
+            } catch (e) {
+                this.logger.debug(
+                    `Failed writing fallback metadata: ${e.message}`
+                );
+            }
+        }
 
         try {
             const metadata_str = (
@@ -419,21 +527,34 @@ class Job {
         }
         await Promise.all(
             this.#dirty_boxes.map(async box => {
-                cp.exec(
-                    `isolate --cleanup --cg -b${box.id}`,
-                    (error, stdout, stderr) => {
-                        if (error) {
-                            this.logger.error(
-                                `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${stdout}\nstderr: ${stderr}`
-                            );
+                if (box.isolated) {
+                    cp.exec(
+                        `isolate --cleanup --cg -b${box.id}`,
+                        (error, stdout, stderr) => {
+                            if (error) {
+                                this.logger.error(
+                                    `Failed to run isolate --cleanup: ${error.message} on box #${box.id}\nstdout: ${stdout}\nstderr: ${stderr}`
+                                );
+                            }
                         }
+                    );
+                } else if (box.root) {
+                    try {
+                        await fs.rm(box.root, {
+                            recursive: true,
+                            force: true,
+                        });
+                    } catch (e) {
+                        this.logger.error(
+                            `Failed to remove fallback box dir ${box.root}: ${e.message}`
+                        );
                     }
-                );
+                }
                 try {
                     await fs.rm(box.metadata_file_path);
                 } catch (e) {
-                    this.logger.error(
-                        `Failed to remove the metadata directory of box #${box.id}. Error: ${e.message}`
+                    this.logger.debug(
+                        `Failed to remove the metadata file of box #${box.id}. Error: ${e.message}`
                     );
                 }
             })

@@ -161,6 +161,70 @@ docker run \
 ./piston help
 ```
 
+## Deploy to Railway (and other managed platforms)
+
+Railway, Render, Cloud Run, and similar managed platforms do **not** allow
+privileged containers, so the default Piston image (which relies on the
+`isolate` sandbox + cgroup v2) cannot run code there. This fork ships a
+Railway-friendly entrypoint and a `disable_isolate` mode so the API can boot
+and execute code on those platforms — at the cost of disabling the isolate
+sandbox.
+
+> [!WARNING]
+>
+> When `PISTON_DISABLE_ISOLATE=true`, code is executed directly with `bash`
+> under a wall-clock `timeout`. There is **no isolate sandbox**, so untrusted
+> code can read everything the `piston` user can read, make network requests,
+> and consume resources up to whatever Linux limits are in place. Only enable
+> this on trusted, low-volume deployments (personal tooling, demos,
+> classrooms). For production / public usage, run the regular image on a
+> platform that supports `--privileged`.
+
+### One-click style deploy
+
+1. Fork or push this repo to your own GitHub account.
+2. Create a new Railway project from the repo. Railway auto-detects the root
+   `Dockerfile` and `railway.json`.
+3. (Recommended) Attach a persistent volume mounted at `/piston` so installed
+   language packages survive restarts.
+4. Deploy. The image defaults to `PISTON_DISABLE_ISOLATE=true` so it works
+   without privileged mode out of the box.
+
+### Environment variables
+
+| Variable                 | Default                | Purpose                                                                              |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------------------------ |
+| `PORT`                   | `2000`                 | Forwarded into `PISTON_BIND_ADDRESS` automatically.                                  |
+| `PISTON_BIND_ADDRESS`    | `0.0.0.0:$PORT`        | Address/port the API listens on.                                                     |
+| `PISTON_DISABLE_ISOLATE` | `true` (in this image) | Skip the isolate sandbox. Set to `false` if you run with `--privileged` + cgroup v2. |
+| `PISTON_DATA_DIRECTORY`  | `/piston`              | Where packages and jobs live. Point at a Railway volume to persist installs.         |
+| `PISTON_REPO_URL`        | upstream piston index  | Override to use a private package repo.                                              |
+
+### Install a language and run code
+
+```sh
+# Replace <your-app> with the Railway public URL.
+BASE=https://<your-app>.up.railway.app
+
+# Install python 3.10
+curl -X POST -H 'Content-Type: application/json' \
+  -d '{"language":"python","version":"3.10.0"}' \
+  "$BASE/api/v2/packages"
+
+# Execute code
+curl -X POST -H 'Content-Type: application/json' \
+  -d '{"language":"python","version":"3.10.0","files":[{"content":"print(\"hi\")"}]}' \
+  "$BASE/api/v2/execute"
+```
+
+### Deploying elsewhere
+
+The same image works on any platform that can build a Dockerfile and forward
+a `$PORT` (Render, Fly.io machines without `--privileged`, Cloud Run, etc.).
+On platforms that _do_ allow privileged containers + cgroup v2 (e.g. Fly.io
+machines with `[mounts]` + `[privileged] = true`, your own Docker host), set
+`PISTON_DISABLE_ISOLATE=false` to regain the full isolate sandbox.
+
 <br>
 
 # Usage
