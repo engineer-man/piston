@@ -1,0 +1,92 @@
+name: Publish Piston Python 3.13 image
+
+on:
+    push:
+        branches:
+            - master
+            - main
+            - v3
+        paths:
+            - api/**
+            - packages/Makefile
+            - packages/python/3.13.0/**
+            - .github/workflows/piston-python313-image.yaml
+    workflow_dispatch:
+        inputs:
+            image_tag:
+                description: Extra tag to publish, for example python-3.13-prod
+                required: false
+                type: string
+
+env:
+    IMAGE_NAME: piston
+    PYTHON_IMAGE_TAG: python-3.13
+
+jobs:
+    build_and_push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+        steps:
+            - name: Check out repo
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Compute image tags
+              id: meta
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  DEFAULT_REGISTRY="${{ secrets.PISTON_IMAGE_REGISTRY }}"
+                  DEFAULT_IMAGE="${{ secrets.PISTON_IMAGE_NAME }}"
+
+                  REGISTRY="${DEFAULT_REGISTRY:-ghcr.io}"
+                  IMAGE="${DEFAULT_IMAGE:-${GITHUB_REPOSITORY}}"
+                  REGISTRY="$(echo "${REGISTRY}" | tr '[:upper:]' '[:lower:]')"
+                  IMAGE="$(echo "${IMAGE}" | tr '[:upper:]' '[:lower:]')"
+                  SHA_TAG="${REGISTRY}/${IMAGE}:${PYTHON_IMAGE_TAG}-${GITHUB_SHA::12}"
+                  STABLE_TAG="${REGISTRY}/${IMAGE}:${PYTHON_IMAGE_TAG}"
+
+                  {
+                    echo "registry=${REGISTRY}"
+                    echo "image=${IMAGE}"
+                    echo "tags<<EOF"
+                    echo "${STABLE_TAG}"
+                    echo "${SHA_TAG}"
+                    if [ -n "${{ inputs.image_tag }}" ]; then
+                      echo "${REGISTRY}/${IMAGE}:${{ inputs.image_tag }}"
+                    fi
+                    echo "EOF"
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Login to GHCR
+              if: steps.meta.outputs.registry == 'ghcr.io'
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Login to private registry
+              if: steps.meta.outputs.registry != 'ghcr.io'
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ steps.meta.outputs.registry }}
+                  username: ${{ secrets.PISTON_IMAGE_REGISTRY_USERNAME }}
+                  password: ${{ secrets.PISTON_IMAGE_REGISTRY_PASSWORD }}
+
+            - name: Build and push image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: api/Dockerfile.python-3.13
+                  platforms: linux/amd64
+                  pull: true
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
