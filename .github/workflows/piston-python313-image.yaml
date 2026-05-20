@@ -45,7 +45,7 @@ jobs:
                   DEFAULT_IMAGE="${{ secrets.PISTON_IMAGE_NAME }}"
 
                   REGISTRY="${DEFAULT_REGISTRY:-ghcr.io}"
-                  IMAGE="${DEFAULT_IMAGE:-${GITHUB_REPOSITORY}}"
+                  IMAGE="${DEFAULT_IMAGE:-${GITHUB_REPOSITORY}/api}"
                   REGISTRY="$(echo "${REGISTRY}" | tr '[:upper:]' '[:lower:]')"
                   IMAGE="$(echo "${IMAGE}" | tr '[:upper:]' '[:lower:]')"
                   SHA_TAG="${REGISTRY}/${IMAGE}:${PYTHON_IMAGE_TAG}-${GITHUB_SHA::12}"
