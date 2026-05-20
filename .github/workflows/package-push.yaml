@@ -14,26 +14,29 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
-            - name: Login to GitHub registry
-              uses: docker/login-action@v2
-              with:
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-                  registry: docker.pkg.github.com
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
             - name: Get list of changed files
               uses: lots0logs/gh-action-get-changed-files@2.1.4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
+            - name: Build repo-builder image
+              uses: docker/build-push-action@v6
+              with:
+                  context: repo
+                  load: true
+                  tags: repo-builder:latest
+                  cache-from: type=gha,scope=repo-builder
+                  cache-to: type=gha,mode=max,ignore-error=true,scope=repo-builder
+
             - name: Build Packages
               run: |
                   PACKAGES=$(jq '.[]' -r ${HOME}/files*.json | awk -F/ '$1~/packages/ && $2 && $3{ print $2 "-" $3 }' | sort -u)
                   echo "Packages: $PACKAGES"
-                  docker pull "docker.pkg.github.com/${GITHUB_REPOSITORY}/repo-builder:latest"
-                  docker build -t repo-builder repo
                   docker run -v "${{ github.workspace }}:/piston" repo-builder --no-server $PACKAGES
                   ls -la packages
 
