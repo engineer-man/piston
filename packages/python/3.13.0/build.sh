@@ -21,5 +21,5 @@ rm -rf build
 if [ -f "$PREFIX/requirements.txt" ]; then
     bin/pip3 install --no-cache-dir -r "$PREFIX/requirements.txt"
 else
-    bin/pip3 install --no-cache-dir numpy scipy pandas pycryptodome whoosh bcrypt passlib sympy xxhash base58 cryptography PyNaCl
+    bin/pip3 install --no-cache-dir numpy scipy pandas pycryptodome whoosh bcrypt passlib sympy xxhash base58 cryptography PyNaCl openpyxl requests
 fi
