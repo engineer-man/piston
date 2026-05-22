@@ -1,6 +1,6 @@
 {
     "language": "node",
-    "version": "15.10.0",
+    "version": "24.16.0",
     "provides": [
         {
             "language": "javascript",

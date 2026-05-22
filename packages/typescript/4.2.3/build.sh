@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ../../node/15.10.0/build.sh
+source ../../node/24.16.0/build.sh
 
 source ./environment
 

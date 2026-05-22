@@ -257,7 +257,7 @@ This endpoint requests execution of some arbitrary code.
 ```json
 {
     "language": "js",
-    "version": "15.10.0",
+    "version": "24.16.0",
     "files": [
         {
             "name": "my_cool_code.js",
@@ -294,11 +294,11 @@ Content-Type: application/json
 
 {
     "language": "js",
-    "version": "15.10.0",
+    "version": "24.16.0",
     "run": {
-        "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
+        "stdout": "[\n  '/piston/packages/node/24.16.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "stderr": "",
-        "output": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
+        "output": "[\n  '/piston/packages/node/24.16.0/bin/node',\n  '/piston/jobs/9501b09d-0105-496b-b61a-e5148cf66384/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
         "code": 0,
         "signal": null,
         "message": null,
