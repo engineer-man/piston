@@ -59,7 +59,8 @@ RUN cd /piston/packages/python/3.13.0 && \
     env -i bash -c 'cd /piston/packages/python/3.13.0; source environment; env' \
         | grep -v -E '^(PWD|OLDPWD|_|SHLVL)=' > .env && \
     date +%s > .ppman-installed && \
-    rm /tmp/python-3.13.0.pkg.tar.gz
+    rm /tmp/python-3.13.0.pkg.tar.gz && \
+    /piston/packages/python/3.13.0/bin/pip3 install openpyxl pandas numpy requests
 
 WORKDIR /piston_api
 COPY api/package.json api/package-lock.json ./
