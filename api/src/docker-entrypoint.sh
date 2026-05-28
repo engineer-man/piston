@@ -1,8 +1,6 @@
 #!/bin/bash
 
 CGROUP_FS="/sys/fs/cgroup"
-CGROUP_PATH="$(awk -F: '$1 == "0" { print $3 }' /proc/self/cgroup)"
-CGROUP_DIR="${CGROUP_FS}${CGROUP_PATH}"
 if [ ! -e "$CGROUP_FS" ]; then
   echo "Cannot find $CGROUP_FS. Please make sure your system is using cgroup v2"
   exit 1
@@ -13,13 +11,13 @@ if [ -e "$CGROUP_FS/unified" ]; then
   exit 1
 fi
 
-if [ ! -e "$CGROUP_DIR/cgroup.subtree_control" ]; then
+if [ ! -e "$CGROUP_FS/cgroup.subtree_control" ]; then
   echo "Cgroup v2 not found. Please make sure cgroup v2 is enabled on your system"
   exit 1
 fi
 
-cd "$CGROUP_DIR" && \
-mkdir -p isolate/ && \
+cd /sys/fs/cgroup && \
+mkdir isolate/ && \
 echo 1 > isolate/cgroup.procs && \
 echo '+cpuset +cpu +io +memory +pids' > cgroup.subtree_control && \
 cd isolate && \
