@@ -17,7 +17,7 @@ if [ ! -e "$CGROUP_FS/cgroup.subtree_control" ]; then
 fi
 
 cd /sys/fs/cgroup && \
-mkdir isolate/ && \
+mkdir -p isolate/ && \
 echo 1 > isolate/cgroup.procs && \
 echo '+cpuset +cpu +io +memory +pids' > cgroup.subtree_control && \
 cd isolate && \
