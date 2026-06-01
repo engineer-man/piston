@@ -46,6 +46,17 @@ Absolute path to piston related data, including packages and job contexts.
     Some packages require absolute paths on disk at build time.
     Due to this, some packages may break when changing this parameter.
 
+## Request Body Limit
+
+```yaml
+key: PISTON_REQUEST_BODY_LIMIT
+default: 100mb
+```
+
+Maximum size for incoming HTTP request bodies.
+
+The default allows execution requests containing files up to roughly 50MB, including JSON/base64 overhead.
+
 ## Runner GID/UID range
 
 ```yaml

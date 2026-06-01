@@ -64,8 +64,13 @@ expressWs(app);
     logger.debug('Constructing Express App');
     logger.debug('Registering middleware');
 
-    app.use(body_parser.urlencoded({ extended: true }));
-    app.use(body_parser.json());
+    app.use(
+        body_parser.urlencoded({
+            extended: true,
+            limit: config.request_body_limit,
+        })
+    );
+    app.use(body_parser.json({ limit: config.request_body_limit }));
 
     app.use((err, req, res, next) => {
         return res.status(400).send({
