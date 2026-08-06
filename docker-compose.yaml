@@ -9,6 +9,7 @@ services:
         ports:
             - 2000:2000
         volumes:
+            - /sys/fs/cgroup:/sys/fs/cgroup:rw
             - ./data/piston/packages:/piston/packages
         tmpfs:
             - /tmp:exec

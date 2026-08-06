@@ -21,6 +21,20 @@ let job_queue = [];
 
 const get_next_box_id = () => ++box_id % MAX_BOX_ID;
 
+function acquire_job_slot(logger) {
+    if (remaining_job_spaces < 1) {
+        if (logger) logger.info('Awaiting job slot');
+        return new Promise(resolve => job_queue.push(resolve));
+    }
+    remaining_job_spaces--;
+    return Promise.resolve();
+}
+
+function release_job_slot() {
+    remaining_job_spaces++;
+    if (job_queue.length > 0) job_queue.shift()();
+}
+
 class Job {
     #dirty_boxes;
     constructor({
@@ -88,14 +102,8 @@ class Job {
     }
 
     async prime() {
-        if (remaining_job_spaces < 1) {
-            this.logger.info(`Awaiting job slot`);
-            await new Promise(resolve => {
-                job_queue.push(resolve);
-            });
-        }
+        await acquire_job_slot(this.logger);
         this.logger.info(`Priming job`);
-        remaining_job_spaces--;
         this.logger.debug('Running isolate --init');
         const box = await this.#create_isolate_box();
 
@@ -413,10 +421,7 @@ class Job {
     async cleanup() {
         this.logger.info(`Cleaning up job`);
 
-        remaining_job_spaces++;
-        if (job_queue.length > 0) {
-            job_queue.shift()();
-        }
+        release_job_slot();
         await Promise.all(
             this.#dirty_boxes.map(async box => {
                 cp.exec(
@@ -443,4 +448,7 @@ class Job {
 
 module.exports = {
     Job,
+    acquire_job_slot,
+    release_job_slot,
+    get_next_box_id,
 };

@@ -32,8 +32,8 @@ exports.handler = async ({ axios, packages }) => {
             const install = await axios.post(`/api/v2/packages`, request);
 
             console.log(msg_format.color(install.data));
-        } catch ({ response }) {
-            console.error(response.data.message);
+        } catch (e) {
+			console.log(e)
         }
     }
 };

@@ -137,6 +137,31 @@ const options = {
             validate_overrides,
         ],
     },
+    s3_bucket: {
+        desc: 'S3 bucket name for session output uploads (empty string disables S3)',
+        default: '',
+        validators: [],
+    },
+    s3_endpoint: {
+        desc: 'S3 endpoint URL (optional, for S3-compatible services like MinIO)',
+        default: '',
+        validators: [],
+    },
+    s3_region: {
+        desc: 'AWS region for S3',
+        default: 'us-east-1',
+        validators: [],
+    },
+    s3_access_key_id: {
+        desc: 'S3 access key ID',
+        default: '',
+        validators: [],
+    },
+    s3_secret_access_key: {
+        desc: 'S3 secret access key',
+        default: '',
+        validators: [],
+    },
 };
 
 Object.freeze(options);

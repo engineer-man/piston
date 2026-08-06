@@ -2,12 +2,39 @@ const express = require('express');
 const router = express.Router();
 
 const events = require('events');
+const fetch = require('node-fetch');
 
 const runtime = require('../runtime');
 const { Job } = require('../job');
+const { Session } = require('../session');
+const s3 = require('../s3');
 const package = require('../package');
 const globals = require('../globals');
 const logger = require('logplease').create('api/v2');
+
+async function resolve_file_urls(files) {
+    for (const [i, file] of files.entries()) {
+        if (file.url !== undefined) {
+            let parsed;
+            try {
+                parsed = new URL(file.url);
+            } catch (e) {
+                throw { message: `files[${i}].url is not a valid URL` };
+            }
+            if (!['http:', 'https:'].includes(parsed.protocol)) {
+                throw { message: `files[${i}].url must use http or https` };
+            }
+            const resp = await fetch(file.url);
+            if (!resp.ok) {
+                throw {
+                    message: `Failed to fetch files[${i}].url: HTTP ${resp.status}`,
+                };
+            }
+            file.content = (await resp.buffer()).toString('base64');
+            file.encoding = 'base64';
+        }
+    }
+}
 
 function get_job(body) {
     let {
@@ -41,9 +68,9 @@ function get_job(body) {
             });
         }
         for (const [i, file] of files.entries()) {
-            if (typeof file.content !== 'string') {
+            if (file.url === undefined && typeof file.content !== 'string') {
                 return reject({
-                    message: `files[${i}].content is required as a string`,
+                    message: `files[${i}].content is required as a string (or provide files[${i}].url)`,
                 });
             }
         }
@@ -60,7 +87,10 @@ function get_job(body) {
 
         if (
             rt.language !== 'file' &&
-            !files.some(file => !file.encoding || file.encoding === 'utf8')
+            !files.some(
+                file =>
+                    !file.encoding || file.encoding === 'utf8' || file.url
+            )
         ) {
             return reject({
                 message: 'files must include at least one utf8 encoded file',
@@ -134,109 +164,254 @@ router.use((req, res, next) => {
 });
 
 router.ws('/connect', async (ws, req) => {
-    let job = null;
-    let event_bus = new events.EventEmitter();
+    let session = null;
+    let s3_output_file = null;
+    let is_executing = false;
+    let current_event_bus = null;
+    let current_execution_promise = null;
 
-    event_bus.on('stdout', data =>
-        ws.send(
-            JSON.stringify({
-                type: 'data',
-                stream: 'stdout',
-                data: data.toString(),
-            })
-        )
-    );
-    event_bus.on('stderr', data =>
-        ws.send(
-            JSON.stringify({
-                type: 'data',
-                stream: 'stderr',
-                data: data.toString(),
-            })
-        )
-    );
-    event_bus.on('stage', stage =>
-        ws.send(JSON.stringify({ type: 'stage', stage }))
-    );
-    event_bus.on('exit', (stage, status) =>
-        ws.send(JSON.stringify({ type: 'exit', stage, ...status }))
-    );
+    const send = obj => {
+        try {
+            ws.send(JSON.stringify(obj));
+        } catch (_) {
+            // ignore send errors on already-closed socket
+        }
+    };
 
     ws.on('message', async data => {
         try {
             const msg = JSON.parse(data);
 
             switch (msg.type) {
-                case 'init':
-                    if (job === null) {
-                        job = await get_job(msg);
-
-                        try {
-                            const box = await job.prime();
-
-                            ws.send(
-                                JSON.stringify({
-                                    type: 'runtime',
-                                    language: job.runtime.language,
-                                    version: job.runtime.version.raw,
-                                })
-                            );
-
-                            await job.execute(box, event_bus);
-                        } catch (error) {
-                            logger.error(
-                                `Error cleaning up job: ${job.uuid}:\n${error}`
-                            );
-                            throw error;
-                        } finally {
-                            await job.cleanup();
-                        }
-                        ws.close(4999, 'Job Completed'); // Will not execute if an error is thrown above
-                    } else {
+                case 'init': {
+                    if (session !== null) {
                         ws.close(4000, 'Already Initialized');
+                        return;
                     }
-                    break;
-                case 'data':
-                    if (job !== null) {
-                        if (msg.stream === 'stdin') {
-                            event_bus.emit('stdin', msg.data);
-                        } else {
-                            ws.close(4004, 'Can only write to stdin');
+
+                    const {
+                        language,
+                        version,
+                        files,
+                        s3_output_file: s3_file,
+                        run_timeout,
+                        run_cpu_time,
+                        run_memory_limit,
+                    } = msg;
+
+                    if (!language || typeof language !== 'string') {
+                        send({ type: 'error', message: 'language is required as a string' });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+                    if (!version || typeof version !== 'string') {
+                        send({ type: 'error', message: 'version is required as a string' });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+                    if (!files || !Array.isArray(files) || files.length === 0) {
+                        send({ type: 'error', message: 'files is required as a non-empty array' });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+
+                    const rt = runtime.get_latest_runtime_matching_language_version(
+                        language,
+                        version
+                    );
+                    if (rt === undefined) {
+                        send({ type: 'error', message: `${language}-${version} runtime is unknown` });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+
+                    try {
+                        await resolve_file_urls(files);
+                    } catch (err) {
+                        send({ type: 'error', message: err.message });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+
+                    for (const [i, file] of files.entries()) {
+                        if (file.url === undefined && typeof file.content !== 'string') {
+                            send({ type: 'error', message: `files[${i}].content is required as a string` });
+                            ws.close(4002, 'Notified Error');
+                            return;
                         }
-                    } else {
-                        ws.close(4003, 'Not yet initialized');
-                    }
-                    break;
-                case 'signal':
-                    if (job !== null) {
-                        if (
-                            Object.values(globals.SIGNALS).includes(msg.signal)
-                        ) {
-                            event_bus.emit('signal', msg.signal);
-                        } else {
-                            ws.close(4005, 'Invalid signal');
+                        if (!file.name || typeof file.name !== 'string') {
+                            file.name = `file${i}.code`;
                         }
-                    } else {
+                        if (!file.encoding || !['base64', 'hex', 'utf8'].includes(file.encoding)) {
+                            file.encoding = 'utf8';
+                        }
+                    }
+
+                    s3_output_file = s3_file || null;
+
+                    session = new Session({
+                        runtime: rt,
+                        files,
+                        timeouts: { run: run_timeout ?? rt.timeouts.run },
+                        cpu_times: { run: run_cpu_time ?? rt.cpu_times.run },
+                        memory_limits: { run: run_memory_limit ?? rt.memory_limits.run },
+                    });
+
+                    try {
+                        await session.prime();
+                    } catch (err) {
+                        session = null;
+                        send({ type: 'error', message: err.message || String(err) });
+                        ws.close(4002, 'Notified Error');
+                        return;
+                    }
+
+                    send({
+                        type: 'runtime',
+                        language: rt.language,
+                        version: rt.version.raw,
+                    });
+                    break;
+                }
+
+                case 'execute': {
+                    if (session === null) {
                         ws.close(4003, 'Not yet initialized');
+                        return;
+                    }
+                    if (is_executing) {
+                        send({ type: 'error', message: 'Execution already in progress' });
+                        return;
+                    }
+
+                    const {
+                        code,
+                        args = [],
+                        stdin = '',
+                        run_timeout,
+                        run_cpu_time,
+                        run_memory_limit,
+                    } = msg;
+
+                    if (typeof code !== 'string') {
+                        send({ type: 'error', message: 'execute.code must be a string' });
+                        return;
+                    }
+
+                    const exec_event_bus = new events.EventEmitter();
+                    exec_event_bus.on('stdout', data =>
+                        send({ type: 'data', stream: 'stdout', data: data.toString() })
+                    );
+                    exec_event_bus.on('stderr', data =>
+                        send({ type: 'data', stream: 'stderr', data: data.toString() })
+                    );
+
+                    is_executing = true;
+                    current_event_bus = exec_event_bus;
+
+                    const exec_promise = session.run_execute(
+                        code,
+                        args,
+                        stdin,
+                        run_timeout ?? session.timeouts.run,
+                        run_cpu_time ?? session.cpu_times.run,
+                        run_memory_limit ?? session.memory_limits.run,
+                        exec_event_bus
+                    );
+                    current_execution_promise = exec_promise;
+
+                    send({ type: 'stage', stage: 'run' });
+
+                    try {
+                        const result = await exec_promise;
+                        send({
+                            type: 'exit',
+                            stage: 'run',
+                            code: result.code,
+                            signal: result.signal,
+                        });
+                    } catch (err) {
+                        send({ type: 'error', message: err.message || String(err) });
+                    } finally {
+                        is_executing = false;
+                        current_event_bus = null;
+                        current_execution_promise = null;
                     }
                     break;
+                }
+
+                case 'data': {
+                    if (session === null) {
+                        ws.close(4003, 'Not yet initialized');
+                        return;
+                    }
+                    if (msg.stream !== 'stdin') {
+                        ws.close(4004, 'Can only write to stdin');
+                        return;
+                    }
+                    if (is_executing && current_event_bus) {
+                        current_event_bus.emit('stdin', msg.data);
+                    }
+                    break;
+                }
+
+                case 'signal': {
+                    if (session === null) {
+                        ws.close(4003, 'Not yet initialized');
+                        return;
+                    }
+                    if (!Object.values(globals.SIGNALS).includes(msg.signal)) {
+                        ws.close(4005, 'Invalid signal');
+                        return;
+                    }
+
+                    if (msg.signal === 'SIGTERM') {
+                        if (is_executing && current_event_bus && current_execution_promise) {
+                            current_event_bus.emit('kill', 'SIGKILL');
+                            try { await current_execution_promise; } catch (_) {}
+                        }
+
+                        if (s3_output_file && s3.enabled) {
+                            try {
+                                const buf = await session.read_file(s3_output_file);
+                                const key = await s3.upload(buf);
+                                send({ type: 'upload', key });
+                            } catch (err) {
+                                send({ type: 'error', message: `S3 upload failed: ${err.message}` });
+                            }
+                        }
+
+                        await session.cleanup();
+                        ws.close(4999, 'Session Ended');
+                    } else if (is_executing && current_event_bus) {
+                        current_event_bus.emit('kill', msg.signal);
+                    }
+                    break;
+                }
             }
         } catch (error) {
-            ws.send(JSON.stringify({ type: 'error', message: error.message }));
+            send({ type: 'error', message: error.message });
             ws.close(4002, 'Notified Error');
-            // ws.close message is limited to 123 characters, so we notify over WS then close.
+        }
+    });
+
+    ws.on('close', async () => {
+        if (session !== null && !session.cleaned_up) {
+            try {
+                await session.cleanup();
+            } catch (_) {}
         }
     });
 
     setTimeout(() => {
-        //Terminate the socket after 1 second, if not initialized.
-        if (job === null) ws.close(4001, 'Initialization Timeout');
+        if (session === null) ws.close(4001, 'Initialization Timeout');
     }, 1000);
 });
 
 router.post('/execute', async (req, res) => {
     let job;
     try {
+        await resolve_file_urls(req.body.files || []);
         job = await get_job(req.body);
     } catch (error) {
         return res.status(400).json(error);
