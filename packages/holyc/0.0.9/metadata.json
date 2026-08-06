@@ -1,0 +1,9 @@
+{
+    "language": "HolyC",
+    "version": "0.0.9",
+    "aliases": ["holyc", "HolyC", "hcc"],
+    "limit_overrides": {
+        "compile_timeout": 15000,
+        "compile_cpu_time": 15000
+    }
+}
