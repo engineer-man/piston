@@ -40,7 +40,7 @@ Content-Type: application/json
   },
   {
     "language": "javascript",
-    "version": "15.10.0",
+    "version": "24.16.0",
     "aliases": ["node-javascript", "node-js", "javascript", "js"],
     "runtime": "node"
   }
@@ -93,7 +93,7 @@ Content-Type: application/json
 
 {
   "language": "js",
-  "version": "15.10.0",
+  "version": "24.16.0",
   "files": [
     {
       "name": "my_cool_code.js",
@@ -115,14 +115,14 @@ Content-Type: application/json
 
 {
   "run": {
-    "stdout": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/e87afa0d-6c2a-40b8-a824-ffb9c5c6cb64/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
+    "stdout": "[\n  '/piston/packages/node/24.16.0/bin/node',\n  '/piston/jobs/e87afa0d-6c2a-40b8-a824-ffb9c5c6cb64/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n",
     "stderr": "",
     "code": 0,
     "signal": null,
-    "output": "[\n  '/piston/packages/node/15.10.0/bin/node',\n  '/piston/jobs/e87afa0d-6c2a-40b8-a824-ffb9c5c6cb64/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n"
+    "output": "[\n  '/piston/packages/node/24.16.0/bin/node',\n  '/piston/jobs/e87afa0d-6c2a-40b8-a824-ffb9c5c6cb64/my_cool_code.js',\n  '1',\n  '2',\n  '3'\n]\n"
   },
   "language": "javascript",
-  "version": "15.10.0"
+  "version": "24.16.0"
 }
 ```
 
@@ -151,7 +151,7 @@ Content-Type: application/json
 [
   {
     "language": "node",
-    "language_version": "15.10.0",
+    "language_version": "24.16.0",
     "installed": true
   },
   {

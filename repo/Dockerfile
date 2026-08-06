@@ -1,9 +1,11 @@
 FROM debian:buster-slim
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y unzip autoconf build-essential libssl-dev \
+RUN sed -i 's|http://deb.debian.org/debian-security|http://archive.debian.org/debian-security|g; s|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g; s|http://deb.debian.org/debian|http://archive.debian.org/debian|g; /buster-updates/d' /etc/apt/sources.list && \
+    apt-get -o Acquire::Check-Valid-Until=false update && \
+    apt-get install -y unzip autoconf build-essential libssl-dev \
         pkg-config zlib1g-dev libargon2-dev libsodium-dev libcurl4-openssl-dev \
         sqlite3 libsqlite3-dev libonig-dev libxml2 libxml2-dev bc curl git \
-        linux-headers-amd64 perl xz-utils python3 python3-pip gnupg jq zlib1g-dev \
+        perl xz-utils python3 python3-pip gnupg jq zlib1g-dev \
         cmake cmake-doc extra-cmake-modules build-essential gcc binutils bash coreutils \
         util-linux pciutils usbutils coreutils binutils findutils grep libncurses5-dev \
         libncursesw5-dev python3-pip libgmp-dev libmpfr-dev python2 libffi-dev gfortran\

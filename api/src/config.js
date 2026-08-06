@@ -24,6 +24,16 @@ const options = {
             x => fss.exists_sync(x) || `Directory ${x} does not exist`,
         ],
     },
+    request_body_limit: {
+        desc: 'Max size of incoming request bodies',
+        default: '100mb',
+        validators: [
+            x =>
+                typeof x === 'string' ||
+                typeof x === 'number' ||
+                `${x} is not a valid body size limit`,
+        ],
+    },
     runner_uid_min: {
         desc: 'Minimum uid to use for runner',
         default: 1001,
