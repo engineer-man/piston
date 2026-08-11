@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+VERSION=1.82.0
+
+# Put 'export' statements here for environment variables
+export "PATH=$PWD/rust-${VERSION}-x86_64-unknown-linux-gnu/rustc/bin/:$PATH"
+export RUST_INSTALL_LOC=$PWD/rust-${VERSION}-x86_64-unknown-linux-gnu
