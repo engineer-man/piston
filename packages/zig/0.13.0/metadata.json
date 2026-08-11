@@ -1,0 +1,9 @@
+{
+    "language": "zig",
+    "version": "0.13.0",
+    "aliases": [],
+    "limit_overrides": {
+        "compile_timeout": 15000,
+        "compile_cpu_time": 15000
+    }
+}
