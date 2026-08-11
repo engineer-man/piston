@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Python path
+export PATH=$PWD/bin:$PATH
