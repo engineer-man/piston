@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Put instructions to run the runtime
+#dart run "$@"
+
+# assure there is only one unit in the given file
+gnatchop "$1"
+
+numSourceFiles=$(ls -1q *.adb | wc -l)
+
+gnatmake "test.adb"
+
+
+
