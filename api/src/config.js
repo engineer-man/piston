@@ -24,6 +24,13 @@ const options = {
             x => fss.exists_sync(x) || `Directory ${x} does not exist`,
         ],
     },
+    body_parser_json: {
+        desc: 'Body size limit for JSON requests',
+        default: '100kb', //https://github.com/expressjs/body-parser#limit-2
+        validators: [
+            x => /^\d+(kb|mb|gb)$/i.test(x) || `${x} is not a valid size (e.g. 10mb, 100kb)`,
+        ],
+    },
     runner_uid_min: {
         desc: 'Minimum uid to use for runner',
         default: 1001,
