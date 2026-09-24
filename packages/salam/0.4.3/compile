@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+glibc/ld-linux-x86-64.so.2 --library-path glibc salam/salam llvm "$1" --stdlib-path=salam/std --emit-exec --log-level=error --output=out
+chmod +x out
