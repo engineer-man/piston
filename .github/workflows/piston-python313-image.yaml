@@ -41,14 +41,14 @@ jobs:
             id-token: write
         steps:
             - name: Check out repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
             - name: Configure AWS credentials
               if: vars.AWS_OIDC_ROLE != '' && vars.AWS_REGION != ''
-              uses: aws-actions/configure-aws-credentials@v6
+              uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
               with:
                   role-to-assume: ${{ vars.AWS_OIDC_ROLE }}
                   aws-region: ${{ vars.AWS_REGION }}
@@ -56,11 +56,11 @@ jobs:
             - name: Login to Amazon ECR
               if: vars.AWS_OIDC_ROLE != '' && vars.AWS_REGION != ''
               id: ecr
-              uses: aws-actions/amazon-ecr-login@v2
+              uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
 
             - name: Login to GHCR
               if: vars.AWS_OIDC_ROLE == '' && (env.CONFIGURED_REGISTRY == '' || env.CONFIGURED_REGISTRY == 'ghcr.io')
-              uses: docker/login-action@v3
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -68,7 +68,7 @@ jobs:
 
             - name: Login to private registry
               if: vars.AWS_OIDC_ROLE == '' && env.CONFIGURED_REGISTRY != '' && env.CONFIGURED_REGISTRY != 'ghcr.io'
-              uses: docker/login-action@v3
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
               with:
                   registry: ${{ vars.PISTON_IMAGE_REGISTRY }}
                   username: ${{ vars.PISTON_IMAGE_REGISTRY_USERNAME }}
@@ -107,7 +107,7 @@ jobs:
                   } >> "$GITHUB_OUTPUT"
 
             - name: Build and push image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
               with:
                   context: .
                   file: api/Dockerfile.python-3.13
@@ -151,17 +151,17 @@ jobs:
             id-token: write
         steps:
             - name: Check out repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
             - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v6
+              uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
               with:
                   role-to-assume: ${{ vars.AWS_OIDC_ROLE }}
                   aws-region: ${{ vars.AWS_REGION }}
 
             - name: Login to Amazon ECR
               id: ecr
-              uses: aws-actions/amazon-ecr-login@v2
+              uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
 
             - name: Compute immutable image tag
               id: meta
@@ -181,7 +181,7 @@ jobs:
                   sudo dpkg -i /tmp/session-manager-plugin.deb
 
             - name: Setup Packer
-              uses: hashicorp/setup-packer@v3
+              uses: hashicorp/setup-packer@ce93c3c08a6c2ff2275bf4b54ff0d9a75f6c9789 # v3.4.0
               with:
                   version: "1.16.0"
 

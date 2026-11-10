@@ -14,18 +14,18 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
             - name: Get list of changed files
-              uses: lots0logs/gh-action-get-changed-files@2.1.4
+              uses: lots0logs/gh-action-get-changed-files@af14147b3aba94b0ced11732399a2ab748097de9 # 2.1.4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Build repo-builder image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
               with:
                   context: repo
                   load: true
@@ -41,7 +41,7 @@ jobs:
                   ls -la packages
 
             - name: Upload Packages
-              uses: svenstaro/upload-release-action@v2
+              uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
               with:
                   repo_token: ${{ secrets.GITHUB_TOKEN }}
                   file: packages/*.pkg.tar.gz
@@ -71,7 +71,7 @@ jobs:
                     echo "Adding package $PKGNAME-$PKGVERSION"
                   done
             - name: Upload index
-              uses: svenstaro/upload-release-action@v2
+              uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
               with:
                   repo_token: ${{ secrets.GITHUB_TOKEN }}
                   file: index

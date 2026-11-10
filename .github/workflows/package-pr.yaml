@@ -15,9 +15,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
             - name: Get list of changed files
-              uses: lots0logs/gh-action-get-changed-files@2.1.4
+              uses: lots0logs/gh-action-get-changed-files@af14147b3aba94b0ced11732399a2ab748097de9 # 2.1.4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -36,18 +36,18 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
             - name: Get list of changed files
-              uses: lots0logs/gh-action-get-changed-files@2.1.4
+              uses: lots0logs/gh-action-get-changed-files@af14147b3aba94b0ced11732399a2ab748097de9 # 2.1.4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Build repo-builder image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
               with:
                   context: repo
                   load: true
@@ -63,7 +63,7 @@ jobs:
                   ls -la packages
 
             - name: Upload package as artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
               with:
                   name: packages
                   path: packages/*.pkg.tar.gz
@@ -73,9 +73,9 @@ jobs:
         runs-on: ubuntu-latest
         needs: build-pkg
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-            - uses: actions/download-artifact@v3
+            - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
               with:
                   name: packages
 
@@ -83,10 +83,10 @@ jobs:
               run: mv *.pkg.tar.gz packages/
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
             - name: Build repo-builder image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
               with:
                   context: repo
                   load: true
@@ -95,7 +95,7 @@ jobs:
                   cache-to: type=gha,mode=max,ignore-error=true,scope=repo-builder
 
             - name: Build piston-api image
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
               with:
                   context: api
                   load: true
