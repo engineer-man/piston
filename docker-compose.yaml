@@ -1,12 +1,11 @@
-# Image Python 3.13 publiée sur ECR par piston-python313-image.yaml, lancée
-# comme en prod (cf. packer/piston/files/piston.service.tftpl). Avant le
-# premier pull :
-#   export PISTON_ECR_REGISTRY=<account_id>.dkr.ecr.eu-west-3.amazonaws.com
-#   aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin "$PISTON_ECR_REGISTRY"
+# Image Python 3.13 de dev publiée sur ECR par piston-python313-image.yaml,
+# lancée comme en prod (cf. packer/piston/files/piston.service.tftpl). Avant
+# le premier pull :
+#   aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 894709375386.dkr.ecr.eu-west-3.amazonaws.com
 
 services:
     api:
-        image: ${PISTON_ECR_REGISTRY:?set PISTON_ECR_REGISTRY}/piston:${PISTON_IMAGE_TAG:-python-3.13-dev}
+        image: 894709375386.dkr.ecr.eu-west-3.amazonaws.com/piston:python-3.13-dev
         platform: linux/amd64
         container_name: piston_api
         restart: always
