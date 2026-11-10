@@ -13,7 +13,8 @@ services:
         cgroup: host
         ports:
             - 2000:2000
-        # Pas de volume sur /piston/packages : Python 3.13 est déjà installé
-        # dans l'image et serait masqué.
+        volumes:
+            - /sys/fs/cgroup:/sys/fs/cgroup:rw
+            - ./data/piston/packages:/piston/packages
         tmpfs:
             - /tmp:exec
