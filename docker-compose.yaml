@@ -1,15 +1,20 @@
-version: '3.2'
+# Image Python 3.13 publiée sur ECR par piston-python313-image.yaml, lancée
+# comme en prod (cf. packer/piston/files/piston.service.tftpl). Avant le
+# premier pull :
+#   export PISTON_ECR_REGISTRY=<account_id>.dkr.ecr.eu-west-3.amazonaws.com
+#   aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin "$PISTON_ECR_REGISTRY"
 
 services:
     api:
-        image: ghcr.io/engineer-man/piston
+        image: ${PISTON_ECR_REGISTRY:?set PISTON_ECR_REGISTRY}/piston:${PISTON_IMAGE_TAG:-python-3.13-dev}
+        platform: linux/amd64
         container_name: piston_api
         restart: always
         privileged: true
+        cgroup: host
         ports:
             - 2000:2000
-        volumes:
-            - /sys/fs/cgroup:/sys/fs/cgroup:rw
-            - ./data/piston/packages:/piston/packages
+        # Pas de volume sur /piston/packages : Python 3.13 est déjà installé
+        # dans l'image et serait masqué.
         tmpfs:
             - /tmp:exec
