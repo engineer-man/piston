@@ -1,0 +1,6 @@
+{
+    "language": "slowlang",
+    "version": "1.0.0",
+    "aliases": ["tortoiselang", "slow"],
+    "dependencies": {}
+}
