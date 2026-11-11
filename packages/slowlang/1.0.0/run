@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# SlowLang only reads .slow/.py files inside the current folder, so copy
+# the program in as code.slow.
+cp "$1" code.slow
+
+# The interpreter lazily refuses ~10% of valid runs by design (exit code
+# is still 0, so detect the refusal message); give it a few honest retries.
+for _ in 1 2 3 4; do
+    out=$(python3 "$SLOWLANG_PATH"/tortoise_lang.py code.slow 2>&1)
+    echo "$out"
+    echo "$out" | grep -q "refuses to run" || break
+done
