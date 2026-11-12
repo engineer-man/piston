@@ -467,6 +467,19 @@ The source file is either ran or compiled and ran (in the case of languages like
 
 <br>
 
+# Office skills
+
+The Python 3.13 image (`api/Dockerfile.python-3.13`) ships the helper scripts of
+Anthropic's official `docx`, `pptx` and `xlsx` skills
+([anthropics/skills](https://github.com/anthropics/skills) @ `2c5958e`,
+Apache-2.0) in `scripts/`, installed at `/usr/local/share/skills/scripts`
+(`$SKILLS_DIR/scripts`), along with their Python dependencies and `pandoc`, so
+LLM-generated code can edit Word, PowerPoint and Excel files. Scripts that need
+LibreOffice (`recalc.py`, `thumbnail.py`, `accept_changes.py`,
+`office/soffice.py`) are vendored but not runnable in the sandbox.
+
+<br>
+
 # Security
 
 Piston uses Isolate which makes use of Linux namespaces, chroot, multiple unprivileged users, and cgroup for sandboxing and resource limiting. Code execution submissions on Piston shall not be aware of each other, shall not affect each other and shall not affect the underlying host system. This is ensured through multiple steps including:

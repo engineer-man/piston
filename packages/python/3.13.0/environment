@@ -1,1 +1,2 @@
 export PATH=$PWD/bin:$PATH
+export SKILLS_DIR=/usr/local/share/skills

@@ -43,7 +43,7 @@ RUN apt-get update && \
     libncurses6 libncurses5 libedit-dev libseccomp-dev rename procps python3 \
     libreadline-dev libblas-dev liblapack-dev libpcre3-dev libarpack2-dev \
     libfftw3-dev libglpk-dev libqhull-dev libqrupdate-dev libsuitesparse-dev \
-    libsundials-dev libpcre2-dev libcap-dev libssl-dev ca-certificates && \
+    libsundials-dev libpcre2-dev libcap-dev libssl-dev ca-certificates pandoc zip unzip && \
     rm -rf /var/lib/apt/lists/*
 RUN useradd -M piston
 COPY --from=isolate /usr/local/bin/isolate /usr/local/bin
@@ -59,6 +59,11 @@ RUN cd /piston/packages/python/3.13.0 && \
         | grep -v -E '^(PWD|OLDPWD|_|SHLVL)=' > .env && \
     date +%s > .ppman-installed && \
     rm /tmp/python-3.13.0.pkg.tar.gz
+
+# Helper scripts of Anthropic's docx/pptx/xlsx skills (see readme.md). Under /usr so
+# isolate's default mounts expose them inside every sandbox.
+COPY scripts /usr/local/share/skills/scripts
+RUN chmod -R a+rX /usr/local/share/skills
 
 WORKDIR /piston_api
 COPY api/package.json api/package-lock.json ./

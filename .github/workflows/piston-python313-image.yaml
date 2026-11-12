@@ -10,6 +10,7 @@ on:
             - api/**
             - packages/Makefile
             - packages/python/3.13.0/**
+            - scripts/**
             - .github/workflows/piston-python313-image.yaml
     workflow_dispatch:
         inputs:

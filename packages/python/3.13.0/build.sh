@@ -18,6 +18,9 @@ cd ..
 
 rm -rf build
 
+# The office skills (skills/) invoke `python scripts/...`
+ln -sf python3 "$PREFIX/bin/python"
+
 if [ -f "$PREFIX/requirements.txt" ]; then
     bin/pip3 install --no-cache-dir -r "$PREFIX/requirements.txt"
 else
